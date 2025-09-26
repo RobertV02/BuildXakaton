@@ -1,0 +1,14 @@
+version: "3.9"
+
+services:
+  web:
+    build:
+      context: .
+    command: >
+      sh -c "python manage.py migrate --noinput && \
+             gunicorn mybuild.wsgi:application --bind 0.0.0.0:8000 --reload"
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+    restart: unless-stopped
