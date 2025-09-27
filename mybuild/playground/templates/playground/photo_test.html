@@ -243,13 +243,27 @@
             transition: all 0.3s ease;
         }
 
-        #video {
+        #video.mirrored { /* зеркалим только если класс добавлен для фронтальной камеры */
             transform: scaleX(-1);
         }
 
         #video:hover {
             border-color: var(--primary-red);
             box-shadow: var(--shadow-glow);
+        }
+
+        .separator {
+            font-weight: 500;
+            color: var(--text-gray);
+            padding: 0 0.8rem;
+            user-select: none;
+        }
+
+        .upload-hint {
+            font-size: 0.75rem;
+            color: var(--text-gray);
+            margin-top: 0.3rem;
+            text-align: center;
         }
 
         .results-section {
@@ -605,13 +619,19 @@
                     <button id="start-camera" class="btn">
                         📹 Запустить камеру
                     </button>
-                    <button id="switch-camera" class="btn btn-secondary btn-small hidden">
+                    <button id="switch-camera" class="btn btn-secondary btn-small hidden" title="Переключить камеру (фронтальная / тыльная)">
                         🔄 Переключить
                     </button>
-                    <button id="click-photo" class="btn btn-secondary hidden">
+                    <button id="click-photo" class="btn btn-secondary hidden" title="Сделать снимок">
                         📸 Сделать фото
                     </button>
+                    <div class="separator">или</div>
+                    <button id="upload-button" class="btn btn-secondary btn-small" title="Загрузить готовое фото">
+                        📁 Загрузить фото
+                    </button>
+                    <input type="file" id="file-input" accept="image/*" class="hidden">
                 </div>
+                <div class="upload-hint">Поддержка JPEG/PNG до ~10 МБ</div>
 
                 <video id="video" autoplay playsinline class="hidden"></video>
                 <canvas id="canvas" class="hidden"></canvas>
@@ -668,21 +688,23 @@
     </div>
 
     <script>
-        const startCameraButton = document.getElementById('start-camera');
-        const switchCameraButton = document.getElementById('switch-camera');
-        const clickPhotoButton = document.getElementById('click-photo');
-        const video = document.getElementById('video');
-        const canvas = document.getElementById('canvas');
-        const resultsDiv = document.getElementById('results');
-        const previewImg = document.getElementById('preview');
-        const deviceTimeSpan = document.getElementById('device-time');
-        const serverTimeSpan = document.getElementById('server-time');
-        const geolocationSpan = document.getElementById('geolocation');
-        const mapLinks = document.getElementById('map-links');
-        const googleMapsLink = document.getElementById('google-maps-link');
-        const yandexMapsLink = document.getElementById('yandex-maps-link');
-        const exifTableBody = document.querySelector('#exif-table tbody');
-        const statusElement = document.getElementById('status');
+    const startCameraButton = document.getElementById('start-camera');
+    const switchCameraButton = document.getElementById('switch-camera');
+    const clickPhotoButton = document.getElementById('click-photo');
+    const uploadButton = document.getElementById('upload-button');
+    const fileInput = document.getElementById('file-input');
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
+    const resultsDiv = document.getElementById('results');
+    const previewImg = document.getElementById('preview');
+    const deviceTimeSpan = document.getElementById('device-time');
+    const serverTimeSpan = document.getElementById('server-time');
+    const geolocationSpan = document.getElementById('geolocation');
+    const mapLinks = document.getElementById('map-links');
+    const googleMapsLink = document.getElementById('google-maps-link');
+    const yandexMapsLink = document.getElementById('yandex-maps-link');
+    const exifTableBody = document.querySelector('#exif-table tbody');
+    const statusElement = document.getElementById('status');
 
         let stream;
         let currentFacingMode = 'user'; // 'user' для фронтальной, 'environment' для задней
@@ -717,8 +739,14 @@
                 };
 
                 stream = await navigator.mediaDevices.getUserMedia(constraints);
-                
+
                 video.srcObject = stream;
+                // зеркалим только фронтальную
+                if (facingMode === 'user') {
+                    video.classList.add('mirrored');
+                } else {
+                    video.classList.remove('mirrored');
+                }
                 video.classList.remove('hidden');
                 clickPhotoButton.classList.remove('hidden');
                 switchCameraButton.classList.remove('hidden');
@@ -755,6 +783,7 @@
             
             // Для фронтальной камеры отражаем изображение при сохранении
             if (currentFacingMode === 'user') {
+                // зеркалим изображение обратно при сохранении
                 context.scale(-1, 1);
                 context.drawImage(video, -canvas.width, 0, canvas.width, canvas.height);
             } else {
@@ -880,6 +909,47 @@
             setTimeout(() => {
                 resultsDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }, 300);
+        }
+
+        // --- Загрузка файла из системы ---
+        uploadButton.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        fileInput.addEventListener('change', () => {
+            const file = fileInput.files && fileInput.files[0];
+            if (!file) return;
+            if (file.size > 12 * 1024 * 1024) { // небольшой лимит безопасности
+                alert('Файл слишком большой (>12MB).');
+                fileInput.value = '';
+                return;
+            }
+            updateStatus('Обработка выбранного файла...', 'processing');
+            deviceTimeSpan.textContent = new Date().toLocaleString('ru-RU');
+            getGeolocation();
+            uploadFileDirect(file);
+        });
+
+        async function uploadFileDirect(file) {
+            const formData = new FormData();
+            formData.append('image', file, file.name || 'upload.jpg');
+            try {
+                const response = await fetch("{% url 'playground:photo_upload_api' %}", {
+                    method: 'POST',
+                    headers: { 'X-CSRFToken': getCookie('csrftoken') },
+                    body: formData
+                });
+                if (!response.ok) throw new Error('HTTP ' + response.status);
+                const data = await response.json();
+                displayResults(data);
+                updateStatus('Готово! Результаты получены');
+            } catch (e) {
+                console.error(e);
+                updateStatus('Ошибка загрузки файла', 'error');
+                alert('Не удалось загрузить файл.');
+            } finally {
+                fileInput.value = '';
+            }
         }
 
         function getCookie(name) {
