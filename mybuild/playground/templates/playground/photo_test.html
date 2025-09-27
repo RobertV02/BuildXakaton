@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Photo Test</title>
+    <style>
+        body { font-family: sans-serif; }
+        #container { max-width: 800px; margin: 0 auto; padding: 20px; }
+        #video, #preview { width: 100%; max-width: 500px; border: 1px solid #ccc; }
+        #results { margin-top: 20px; }
+        table { border-collapse: collapse; width: 100%; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <h1>Photo Test</h1>
+        <button id="start-camera">Start Camera</button>
+        <button id="click-photo" style="display:none;">Take Photo</button>
+        <video id="video" autoplay style="display:none;"></video>
+        <canvas id="canvas" style="display:none;"></canvas>
+        
+        <div id="results" style="display:none;">
+            <h2>Results</h2>
+            <h3>Preview:</h3>
+            <img id="preview" src="" alt="Photo preview">
+            
+            <h3>Information:</h3>
+            <p><strong>Device Time:</strong> <span id="device-time"></span></p>
+            <p><strong>Server Time:</strong> <span id="server-time"></span></p>
+            <p><strong>Geolocation:</strong> <span id="geolocation"></span></p>
+            
+            <h3>EXIF Metadata:</h3>
+            <table id="exif-table">
+                <thead>
+                    <tr>
+                        <th>Tag</th>
+                        <th>Value</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        const startCameraButton = document.getElementById('start-camera');
+        const clickPhotoButton = document.getElementById('click-photo');
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const resultsDiv = document.getElementById('results');
+        const previewImg = document.getElementById('preview');
+        const deviceTimeSpan = document.getElementById('device-time');
+        const serverTimeSpan = document.getElementById('server-time');
+        const geolocationSpan = document.getElementById('geolocation');
+        const exifTableBody = document.querySelector('#exif-table tbody');
+
+        let stream;
+
+        startCameraButton.addEventListener('click', async () => {
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                video.srcObject = stream;
+                video.style.display = 'block';
+                clickPhotoButton.style.display = 'inline-block';
+                startCameraButton.style.display = 'none';
+            } catch (err) {
+                console.error("Error accessing camera: ", err);
+                alert("Could not access the camera. Please check permissions.");
+            }
+        });
+
+        clickPhotoButton.addEventListener('click', () => {
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            const context = canvas.getContext('2d');
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+            
+            // Stop the camera stream
+            stream.getTracks().forEach(track => track.stop());
+            video.style.display = 'none';
+            clickPhotoButton.style.display = 'none';
+
+            deviceTimeSpan.textContent = new Date().toISOString();
+            
+            getGeolocation();
+
+            canvas.toBlob(blob => {
+                uploadImage(blob);
+            }, 'image/jpeg');
+        });
+
+        function getGeolocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(position => {
+                    const lat = position.coords.latitude;
+                    const lon = position.coords.longitude;
+                    geolocationSpan.textContent = `Latitude: ${lat}, Longitude: ${lon} (from browser)`;
+                }, () => {
+                    geolocationSpan.textContent = "Unable to retrieve location from browser.";
+                });
+            } else {
+                geolocationSpan.textContent = "Geolocation is not supported by this browser.";
+            }
+        }
+
+        async function uploadImage(imageBlob) {
+            const formData = new FormData();
+            formData.append('image', imageBlob, 'photo.jpg');
+
+            try {
+                const response = await fetch("{% url 'playground:photo_upload_api' %}", {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': getCookie('csrftoken') // Django CSRF protection
+                    },
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                displayResults(data);
+
+            } catch (error) {
+                console.error('Upload error:', error);
+                alert('Failed to upload image.');
+            }
+        }
+
+        function displayResults(data) {
+            resultsDiv.style.display = 'block';
+            previewImg.src = data.image_url;
+            serverTimeSpan.textContent = data.server_time;
+
+            // Clear previous EXIF data
+            exifTableBody.innerHTML = '';
+
+            // Check for GPSInfo in EXIF and display it
+            if (data.exif_data && data.exif_data.GPSInfo) {
+                geolocationSpan.textContent = `From EXIF: ${JSON.stringify(data.exif_data.GPSInfo)}`;
+            }
+
+            for (const [key, value] of Object.entries(data.exif_data)) {
+                const row = exifTableBody.insertRow();
+                const cell1 = row.insertCell(0);
+                const cell2 = row.insertCell(1);
+                cell1.textContent = key;
+                cell2.textContent = typeof value === 'object' ? JSON.stringify(value) : value;
+            }
+        }
+
+        // Function to get CSRF token from cookies
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    </script>
+</body>
+</html>
