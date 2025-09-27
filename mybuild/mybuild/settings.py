@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-iakwdmv4i=zyptzfy5ha**b*35z3a7z4hy@&^y@u)75n-773u0
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['45.90.216.199', 'alphabuild.ru']
+ALLOWED_HOSTS = ['45.90.216.199', "www.alphabuild.ru", "localhost", "127.0.0.1"]
 
 
 # Application definition
