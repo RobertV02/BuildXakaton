@@ -14,152 +14,142 @@
         }
 
         :root {
-            --primary-blue: #3b82f6;
-            --primary-hover: #2563eb;
-            --primary-light: #60a5fa;
-            --accent-purple: #8b5cf6;
-            --accent-green: #10b981;
-            --accent-orange: #f59e0b;
-            --bg-main: #f8fafc;
-            --bg-card: #ffffff;
-            --bg-secondary: #f1f5f9;
-            --bg-dark: #0f172a;
-            --bg-dark-card: #1e293b;
-            --text-primary: #1e293b;
-            --text-secondary: #64748b;
-            --text-light: #94a3b8;
+            --primary-red: #ff2d55;
+            --dark-red: #d91f47;
+            --light-red: #ff4d6d;
+            --bg-dark: #0a0a0a;
+            --bg-gray: #111111;
+            --bg-card: #1a1a1a;
             --text-white: #ffffff;
-            --border-light: #e2e8f0;
-            --border-medium: #cbd5e1;
-            --border-dark: #334155;
-            --gradient-primary: linear-gradient(135deg, var(--primary-blue), var(--primary-light));
-            --gradient-secondary: linear-gradient(135deg, var(--accent-purple), var(--primary-blue));
-            --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-            --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-            --border-radius-sm: 6px;
-            --border-radius-md: 8px;
-            --border-radius-lg: 12px;
-            --border-radius-xl: 16px;
-            --border-radius-2xl: 24px;
-        }
-
-        [data-theme="dark"] {
-            --bg-main: var(--bg-dark);
-            --bg-card: var(--bg-dark-card);
-            --bg-secondary: #334155;
-            --text-primary: var(--text-white);
-            --text-secondary: #94a3b8;
-            --text-light: #64748b;
-            --border-light: var(--border-dark);
-            --border-medium: #475569;
+            --text-gray: #a1a1aa;
+            --text-light: #e4e4e7;
+            --border-color: #333333;
+            --success-green: #10b981;
+            --warning-orange: #f59e0b;
+            --gradient-primary: linear-gradient(135deg, var(--primary-red), var(--light-red));
+            --gradient-dark: linear-gradient(135deg, var(--bg-dark) 0%, var(--bg-gray) 100%);
+            --shadow-sm: 0 2px 10px rgba(0, 0, 0, 0.3);
+            --shadow-md: 0 4px 20px rgba(0, 0, 0, 0.4);
+            --shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.5);
+            --shadow-glow: 0 0 30px rgba(255, 45, 85, 0.3);
         }
 
         body {
             font-family: 'Inter', sans-serif;
-            background: var(--bg-main);
-            color: var(--text-primary);
+            background: var(--gradient-dark);
+            color: var(--text-white);
             min-height: 100vh;
-            margin: 0;
-            padding: 0;
-            line-height: 1.6;
-            transition: background-color 0.3s ease, color 0.3s ease;
+            padding: 1rem;
+            position: relative;
         }
 
-        .page-background {
+        body::before {
+            content: '';
             position: fixed;
             top: 0;
             left: 0;
-            right: 0;
-            bottom: 0;
+            width: 100%;
+            height: 100%;
             background: 
-                radial-gradient(circle at 30% 20%, rgba(59, 130, 246, 0.08) 0%, transparent 40%),
-                radial-gradient(circle at 70% 80%, rgba(139, 92, 246, 0.06) 0%, transparent 40%);
+                radial-gradient(circle at 20% 20%, rgba(255, 45, 85, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(255, 77, 109, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 70%, rgba(255, 45, 85, 0.05) 0%, transparent 50%);
             pointer-events: none;
             z-index: -1;
         }
 
         .container {
-            max-width: 1280px;
+            max-width: 1200px;
             margin: 0 auto;
             position: relative;
-            padding: 1.5rem;
+            padding-top: 2rem;
         }
 
         .back-button {
-            display: inline-flex;
+            position: fixed;
+            top: 1.5rem;
+            left: 1.5rem;
+            background: rgba(26, 26, 26, 0.9);
+            border: 1px solid var(--border-color);
+            color: var(--text-white);
+            padding: 0.7rem 1.2rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(20px);
+            box-shadow: var(--shadow-sm);
+            z-index: 100;
+            display: flex;
             align-items: center;
             gap: 0.5rem;
-            background: var(--bg-card);
-            border: 1px solid var(--border-light);
-            color: var(--text-secondary);
-            padding: 0.75rem 1.25rem;
-            border-radius: var(--border-radius-lg);
-            text-decoration: none;
-            font-size: 0.875rem;
-            font-weight: 500;
-            transition: all 0.2s ease;
-            box-shadow: var(--shadow-sm);
-            margin-bottom: 1.5rem;
         }
 
         .back-button:hover {
-            background: var(--primary-blue);
-            border-color: var(--primary-blue);
-            color: var(--text-white);
-            transform: translateY(-1px);
+            background: rgba(255, 45, 85, 0.15);
+            border-color: var(--primary-red);
+            transform: translateY(-2px);
             box-shadow: var(--shadow-md);
         }
 
         .header {
             text-align: center;
-            margin-bottom: 2rem;
-            padding: 2rem 1rem;
-            background: var(--bg-card);
-            border-radius: var(--border-radius-2xl);
-            box-shadow: var(--shadow-sm);
-            border: 1px solid var(--border-light);
+            margin-bottom: 3rem;
         }
 
         .header h1 {
-            font-size: clamp(2rem, 4vw, 2.75rem);
-            font-weight: 800;
+            font-size: clamp(2.5rem, 5vw, 3.5rem);
+            font-weight: 700;
             background: var(--gradient-primary);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            margin-bottom: 0.75rem;
-            letter-spacing: -0.025em;
+            margin-bottom: 1rem;
+            position: relative;
+        }
+
+        .header h1::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background: var(--gradient-primary);
+            border-radius: 2px;
         }
 
         .header p {
-            color: var(--text-secondary);
-            font-size: clamp(0.95rem, 2vw, 1.125rem);
-            max-width: 600px;
+            color: var(--text-gray);
+            font-size: clamp(1rem, 2vw, 1.3rem);
+            max-width: 700px;
             margin: 0 auto;
-            line-height: 1.7;
+            line-height: 1.6;
             font-weight: 400;
         }
 
         .main-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-light);
-            border-radius: var(--border-radius-2xl);
-            padding: 2rem;
-            margin-bottom: 1.5rem;
-            box-shadow: var(--shadow-sm);
+            background: rgba(26, 26, 26, 0.9);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            backdrop-filter: blur(20px);
+            box-shadow: var(--shadow-lg);
             position: relative;
-            transition: box-shadow 0.2s ease;
+            overflow: hidden;
         }
 
-        .main-card:hover {
-            box-shadow: var(--shadow-md);
-        }
-
-        .camera-section {
-            text-align: center;
+        .main-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: var(--gradient-primary);
         }
 
         .camera-section {
@@ -168,219 +158,154 @@
 
         .camera-controls {
             display: flex;
-            gap: 0.75rem;
+            gap: 1rem;
             justify-content: center;
-            margin: 1.5rem 0;
+            margin: 2rem 0;
             flex-wrap: wrap;
             align-items: center;
-        }
-
-        .controls-row {
-            display: flex;
-            gap: 0.5rem;
-            align-items: center;
-            justify-content: center;
-            flex-wrap: wrap;
         }
 
         .btn {
             background: var(--gradient-primary);
-            color: var(--text-white);
+            color: white;
             border: none;
-            padding: 0.875rem 1.5rem;
-            border-radius: var(--border-radius-lg);
-            font-size: 0.925rem;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            font-size: 1rem;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: var(--shadow-sm);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: var(--shadow-md);
             position: relative;
-            min-width: 140px;
-            display: inline-flex;
+            overflow: hidden;
+            min-width: 160px;
+            display: flex;
             align-items: center;
             justify-content: center;
             gap: 0.5rem;
-            user-select: none;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.6s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
         }
 
         .btn:hover {
-            background: var(--primary-hover);
-            transform: translateY(-1px);
-            box-shadow: var(--shadow-md);
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: var(--shadow-glow);
         }
 
         .btn:active {
-            transform: translateY(0);
-            box-shadow: var(--shadow-sm);
+            transform: translateY(-1px) scale(0.98);
         }
 
         .btn:disabled {
-            opacity: 0.5;
+            opacity: 0.6;
             cursor: not-allowed;
             transform: none;
-            pointer-events: none;
         }
 
         .btn-secondary {
-            background: var(--bg-card);
-            border: 1px solid var(--border-medium);
-            color: var(--text-primary);
-            box-shadow: var(--shadow-xs);
+            background: transparent;
+            border: 2px solid var(--primary-red);
+            color: var(--primary-red);
+            box-shadow: var(--shadow-sm);
         }
 
         .btn-secondary:hover {
-            background: var(--bg-secondary);
-            border-color: var(--primary-blue);
-            color: var(--primary-blue);
+            background: var(--primary-red);
+            color: white;
+            box-shadow: var(--shadow-glow);
         }
 
         .btn-small {
-            padding: 0.625rem 1rem;
-            font-size: 0.825rem;
-            min-width: 100px;
-        }
-
-        .btn-outline {
-            background: transparent;
-            border: 2px solid var(--primary-blue);
-            color: var(--primary-blue);
-        }
-
-        .btn-outline:hover {
-            background: var(--primary-blue);
-            color: var(--text-white);
+            padding: 0.7rem 1.5rem;
+            font-size: 0.9rem;
+            min-width: 120px;
         }
 
         #video, #canvas {
             width: 100%;
-            max-width: 640px;
-            border-radius: var(--border-radius-xl);
-            border: 1px solid var(--border-light);
-            box-shadow: var(--shadow-md);
-            transition: all 0.2s ease;
-            background: var(--bg-secondary);
+            max-width: 600px;
+            border-radius: 20px;
+            border: 2px solid var(--border-color);
+            box-shadow: var(--shadow-lg);
+            transition: all 0.3s ease;
         }
 
-        #video.mirrored {
+        #video.mirrored { /* зеркалим только если класс добавлен для фронтальной камеры */
             transform: scaleX(-1);
         }
 
         #video:hover {
-            border-color: var(--primary-blue);
-            box-shadow: var(--shadow-lg);
+            border-color: var(--primary-red);
+            box-shadow: var(--shadow-glow);
         }
 
         .separator {
             font-weight: 500;
-            color: var(--text-secondary);
-            padding: 0 0.5rem;
+            color: var(--text-gray);
+            padding: 0 0.8rem;
             user-select: none;
-            font-size: 0.875rem;
         }
 
         .upload-hint {
             font-size: 0.75rem;
-            color: var(--text-secondary);
-            margin-top: 0.5rem;
+            color: var(--text-gray);
+            margin-top: 0.3rem;
             text-align: center;
-        }
-
-        .geo-accuracy {
-            display: block;
-            margin-top: 0.375rem;
-            color: var(--text-secondary);
-            font-size: 0.75rem;
-            font-weight: 500;
-        }
-
-        .info-item {
-            display: flex;
-            align-items: flex-start;
-            gap: 0.75rem;
-            margin-bottom: 0.875rem;
-            padding: 1rem;
-            background: var(--bg-secondary);
-            border-radius: var(--border-radius-md);
-            border: 1px solid var(--border-light);
-            transition: all 0.2s ease;
-        }
-
-        .info-item:hover {
-            background: var(--bg-card);
-            border-color: var(--border-medium);
-            transform: translateX(2px);
-        }
-
-        .info-label {
-            font-weight: 600;
-            color: var(--text-primary);
-            min-width: 120px;
-            font-size: 0.875rem;
-        }
-
-        .info-value {
-            color: var(--text-secondary);
-            word-break: break-all;
-            font-size: 0.875rem;
-            line-height: 1.5;
-        }
-
-        .map-links {
-            display: flex;
-            gap: 0.75rem;
-            margin-top: 0.75rem;
-            flex-wrap: wrap;
-        }
-
-        .map-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.375rem;
-            padding: 0.625rem 1rem;
-            background: var(--bg-card);
-            border: 1px solid var(--primary-blue);
-            border-radius: var(--border-radius-lg);
-            color: var(--primary-blue);
-            text-decoration: none;
-            font-size: 0.825rem;
-            font-weight: 500;
-            transition: all 0.2s ease;
-        }
-
-        .map-link:hover {
-            background: var(--primary-blue);
-            color: var(--text-white);
-            transform: translateY(-1px);
-            box-shadow: var(--shadow-sm);
         }
 
         .results-section {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 1.5rem;
-            margin-top: 1.5rem;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
         }
 
         .result-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-light);
-            border-radius: var(--border-radius-xl);
-            padding: 1.5rem;
-            box-shadow: var(--shadow-sm);
-            transition: all 0.2s ease;
+            background: rgba(26, 26, 26, 0.95);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 2rem;
+            backdrop-filter: blur(20px);
+            box-shadow: var(--shadow-md);
+            transition: all 0.3s ease;
             position: relative;
+            overflow: hidden;
+        }
+
+        .result-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--gradient-primary);
+            opacity: 0.7;
         }
 
         .result-card:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-md);
-            border-color: var(--border-medium);
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+            border-color: rgba(255, 45, 85, 0.3);
         }
 
         .result-card h3 {
-            color: var(--text-primary);
-            margin-bottom: 1.25rem;
-            font-size: 1.125rem;
+            color: var(--primary-red);
+            margin-bottom: 1.5rem;
+            font-size: 1.4rem;
             font-weight: 700;
             display: flex;
             align-items: center;
@@ -494,39 +419,40 @@
         .status-indicator {
             display: inline-flex;
             align-items: center;
-            gap: 0.5rem;
-            padding: 0.625rem 1.25rem;
-            border-radius: var(--border-radius-lg);
-            font-size: 0.875rem;
+            gap: 0.7rem;
+            padding: 0.8rem 1.5rem;
+            border-radius: 30px;
+            font-size: 0.95rem;
             font-weight: 600;
-            margin-bottom: 1.5rem;
-            border: 1px solid;
-            transition: all 0.2s ease;
+            margin-bottom: 2rem;
+            border: 2px solid;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
         }
 
         .status-ready {
-            background: rgba(16, 185, 129, 0.1);
-            border-color: var(--accent-green);
-            color: var(--accent-green);
+            background: rgba(16, 185, 129, 0.15);
+            border-color: var(--success-green);
+            color: var(--success-green);
         }
 
         .status-processing {
-            background: rgba(59, 130, 246, 0.1);
-            border-color: var(--primary-blue);
-            color: var(--primary-blue);
+            background: rgba(245, 158, 11, 0.15);
+            border-color: var(--warning-orange);
+            color: var(--warning-orange);
         }
 
         .status-error {
-            background: rgba(239, 68, 68, 0.1);
+            background: rgba(239, 68, 68, 0.15);
             border-color: #ef4444;
             color: #ef4444;
         }
 
         .loading-spinner {
-            width: 18px;
-            height: 18px;
+            width: 20px;
+            height: 20px;
             border: 2px solid transparent;
-            border-top: 2px solid var(--primary-blue);
+            border-top: 2px solid var(--primary-red);
             border-radius: 50%;
             animation: spin 1s linear infinite;
             display: inline-block;
@@ -539,6 +465,36 @@
 
         .hidden {
             display: none;
+        }
+
+        .mobile-controls-bar {
+            position: fixed;
+            left: 0; right: 0; bottom: 0;
+            background: rgba(20,20,20,0.94);
+            backdrop-filter: blur(14px);
+            display: flex;
+            justify-content: space-around;
+            padding: 0.65rem 1.1rem calc(env(safe-area-inset-bottom,0) + 0.65rem);
+            border-top: 1px solid var(--border-color);
+            z-index: 500;
+        }
+        .mc-btn {
+            background: var(--gradient-primary);
+            border: none;
+            width: 56px; height: 56px;
+            border-radius: 50%;
+            font-size: 1.3rem;
+            display:flex;align-items:center;justify-content:center;
+            color:#fff; cursor:pointer; box-shadow: var(--shadow-md);
+            transition: transform .25s;
+        }
+        .mc-btn.shoot { box-shadow: 0 0 0 3px rgba(255,45,85,0.3); }
+        .mc-btn:active { transform: scale(.9); }
+        .mc-btn.switch, .mc-btn.start { font-size:1.25rem; }
+        .mc-btn:disabled { opacity:.5; cursor:not-allowed; }
+
+        @media (min-width: 900px) {
+            .mobile-controls-bar { display:none !important; }
         }
 
         .preview-wrapper {
@@ -585,127 +541,34 @@
             text-overflow: ellipsis;
         }
 
-        #preview {
-            width: 100%;
-            max-width: 400px;
-            border-radius: var(--border-radius-lg);
-            border: 1px solid var(--border-light);
-            margin-bottom: 1.25rem;
-            box-shadow: var(--shadow-sm);
-            transition: all 0.2s ease;
-            position: relative;
-        }
-
-        #preview:hover {
-            transform: scale(1.02);
-            border-color: var(--primary-blue);
-            box-shadow: var(--shadow-md);
-        }
-
-        .preview-wrapper {
-            position: relative;
-            display: inline-block;
-            max-width: 400px;
-            width: 100%;
-        }
-
-        .photo-overlay {
-            position: absolute;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            padding: 0.5rem 0.75rem 0.6rem;
-            background: linear-gradient(to top, rgba(0,0,0,0.7), rgba(0,0,0,0.1));
-            color: #fff;
-            font-size: 0.7rem;
-            line-height: 1.2;
-            font-family: 'Inter', sans-serif;
-            letter-spacing: 0.025em;
-            border-radius: 0 0 var(--border-radius-lg) var(--border-radius-lg);
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-            pointer-events: none;
-        }
-
-        .photo-overlay strong { 
-            font-weight: 600; 
-        }
-
-        .exif-summary-badge {
-            display: inline-block;
-            background: rgba(59, 130, 246, 0.1);
-            color: var(--primary-blue);
-            border: 1px solid rgba(59, 130, 246, 0.3);
-            padding: 0.375rem 0.75rem;
-            border-radius: var(--border-radius-lg);
-            font-size: 0.75rem;
-            font-weight: 600;
-            margin-top: 0.5rem;
-            max-width: 100%;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .exif-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 1rem;
-            border-radius: var(--border-radius-md);
-            overflow: hidden;
-            border: 1px solid var(--border-light);
-        }
-
-        .exif-table th,
-        .exif-table td {
-            padding: 0.75rem;
-            text-align: left;
-            border-bottom: 1px solid var(--border-light);
-        }
-
-        .exif-table th {
-            background: var(--bg-secondary);
-            color: var(--text-primary);
-            font-weight: 600;
-            font-size: 0.875rem;
-        }
-
-        .exif-table td {
-            color: var(--text-secondary);
-            font-size: 0.825rem;
-        }
-
-        .exif-table tr:hover {
-            background: var(--bg-secondary);
-        }
-
-        .exif-table tr:last-child td {
-            border-bottom: none;
+        @media (max-width: 768px) {
+            .exif-summary-badge { font-size: 0.65rem; padding: 0.35rem 0.6rem; }
+            .photo-overlay { font-size: 0.6rem; padding: 0.45rem 0.55rem 0.5rem; }
         }
 
         /* Responsive */
         @media (max-width: 768px) {
-            .container { padding: 1rem; }
-            .header { padding: 1.5rem 1rem; margin-bottom: 1.5rem; }
-            .header h1 { font-size: 1.75rem; }
-            .header p { font-size: 0.925rem; }
-            .main-card { padding: 1.25rem; margin-bottom: 1.25rem; }
+            body { padding: 0.5rem; }
+            .container { padding-top: 1rem; }
+            .back-button { position: static; margin-bottom: 1rem; display: inline-flex; align-self: flex-start; }
+            .header h1 { font-size: 2rem; }
+            .header p { font-size: 1rem; padding: 0 1rem; }
+            .main-card { padding: 1.2rem 1rem 1.3rem; border-radius: 20px; margin: 0.8rem 0; }
             .camera-controls { flex-direction: column; align-items: stretch; gap: 0.75rem; }
-            .controls-row { justify-content: stretch; }
-            .btn { width: 100%; max-width: none; padding: 0.875rem 1rem; }
-            .btn-small { padding: 0.75rem 0.875rem; }
-            .results-section { grid-template-columns: 1fr; gap: 1rem; }
-            .result-card { padding: 1.25rem; }
-            .info-item { flex-direction: column; align-items: flex-start; gap: 0.375rem; padding: 0.875rem; }
-            .info-label { min-width: auto; font-weight: 600; }
-            .map-links { gap: 0.5rem; }
-            .map-link { padding: 0.75rem 1rem; }
-            #video, #canvas { max-width: 100%; }
-            .exif-table { font-size: 0.8rem; }
-            .exif-table th, .exif-table td { padding: 0.5rem 0.375rem; }
-            .exif-summary-badge { font-size: 0.7rem; padding: 0.35rem 0.65rem; }
-            .photo-overlay { font-size: 0.65rem; padding: 0.45rem 0.6rem 0.5rem; }
+            .btn { width: 100%; max-width: none; padding: 1rem 1.15rem; font-size: 0.95rem; }
+            .btn-small { padding: 0.85rem 1.05rem; font-size: 0.85rem; }
+            .results-section { grid-template-columns: 1fr; gap: 1.2rem; }
+            .result-card { padding: 1.1rem 0.95rem 1.2rem; }
+            .info-item { flex-direction: column; align-items: flex-start; gap: 0.5rem; padding: 0.75rem 0.85rem; }
+            .info-label { min-width: auto; font-weight: 700; }
+            .map-links { flex-direction: column; gap: 0.65rem; }
+            .map-link { justify-content: center; padding: 0.85rem 0.9rem; }
+            #video, #canvas { max-width: 100%; border-radius: 14px; }
+            .exif-table { font-size: 0.78rem; }
+            .exif-table th, .exif-table td { padding: 0.45rem 0.35rem; }
+            .preview-wrapper { max-width: 100%; }
+            #preview { max-width: 100%; }
+            .exif-summary-badge { max-width: 100%; }
         }
 
         @media (max-width: 480px) {
@@ -756,7 +619,6 @@
     </style>
 </head>
 <body>
-    <div class="page-background"></div>
     <div class="container">
         <a href="/" class="back-button">
             <span>←</span>
@@ -775,36 +637,37 @@
                     <span>Готов к работе</span>
                 </div>
 
+                <video id="video" autoplay playsinline class="hidden" style="margin-bottom:1rem;"></video>
                 <div class="camera-controls">
-                    <div class="controls-row">
-                        <button id="start-camera" class="btn">
+                    <div class="controls-row desktop-row">
+                        <button id="start-camera" class="btn primary-action">
                             📹 Запустить камеру
                         </button>
-                        <button id="switch-camera" class="btn btn-small btn-secondary hidden" title="Переключить камеру">
-                            🔄 Переключить
+                        <button id="switch-camera" class="btn btn-secondary btn-small hidden" title="Переключить камеру (фронтальная / тыльная)">
+                            🔄 Камера
                         </button>
-                        <button id="click-photo" class="btn btn-outline hidden" title="Сделать снимок">
+                        <button id="click-photo" class="btn capture-btn hidden" title="Сделать снимок">
                             📸 Снимок
                         </button>
-                    </div>
-                    
-                    <div class="controls-row">
-                        <span class="separator">или</span>
-                        <button id="upload-button" class="btn btn-secondary btn-small" title="Загрузить фото">
-                            📁 Загрузить
+                        <div class="separator desktop-sep">или</div>
+                        <button id="upload-button" class="btn btn-secondary btn-small" title="Загрузить готовое фото">
+                            📁 Файл
                         </button>
                         <input type="file" id="file-input" accept="image/*" class="hidden">
                     </div>
                 </div>
-                <div class="upload-hint">Поддержка JPEG/PNG до ~10 МБ</div>
+                <div class="upload-hint">JPEG/PNG до ~10 МБ • Можно загрузить файл вместо камеры</div>
 
-                <video id="video" autoplay playsinline class="hidden"></video>
+                <div class="mobile-controls-bar hidden" id="mobile-bar">
+                    <button id="mb-upload" class="mc-btn" title="Загрузить файл">📁</button>
+                    <button id="mb-shoot" class="mc-btn shoot hidden" title="Сделать снимок">📸</button>
+                    <button id="mb-start" class="mc-btn start">📹</button>
+                    <button id="mb-switch" class="mc-btn switch hidden" title="Переключить камеру">🔄</button>
+                </div>
                 <canvas id="canvas" class="hidden"></canvas>
-                <div class="geo-controls" style="margin-top:1rem; text-align:center;">
-                    <button id="refresh-geo" class="btn btn-small btn-secondary">
-                        🔁 Обновить геолокацию
-                    </button>
-                    <div id="geo-accuracy" class="geo-accuracy">Точность: —</div>
+                <div style="margin-top:0.75rem;">
+                    <button id="refresh-geo" class="btn btn-small btn-secondary" style="width:auto;min-width:140px;">🔁 Обновить гео</button>
+                    <small id="geo-accuracy" style="display:block;margin-top:6px;color:var(--text-gray);font-size:0.65rem;letter-spacing:.5px;">Точность: —</small>
                 </div>
             </div>
         </div>
@@ -852,6 +715,10 @@
 
             <div class="main-card">
                 <h3>📋 EXIF Метаданные</h3>
+                <div style="margin-bottom:0.8rem;display:flex;gap:.6rem;flex-wrap:wrap;">
+                    <button id="new-capture" class="btn btn-secondary btn-small" style="min-width:150px;">🔄 Новая съемка</button>
+                    <button id="toggle-exif" class="btn btn-secondary btn-small" style="min-width:150px;">👁️ Скрыть EXIF</button>
+                </div>
                 <table class="exif-table" id="exif-table">
                     <thead>
                         <tr>
@@ -889,23 +756,21 @@
     const overlayCoords = document.getElementById('overlay-coords');
     const overlayDatetime = document.getElementById('overlay-datetime');
     const exifSummaryEl = document.getElementById('exif-summary');
+    const mobileBar = document.getElementById('mobile-bar');
+    const mbUpload = document.getElementById('mb-upload');
+    const mbShoot = document.getElementById('mb-shoot');
+    const mbStart = document.getElementById('mb-start');
+    const mbSwitch = document.getElementById('mb-switch');
+    const newCaptureBtn = document.getElementById('new-capture');
+    const toggleExifBtn = document.getElementById('toggle-exif');
 
     let stream;
     let currentFacingMode = 'user'; // 'user' для фронтальной, 'environment' для задней
     let userLocation = null;
-        function resetCameraUI() {
-            // Сбрасываем UI к начальному состоянию
-            video.classList.add('hidden');
-            clickPhotoButton.classList.add('hidden');
-            switchCameraButton.classList.add('hidden');
-            startCameraButton.classList.remove('hidden');
-            
-            // Останавливаем поток, если есть
-            if (stream) {
-                stream.getTracks().forEach(track => track.stop());
-                stream = null;
-            }
-        }        function updateStatus(text, type = 'ready') {
+    let bestGeoSample = null; // {lat, lon, accuracy, ts}
+    let geoWatchId = null;
+
+        function updateStatus(text, type = 'ready') {
             const icons = {
                 ready: '✓',
                 processing: '<span class="loading-spinner"></span>',
@@ -914,6 +779,17 @@
             
             statusElement.className = `status-indicator status-${type}`;
             statusElement.innerHTML = `${icons[type]}<span>${text}</span>`;
+        }
+
+        function isMobile() { return window.innerWidth < 900; }
+
+        function syncMobileBarState() {
+            if (!isMobile()) { mobileBar.classList.add('hidden'); return; }
+            mobileBar.classList.remove('hidden');
+            const cameraActive = !video.classList.contains('hidden');
+            mbStart.classList.toggle('hidden', cameraActive);
+            mbShoot.classList.toggle('hidden', !cameraActive);
+            mbSwitch.classList.toggle('hidden', !cameraActive);
         }
 
         async function startCamera(facingMode = 'user') {
@@ -946,6 +822,7 @@
                 clickPhotoButton.classList.remove('hidden');
                 switchCameraButton.classList.remove('hidden');
                 startCameraButton.classList.add('hidden');
+                syncMobileBarState();
                 
                 currentFacingMode = facingMode;
                 updateStatus('Камера активна - готов к съемке');
@@ -969,6 +846,14 @@
             startCamera(newFacingMode);
         });
 
+        function afterCaptureStopUI() {
+            video.classList.add('hidden');
+            clickPhotoButton.classList.add('hidden');
+            switchCameraButton.classList.add('hidden');
+            startCameraButton.classList.remove('hidden');
+            syncMobileBarState();
+        }
+
         clickPhotoButton.addEventListener('click', () => {
             updateStatus('Создание снимка...', 'processing');
             deviceTimeSpan.textContent = new Date().toLocaleString('ru-RU');
@@ -991,7 +876,8 @@
             }
 
             function finalizeCapture(blob) {
-                resetCameraUI();
+                if (stream) stream.getTracks().forEach(track => track.stop());
+                afterCaptureStopUI();
                 uploadImage(blob);
             }
 
@@ -1110,6 +996,9 @@
                 console.error('Ошибка загрузки:', error);
                 updateStatus('Ошибка загрузки', 'error');
                 alert('Не удалось загрузить изображение на сервер.');
+                
+                startCameraButton.classList.remove('hidden');
+                syncMobileBarState();
             }
         }
 
@@ -1194,8 +1083,23 @@
         }
 
         // --- Загрузка файла из системы ---
-        uploadButton.addEventListener('click', () => {
-            fileInput.click();
+        uploadButton.addEventListener('click', () => { fileInput.click(); });
+        mbUpload.addEventListener('click', () => { fileInput.click(); });
+        mbStart.addEventListener('click', () => startCamera('user'));
+        mbSwitch.addEventListener('click', () => {
+            const newFacingMode = currentFacingMode === 'user' ? 'environment' : 'user';
+            startCamera(newFacingMode);
+        });
+        mbShoot.addEventListener('click', () => clickPhotoButton.click());
+        newCaptureBtn.addEventListener('click', () => {
+            updateStatus('Перезапуск камеры...', 'processing');
+            startCamera('user');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+        toggleExifBtn.addEventListener('click', () => {
+            const tbl = document.getElementById('exif-table');
+            const hidden = tbl.classList.toggle('hidden');
+            toggleExifBtn.textContent = hidden ? '👁️ Показать EXIF' : '👁️ Скрыть EXIF';
         });
 
         fileInput.addEventListener('change', () => {
@@ -1210,6 +1114,9 @@
             deviceTimeSpan.textContent = new Date().toLocaleString('ru-RU');
             getGeolocation();
             uploadFileDirect(file);
+            // После загрузки файла дать возможность снова сделать снимок
+            startCameraButton.classList.remove('hidden');
+            syncMobileBarState();
         });
 
         async function uploadFileDirect(file) {
@@ -1270,9 +1177,9 @@
             }
         });
 
-        window.addEventListener('offline', () => {
-            updateStatus('Нет подключения к интернету', 'error');
-        });
+        window.addEventListener('offline', () => { updateStatus('Нет подключения к интернету', 'error'); });
+        window.addEventListener('resize', syncMobileBarState);
+        syncMobileBarState();
     </script>
 </body>
 </html>
