@@ -5,4 +5,4 @@ db.sqlite3
 *.log
 .env
 **/migrations/*
-!*/migrations/__init__.py
+!**/migrations/__init__.py
