@@ -31,6 +31,7 @@ services:
     command: gunicorn mybuild.wsgi:application --bind 0.0.0.0:8000 --reload
     volumes:
       - .:/app
+      - ./mybuild/static:/app/mybuild/static
     ports:
       - "8000:8000"
     depends_on:
