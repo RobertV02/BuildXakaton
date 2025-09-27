@@ -1,47 +1,356 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Photo Test</title>
+    <title>Тестовый функционал - Alpha Build</title>
     <style>
-        body { font-family: sans-serif; }
-        #container { max-width: 800px; margin: 0 auto; padding: 20px; }
-        #video, #preview { width: 100%; max-width: 500px; border: 1px solid #ccc; }
-        #results { margin-top: 20px; }
-        table { border-collapse: collapse; width: 100%; }
-        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-        th { background-color: #f2f2f2; }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-red: #ff2d55;
+            --dark-red: #d91f47;
+            --light-red: #ff4d6d;
+            --bg-dark: #0a0a0a;
+            --bg-gray: #111111;
+            --bg-card: #1a1a1a;
+            --text-white: #ffffff;
+            --text-gray: #a1a1aa;
+            --text-light: #e4e4e7;
+            --border-color: #333333;
+            --success-green: #10b981;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, var(--bg-dark) 0%, var(--bg-gray) 100%);
+            color: var(--text-white);
+            min-height: 100vh;
+            padding: 2rem 1rem;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .back-button {
+            position: absolute;
+            top: -1rem;
+            left: 0;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--border-color);
+            color: var(--text-white);
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .back-button:hover {
+            background: rgba(255, 45, 85, 0.2);
+            border-color: var(--primary-red);
+            transform: translateY(-2px);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+            margin-top: 2rem;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary-red), var(--light-red));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+        }
+
+        .header p {
+            color: var(--text-gray);
+            font-size: 1.2rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .main-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .camera-section {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .camera-controls {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, var(--primary-red), var(--light-red));
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(255, 45, 85, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(255, 45, 85, 0.4);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border: 2px solid var(--primary-red);
+            color: var(--primary-red);
+            box-shadow: none;
+        }
+
+        .btn-secondary:hover {
+            background: var(--primary-red);
+            color: white;
+        }
+
+        #video, #canvas {
+            width: 100%;
+            max-width: 500px;
+            border-radius: 15px;
+            border: 2px solid var(--border-color);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        #video {
+            transform: scaleX(-1); /* Mirror effect */
+        }
+
+        .results-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .result-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            border-radius: 15px;
+            padding: 1.5rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .result-card h3 {
+            color: var(--primary-red);
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+
+        #preview {
+            width: 100%;
+            max-width: 400px;
+            border-radius: 10px;
+            border: 2px solid var(--border-color);
+            margin-bottom: 1rem;
+        }
+
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.8rem;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: var(--text-light);
+            min-width: 120px;
+        }
+
+        .info-value {
+            color: var(--text-gray);
+            word-break: break-all;
+        }
+
+        .exif-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        .exif-table th,
+        .exif-table td {
+            padding: 0.8rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .exif-table th {
+            background: rgba(255, 45, 85, 0.1);
+            color: var(--primary-red);
+            font-weight: 600;
+        }
+
+        .exif-table td {
+            color: var(--text-gray);
+        }
+
+        .exif-table tr:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .status-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-bottom: 1rem;
+        }
+
+        .status-ready {
+            background: rgba(16, 185, 129, 0.2);
+            border: 1px solid var(--success-green);
+            color: var(--success-green);
+        }
+
+        .status-processing {
+            background: rgba(255, 45, 85, 0.2);
+            border: 1px solid var(--primary-red);
+            color: var(--primary-red);
+        }
+
+        .loading-spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid transparent;
+            border-top: 2px solid var(--primary-red);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            body { padding: 1rem; }
+            .header h1 { font-size: 2rem; }
+            .header p { font-size: 1rem; }
+            .main-card { padding: 1.5rem; }
+            .camera-controls { flex-direction: column; align-items: center; }
+            .btn { width: 100%; max-width: 300px; }
+            .results-section { grid-template-columns: 1fr; gap: 1rem; }
+            .back-button { position: static; margin-bottom: 1rem; display: inline-block; }
+        }
     </style>
 </head>
 <body>
-    <div id="container">
-        <h1>Photo Test</h1>
-        <button id="start-camera">Start Camera</button>
-        <button id="click-photo" style="display:none;">Take Photo</button>
-        <video id="video" autoplay style="display:none;"></video>
-        <canvas id="canvas" style="display:none;"></canvas>
+    <div class="container">
+        <a href="/" class="back-button">← Назад на главную</a>
         
-        <div id="results" style="display:none;">
-            <h2>Results</h2>
-            <h3>Preview:</h3>
-            <img id="preview" src="" alt="Photo preview">
-            
-            <h3>Information:</h3>
-            <p><strong>Device Time:</strong> <span id="device-time"></span></p>
-            <p><strong>Server Time:</strong> <span id="server-time"></span></p>
-            <p><strong>Geolocation:</strong> <span id="geolocation"></span></p>
-            
-            <h3>EXIF Metadata:</h3>
-            <table id="exif-table">
-                <thead>
-                    <tr>
-                        <th>Tag</th>
-                        <th>Value</th>
-                    </tr>
-                </thead>
-                <tbody></tbody>
-            </table>
+        <div class="header">
+            <h1>📷 Тестовый функционал</h1>
+            <p>Сделайте фото через камеру устройства и посмотрите на извлеченные EXIF-данные и геолокацию</p>
+        </div>
+
+        <div class="main-card">
+            <div class="camera-section">
+                <div class="status-indicator status-ready" id="status">
+                    <span>✓ Готов к работе</span>
+                </div>
+
+                <div class="camera-controls">
+                    <button id="start-camera" class="btn">📹 Запустить камеру</button>
+                    <button id="click-photo" class="btn btn-secondary hidden">📸 Сделать фото</button>
+                </div>
+
+                <video id="video" autoplay class="hidden"></video>
+                <canvas id="canvas" class="hidden"></canvas>
+            </div>
+        </div>
+
+        <div id="results" class="hidden">
+            <div class="results-section">
+                <div class="result-card">
+                    <h3>🖼️ Превью фотографии</h3>
+                    <img id="preview" src="" alt="Превью фото">
+                </div>
+
+                <div class="result-card">
+                    <h3>📍 Информация</h3>
+                    <div class="info-item">
+                        <span class="info-label">⏰ Время устройства:</span>
+                        <span class="info-value" id="device-time">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">🖥️ Время сервера:</span>
+                        <span class="info-value" id="server-time">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">🌍 Геолокация:</span>
+                        <span class="info-value" id="geolocation">-</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="main-card">
+                <h3>📋 EXIF Метаданные</h3>
+                <table class="exif-table" id="exif-table">
+                    <thead>
+                        <tr>
+                            <th>Параметр</th>
+                            <th>Значение</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
         </div>
     </div>
 
@@ -56,57 +365,85 @@
         const serverTimeSpan = document.getElementById('server-time');
         const geolocationSpan = document.getElementById('geolocation');
         const exifTableBody = document.querySelector('#exif-table tbody');
+        const statusElement = document.getElementById('status');
 
         let stream;
 
+        function updateStatus(text, isProcessing = false) {
+            statusElement.className = `status-indicator ${isProcessing ? 'status-processing' : 'status-ready'}`;
+            statusElement.innerHTML = isProcessing ? 
+                `<span class="loading-spinner"></span><span>${text}</span>` : 
+                `<span>✓ ${text}</span>`;
+        }
+
         startCameraButton.addEventListener('click', async () => {
             try {
-                stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                updateStatus('Получение доступа к камере...', true);
+                stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { 
+                        facingMode: 'user',
+                        width: { ideal: 1280 },
+                        height: { ideal: 720 }
+                    } 
+                });
+                
                 video.srcObject = stream;
-                video.style.display = 'block';
-                clickPhotoButton.style.display = 'inline-block';
-                startCameraButton.style.display = 'none';
+                video.classList.remove('hidden');
+                clickPhotoButton.classList.remove('hidden');
+                startCameraButton.classList.add('hidden');
+                
+                updateStatus('Камера активна - готов к съемке');
             } catch (err) {
-                console.error("Error accessing camera: ", err);
-                alert("Could not access the camera. Please check permissions.");
+                console.error("Ошибка доступа к камере: ", err);
+                alert("Не удалось получить доступ к камере. Проверьте разрешения.");
+                updateStatus('Ошибка доступа к камере');
             }
         });
 
         clickPhotoButton.addEventListener('click', () => {
+            updateStatus('Создание снимка...', true);
+            
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
             const context = canvas.getContext('2d');
-            context.drawImage(video, 0, 0, canvas.width, canvas.height);
             
-            // Stop the camera stream
+            // Mirror the image back for saving
+            context.scale(-1, 1);
+            context.drawImage(video, -canvas.width, 0, canvas.width, canvas.height);
+            
+            // Stop camera
             stream.getTracks().forEach(track => track.stop());
-            video.style.display = 'none';
-            clickPhotoButton.style.display = 'none';
+            video.classList.add('hidden');
+            clickPhotoButton.classList.add('hidden');
 
-            deviceTimeSpan.textContent = new Date().toISOString();
+            // Set device time
+            deviceTimeSpan.textContent = new Date().toLocaleString('ru-RU');
             
+            updateStatus('Получение геолокации...', true);
             getGeolocation();
 
             canvas.toBlob(blob => {
                 uploadImage(blob);
-            }, 'image/jpeg');
+            }, 'image/jpeg', 0.8);
         });
 
         function getGeolocation() {
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(position => {
-                    const lat = position.coords.latitude;
-                    const lon = position.coords.longitude;
-                    geolocationSpan.textContent = `Latitude: ${lat}, Longitude: ${lon} (from browser)`;
+                    const lat = position.coords.latitude.toFixed(6);
+                    const lon = position.coords.longitude.toFixed(6);
+                    geolocationSpan.innerHTML = `<strong>${lat}</strong>, <strong>${lon}</strong> <small>(браузер)</small>`;
                 }, () => {
-                    geolocationSpan.textContent = "Unable to retrieve location from browser.";
+                    geolocationSpan.textContent = "Не удалось получить геолокацию из браузера";
                 });
             } else {
-                geolocationSpan.textContent = "Geolocation is not supported by this browser.";
+                geolocationSpan.textContent = "Геолокация не поддерживается браузером";
             }
         }
 
         async function uploadImage(imageBlob) {
+            updateStatus('Загрузка на сервер...', true);
+            
             const formData = new FormData();
             formData.append('image', imageBlob, 'photo.jpg');
 
@@ -114,47 +451,61 @@
                 const response = await fetch("{% url 'playground:photo_upload_api' %}", {
                     method: 'POST',
                     headers: {
-                        'X-CSRFToken': getCookie('csrftoken') // Django CSRF protection
+                        'X-CSRFToken': getCookie('csrftoken')
                     },
                     body: formData
                 });
 
                 if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                    throw new Error(`HTTP ошибка! статус: ${response.status}`);
                 }
 
                 const data = await response.json();
                 displayResults(data);
+                updateStatus('Готово! Результаты получены');
 
             } catch (error) {
-                console.error('Upload error:', error);
-                alert('Failed to upload image.');
+                console.error('Ошибка загрузки:', error);
+                alert('Не удалось загрузить изображение на сервер.');
+                updateStatus('Ошибка загрузки');
             }
         }
 
         function displayResults(data) {
-            resultsDiv.style.display = 'block';
+            resultsDiv.classList.remove('hidden');
             previewImg.src = data.image_url;
-            serverTimeSpan.textContent = data.server_time;
+            serverTimeSpan.textContent = new Date(data.server_time).toLocaleString('ru-RU');
 
             // Clear previous EXIF data
             exifTableBody.innerHTML = '';
 
-            // Check for GPSInfo in EXIF and display it
+            // Check for GPS in EXIF
             if (data.exif_data && data.exif_data.GPSInfo) {
-                geolocationSpan.textContent = `From EXIF: ${JSON.stringify(data.exif_data.GPSInfo)}`;
+                geolocationSpan.innerHTML = `<strong>Из EXIF:</strong> ${JSON.stringify(data.exif_data.GPSInfo)}`;
             }
 
-            for (const [key, value] of Object.entries(data.exif_data)) {
+            // Populate EXIF table
+            if (data.exif_data && Object.keys(data.exif_data).length > 0) {
+                for (const [key, value] of Object.entries(data.exif_data)) {
+                    const row = exifTableBody.insertRow();
+                    const cell1 = row.insertCell(0);
+                    const cell2 = row.insertCell(1);
+                    cell1.textContent = key;
+                    cell2.textContent = typeof value === 'object' ? JSON.stringify(value) : value;
+                }
+            } else {
                 const row = exifTableBody.insertRow();
-                const cell1 = row.insertCell(0);
-                const cell2 = row.insertCell(1);
-                cell1.textContent = key;
-                cell2.textContent = typeof value === 'object' ? JSON.stringify(value) : value;
+                const cell = row.insertCell(0);
+                cell.colSpan = 2;
+                cell.textContent = 'EXIF данные не найдены';
+                cell.style.textAlign = 'center';
+                cell.style.color = 'var(--text-gray)';
             }
+
+            // Smooth scroll to results
+            resultsDiv.scrollIntoView({ behavior: 'smooth' });
         }
 
-        // Function to get CSRF token from cookies
         function getCookie(name) {
             let cookieValue = null;
             if (document.cookie && document.cookie !== '') {
@@ -169,6 +520,20 @@
             }
             return cookieValue;
         }
+
+        // Add some nice entrance animations
+        document.addEventListener('DOMContentLoaded', () => {
+            const cards = document.querySelectorAll('.main-card, .header');
+            cards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                setTimeout(() => {
+                    card.style.transition = 'all 0.6s ease';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, index * 200);
+            });
+        });
     </script>
 </body>
 </html>

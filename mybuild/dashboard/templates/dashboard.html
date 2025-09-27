@@ -457,6 +457,46 @@
             width: 100px;
             transition: width 0.3s ease;
         }
+
+        /* Test functionality button */
+        .test-function-btn {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: linear-gradient(135deg, var(--primary-red), var(--light-red));
+            color: white;
+            padding: 1rem 1.5rem;
+            border: none;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(255, 45, 85, 0.3);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            z-index: 100;
+        }
+
+        .test-function-btn:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 8px 30px rgba(255, 45, 85, 0.4);
+        }
+
+        .test-function-btn:active {
+            transform: translateY(-1px) scale(1.02);
+        }
+
+        @media (max-width: 768px) {
+            .test-function-btn {
+                bottom: 1rem;
+                right: 1rem;
+                padding: 0.8rem 1.2rem;
+                font-size: 0.9rem;
+            }
+        }
     </style>
 </head>
 <body>
@@ -515,6 +555,11 @@
     <div class="notification" id="notification">
         <span id="notification-text"></span>
     </div>
+
+    <!-- Test Functionality Button -->
+    <a href="/playground/test/" class="test-function-btn">
+        📷 Тестовый функционал
+    </a>
 
     <script>
         // Create floating particles
