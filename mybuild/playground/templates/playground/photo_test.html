@@ -467,63 +467,6 @@
             display: none;
         }
 
-        .camera-active-controls {
-            display: flex;
-            gap: 1rem;
-            justify-content: center;
-            align-items: center;
-            margin-top: 1rem;
-            flex-wrap: wrap;
-        }
-        .capture-btn-large {
-            background: var(--gradient-primary);
-            border: none;
-            width: 80px; height: 80px;
-            border-radius: 50%;
-            font-size: 2rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #fff;
-            cursor: pointer;
-            box-shadow: 0 0 0 4px rgba(255,45,85,0.2), var(--shadow-lg);
-            transition: all 0.3s ease;
-            position: relative;
-        }
-        .capture-btn-large::before {
-            content: '';
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            background: rgba(255,255,255,0.1);
-            transform: scale(0);
-            transition: transform 0.3s ease;
-        }
-        .capture-btn-large:hover::before {
-            transform: scale(1.1);
-        }
-        .capture-btn-large:active {
-            transform: scale(0.95);
-        }
-        .switch-btn-mobile {
-            background: rgba(255,45,85,0.15);
-            border: 2px solid var(--primary-red);
-            color: var(--primary-red);
-            width: 50px; height: 50px;
-            border-radius: 50%;
-            font-size: 1.2rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        .switch-btn-mobile:hover {
-            background: var(--primary-red);
-            color: white;
-        }
-
         .preview-wrapper {
             position: relative;
             display: inline-block;
@@ -582,8 +525,6 @@
             .header p { font-size: 1rem; padding: 0 1rem; }
             .main-card { padding: 1.2rem 1rem 1.3rem; border-radius: 20px; margin: 0.8rem 0; }
             .camera-controls { flex-direction: column; align-items: stretch; gap: 0.75rem; }
-            .camera-controls .controls-row { flex-direction: column; gap: 0.75rem; }
-            .separator { display: none; }
             .btn { width: 100%; max-width: none; padding: 1rem 1.15rem; font-size: 0.95rem; }
             .btn-small { padding: 0.85rem 1.05rem; font-size: 0.85rem; }
             .results-section { grid-template-columns: 1fr; gap: 1.2rem; }
@@ -598,8 +539,6 @@
             .preview-wrapper { max-width: 100%; }
             #preview { max-width: 100%; }
             .exif-summary-badge { max-width: 100%; }
-            /* Скрываем десктопные кнопки переключения/съемки на мобильных когда камера активна */
-            #switch-camera, #click-photo { display: none !important; }
         }
 
         @media (max-width: 480px) {
@@ -668,38 +607,25 @@
                     <span>Готов к работе</span>
                 </div>
 
-                <video id="video" autoplay playsinline class="hidden" style="margin-bottom:1rem;"></video>
-                
-                <!-- Кнопки активной камеры - появляются только когда камера включена -->
-                <div class="camera-active-controls hidden" id="camera-active-controls">
-                    <button id="click-photo-large" class="capture-btn-large" title="Сделать снимок">
-                        📸
+                <div class="camera-controls">
+                    <button id="start-camera" class="btn">
+                        📹 Запустить камеру
                     </button>
-                    <button id="switch-camera-mobile" class="switch-btn-mobile" title="Переключить камеру">
-                        🔄
+                    <button id="switch-camera" class="btn btn-secondary btn-small hidden" title="Переключить камеру (фронтальная / тыльная)">
+                        🔄 Переключить
                     </button>
+                    <button id="click-photo" class="btn btn-secondary hidden" title="Сделать снимок">
+                        📸 Сделать фото
+                    </button>
+                    <div class="separator">или</div>
+                    <button id="upload-button" class="btn btn-secondary btn-small" title="Загрузить готовое фото">
+                        📁 Загрузить фото
+                    </button>
+                    <input type="file" id="file-input" accept="image/*" class="hidden">
                 </div>
-                
-                <!-- Обычные кнопки управления -->
-                <div class="camera-controls" id="main-controls">
-                    <div class="controls-row">
-                        <button id="start-camera" class="btn primary-action">
-                            📹 Запустить камеру
-                        </button>
-                        <button id="switch-camera" class="btn btn-secondary btn-small hidden" title="Переключить камеру (фронтальная / тыльная)">
-                            🔄 Переключить
-                        </button>
-                        <button id="click-photo" class="btn btn-secondary hidden" title="Сделать снимок">
-                            📸 Сделать фото
-                        </button>
-                        <div class="separator">или</div>
-                        <button id="upload-button" class="btn btn-secondary btn-small" title="Загрузить готовое фото">
-                            📁 Загрузить фото
-                        </button>
-                        <input type="file" id="file-input" accept="image/*" class="hidden">
-                    </div>
-                </div>
-                <div class="upload-hint">JPEG/PNG до ~10 МБ • Можно загрузить файл вместо камеры</div>
+                <div class="upload-hint">Поддержка JPEG/PNG до ~10 МБ</div>
+
+                <video id="video" autoplay playsinline class="hidden"></video>
                 <canvas id="canvas" class="hidden"></canvas>
                 <div style="margin-top:0.75rem;">
                     <button id="refresh-geo" class="btn btn-small btn-secondary" style="width:auto;min-width:140px;">🔁 Обновить гео</button>
@@ -751,10 +677,6 @@
 
             <div class="main-card">
                 <h3>📋 EXIF Метаданные</h3>
-                <div style="margin-bottom:0.8rem;display:flex;gap:.6rem;flex-wrap:wrap;">
-                    <button id="new-capture" class="btn btn-secondary btn-small" style="min-width:150px;">🔄 Новая съемка</button>
-                    <button id="toggle-exif" class="btn btn-secondary btn-small" style="min-width:150px;">👁️ Скрыть EXIF</button>
-                </div>
                 <table class="exif-table" id="exif-table">
                     <thead>
                         <tr>
@@ -792,12 +714,6 @@
     const overlayCoords = document.getElementById('overlay-coords');
     const overlayDatetime = document.getElementById('overlay-datetime');
     const exifSummaryEl = document.getElementById('exif-summary');
-    const cameraActiveControls = document.getElementById('camera-active-controls');
-    const clickPhotoLarge = document.getElementById('click-photo-large');
-    const switchCameraMobile = document.getElementById('switch-camera-mobile');
-    const mainControls = document.getElementById('main-controls');
-    const newCaptureBtn = document.getElementById('new-capture');
-    const toggleExifBtn = document.getElementById('toggle-exif');
 
     let stream;
     let currentFacingMode = 'user'; // 'user' для фронтальной, 'environment' для задней
@@ -814,22 +730,6 @@
             
             statusElement.className = `status-indicator status-${type}`;
             statusElement.innerHTML = `${icons[type]}<span>${text}</span>`;
-        }
-
-        function isMobile() { return window.innerWidth <= 768; }
-
-        function updateCameraUI(cameraActive) {
-            if (cameraActive) {
-                cameraActiveControls.classList.remove('hidden');
-                startCameraButton.classList.add('hidden');
-                clickPhotoButton.classList.add('hidden');
-                switchCameraButton.classList.add('hidden');
-            } else {
-                cameraActiveControls.classList.add('hidden');
-                startCameraButton.classList.remove('hidden');
-                clickPhotoButton.classList.add('hidden');
-                switchCameraButton.classList.add('hidden');
-            }
         }
 
         async function startCamera(facingMode = 'user') {
@@ -859,11 +759,9 @@
                     video.classList.remove('mirrored');
                 }
                 video.classList.remove('hidden');
-                if (!isMobile()) {
-                    clickPhotoButton.classList.remove('hidden');
-                    switchCameraButton.classList.remove('hidden');
-                }
-                updateCameraUI(true);
+                clickPhotoButton.classList.remove('hidden');
+                switchCameraButton.classList.remove('hidden');
+                startCameraButton.classList.add('hidden');
                 
                 currentFacingMode = facingMode;
                 updateStatus('Камера активна - готов к съемке');
@@ -887,11 +785,6 @@
             startCamera(newFacingMode);
         });
 
-        function afterCaptureStopUI() {
-            video.classList.add('hidden');
-            updateCameraUI(false);
-        }
-
         clickPhotoButton.addEventListener('click', () => {
             updateStatus('Создание снимка...', 'processing');
             deviceTimeSpan.textContent = new Date().toLocaleString('ru-RU');
@@ -914,8 +807,13 @@
             }
 
             function finalizeCapture(blob) {
-                if (stream) stream.getTracks().forEach(track => track.stop());
-                afterCaptureStopUI();
+                // Останавливаем камеру
+                if (stream) {
+                    stream.getTracks().forEach(track => track.stop());
+                }
+                video.classList.add('hidden');
+                clickPhotoButton.classList.add('hidden');
+                switchCameraButton.classList.add('hidden');
                 uploadImage(blob);
             }
 
@@ -1035,7 +933,8 @@
                 updateStatus('Ошибка загрузки', 'error');
                 alert('Не удалось загрузить изображение на сервер.');
                 
-                updateCameraUI(false);
+                // Возвращаем кнопки для повторной попытки
+                startCameraButton.classList.remove('hidden');
             }
         }
 
@@ -1120,24 +1019,8 @@
         }
 
         // --- Загрузка файла из системы ---
-        uploadButton.addEventListener('click', () => { fileInput.click(); });
-        
-        // Новые крупные кнопки для мобильных
-        clickPhotoLarge.addEventListener('click', () => clickPhotoButton.click());
-        switchCameraMobile.addEventListener('click', () => {
-            const newFacingMode = currentFacingMode === 'user' ? 'environment' : 'user';
-            startCamera(newFacingMode);
-        });
-        
-        newCaptureBtn.addEventListener('click', () => {
-            updateStatus('Перезапуск камеры...', 'processing');
-            startCamera('user');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        });
-        toggleExifBtn.addEventListener('click', () => {
-            const tbl = document.getElementById('exif-table');
-            const hidden = tbl.classList.toggle('hidden');
-            toggleExifBtn.textContent = hidden ? '👁️ Показать EXIF' : '👁️ Скрыть EXIF';
+        uploadButton.addEventListener('click', () => {
+            fileInput.click();
         });
 
         fileInput.addEventListener('change', () => {
@@ -1152,8 +1035,6 @@
             deviceTimeSpan.textContent = new Date().toLocaleString('ru-RU');
             getGeolocation();
             uploadFileDirect(file);
-            // После загрузки файла дать возможность снова сделать снимок
-            updateCameraUI(false);
         });
 
         async function uploadFileDirect(file) {
@@ -1214,10 +1095,9 @@
             }
         });
 
-        window.addEventListener('offline', () => { updateStatus('Нет подключения к интернету', 'error'); });
-        
-        // Инициализация UI
-        updateCameraUI(false);
+        window.addEventListener('offline', () => {
+            updateStatus('Нет подключения к интернету', 'error');
+        });
     </script>
 </body>
 </html>
