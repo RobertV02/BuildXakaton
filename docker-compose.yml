@@ -1,0 +1,41 @@
+version: "3.8"
+
+services:
+  db:
+    image: postgis/postgis:15-3.4
+    container_name: buildnadz_db
+    restart: always
+    environment:
+      POSTGRES_DB: buildnadz
+      POSTGRES_USER: buildnadz_user
+      POSTGRES_PASSWORD: buildnadz_pass
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  redis:
+    image: redis:7
+    container_name: buildnadz_redis
+    restart: always
+    ports:
+      - "6379:6379"
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: buildnadz_web
+    restart: always
+    working_dir: /app/mybuild
+    command: gunicorn mybuild.wsgi:application --bind 0.0.0.0:8000 --reload
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+      - redis
+
+volumes:
+  postgres_data:
