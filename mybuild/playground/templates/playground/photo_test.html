@@ -776,35 +776,53 @@
 
         clickPhotoButton.addEventListener('click', () => {
             updateStatus('Создание снимка...', 'processing');
-            
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            const context = canvas.getContext('2d');
-            
-            // Для фронтальной камеры отражаем изображение при сохранении
-            if (currentFacingMode === 'user') {
-                // зеркалим изображение обратно при сохранении
-                context.scale(-1, 1);
-                context.drawImage(video, -canvas.width, 0, canvas.width, canvas.height);
-            } else {
-                context.drawImage(video, 0, 0, canvas.width, canvas.height);
-            }
-            
-            // Останавливаем камеру
-            stream.getTracks().forEach(track => track.stop());
-            video.classList.add('hidden');
-            clickPhotoButton.classList.add('hidden');
-            switchCameraButton.classList.add('hidden');
-
-            // Устанавливаем время устройства
             deviceTimeSpan.textContent = new Date().toLocaleString('ru-RU');
-            
             updateStatus('Получение геолокации...', 'processing');
             getGeolocation();
 
-            canvas.toBlob(blob => {
+            function captureWithCanvasFallback() {
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                const context = canvas.getContext('2d');
+                if (currentFacingMode === 'user') {
+                    context.scale(-1, 1);
+                    context.drawImage(video, -canvas.width, 0, canvas.width, canvas.height);
+                } else {
+                    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+                }
+                canvas.toBlob(blob => {
+                    finalizeCapture(blob);
+                }, 'image/jpeg', 0.85);
+            }
+
+            function finalizeCapture(blob) {
+                // Останавливаем камеру
+                if (stream) {
+                    stream.getTracks().forEach(track => track.stop());
+                }
+                video.classList.add('hidden');
+                clickPhotoButton.classList.add('hidden');
+                switchCameraButton.classList.add('hidden');
                 uploadImage(blob);
-            }, 'image/jpeg', 0.8);
+            }
+
+            try {
+                const track = stream && stream.getVideoTracks ? stream.getVideoTracks()[0] : null;
+                if (track && 'ImageCapture' in window) {
+                    const imageCapture = new ImageCapture(track);
+                    imageCapture.takePhoto().then(blob => {
+                        finalizeCapture(blob);
+                    }).catch(err => {
+                        console.warn('ImageCapture.takePhoto() не удался, fallback на canvas:', err);
+                        captureWithCanvasFallback();
+                    });
+                } else {
+                    captureWithCanvasFallback();
+                }
+            } catch (e) {
+                console.warn('Ошибка при попытке ImageCapture, fallback canvas:', e);
+                captureWithCanvasFallback();
+            }
         });
 
         function getGeolocation() {
@@ -880,20 +898,37 @@
             // Очищаем предыдущие EXIF данные
             exifTableBody.innerHTML = '';
 
-            // Проверяем GPS в EXIF
-            if (data.exif_data && data.exif_data.GPSInfo) {
-                geolocationSpan.innerHTML = `<strong style="color: var(--primary-red);">Из EXIF:</strong> ${JSON.stringify(data.exif_data.GPSInfo)}`;
+            // Приоритет: если есть gps_latitude/gps_longitude из EXIF — показываем их
+            if (data.gps_latitude !== null && data.gps_latitude !== undefined &&
+                data.gps_longitude !== null && data.gps_longitude !== undefined) {
+                const lat = data.gps_latitude.toFixed(6);
+                const lon = data.gps_longitude.toFixed(6);
+                geolocationSpan.innerHTML = `<strong>${lat}</strong>, <strong>${lon}</strong> <small style="color: var(--primary-red);">(EXIF)</small>`;
+                updateMapLinks(lat, lon);
                 mapLinks.classList.remove('hidden');
+            } else {
+                // Если EXIF GPS нет, сохраняем ранее установленную браузером (не перетираем, если она уже есть)
+                if (!geolocationSpan.textContent || geolocationSpan.textContent.trim() === '-' ) {
+                    geolocationSpan.innerHTML = '<span style="color: var(--warning-orange);">GPS координаты в EXIF отсутствуют — ожидаем браузер</span>';
+                }
             }
 
-            // Заполняем таблицу EXIF
+            // Заполняем таблицу EXIF (отрисовываем первые 300 элементов максимум, чтобы не перегружать)
             if (data.exif_data && Object.keys(data.exif_data).length > 0) {
-                for (const [key, value] of Object.entries(data.exif_data)) {
+                const entries = Object.entries(data.exif_data);
+                const MAX_ROWS = 300;
+                entries.slice(0, MAX_ROWS).forEach(([key, value]) => {
                     const row = exifTableBody.insertRow();
                     const cell1 = row.insertCell(0);
                     const cell2 = row.insertCell(1);
                     cell1.textContent = key;
                     cell2.textContent = typeof value === 'object' ? JSON.stringify(value) : value;
+                });
+                if (entries.length > MAX_ROWS) {
+                    const row = exifTableBody.insertRow();
+                    const cell = row.insertCell(0);
+                    cell.colSpan = 2;
+                    cell.innerHTML = `<em style="color: var(--text-gray);">Показаны первые ${MAX_ROWS} записей из ${entries.length}</em>`;
                 }
             } else {
                 const row = exifTableBody.insertRow();
