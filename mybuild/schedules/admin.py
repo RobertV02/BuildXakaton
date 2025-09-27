@@ -1,3 +1,6 @@
 from django.contrib import admin
+from .models import ScheduleRevision, WorkItem, ChangeRequest
 
-# Register your models here.
+admin.site.register(ScheduleRevision)
+admin.site.register(WorkItem)
+admin.site.register(ChangeRequest)
