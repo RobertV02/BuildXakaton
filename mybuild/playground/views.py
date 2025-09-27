@@ -89,6 +89,47 @@ def get_exif_full(path):
             lon = lon2
     return exif_data, lat, lon
 
+
+def build_exif_summary(exif_dict):
+    """Формирует компактное человеко-читаемое summary по наиболее полезным полям."""
+    if not exif_dict:
+        return None
+
+    # Возможные варианты ключей (exifread даёт префиксы Image / EXIF)
+    def g(*candidates):
+        for c in candidates:
+            if c in exif_dict and exif_dict[c]:
+                return exif_dict[c]
+        return None
+
+    make = g('Image Make', 'Make')
+    model = g('Image Model', 'Model')
+    dt = g('EXIF DateTimeOriginal', 'Image DateTime', 'DateTimeOriginal')
+    exposure = g('EXIF ExposureTime', 'ExposureTime')
+    iso = g('EXIF ISOSpeedRatings', 'ISOSpeedRatings', 'EXIF PhotographicSensitivity')
+    aperture = g('EXIF FNumber', 'FNumber', 'EXIF ApertureValue')
+    focal = g('EXIF FocalLength', 'FocalLength')
+
+    parts = []
+    cam = ' '.join(p for p in [make, model] if p)
+    if cam:
+        parts.append(cam)
+    if dt:
+        parts.append(dt)
+    exp_parts = []
+    if exposure:
+        exp_parts.append(f"exp {exposure}")
+    if iso:
+        exp_parts.append(f"ISO {iso}")
+    if aperture:
+        exp_parts.append(f"f/{aperture.split('/')[-1] if '/' in aperture else aperture}")
+    if focal:
+        exp_parts.append(f"{focal}mm")
+    if exp_parts:
+        parts.append(', '.join(exp_parts))
+
+    return ' | '.join(parts) if parts else None
+
 class PhotoUploadView(APIView):
     def post(self, request, *args, **kwargs):
         serializer = PhotoTestSerializer(data=request.data)
@@ -99,6 +140,7 @@ class PhotoUploadView(APIView):
 
         exif_data, gps_lat, gps_lon = get_exif_full(photo_instance.image.path)
         has_exif = bool(exif_data)
+        exif_summary = build_exif_summary(exif_data)
 
         server_time = datetime.datetime.now().isoformat()
 
@@ -111,6 +153,7 @@ class PhotoUploadView(APIView):
             'gps_longitude': gps_lon,
             'gps_source': 'exif' if gps_lat is not None and gps_lon is not None else None,
             'server_time': server_time,
+            'exif_summary': exif_summary,
         }
         return Response(response_data, status=status.HTTP_201_CREATED)
 

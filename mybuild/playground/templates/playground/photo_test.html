@@ -320,6 +320,7 @@
             margin-bottom: 1.5rem;
             box-shadow: var(--shadow-md);
             transition: all 0.3s ease;
+            position: relative;
         }
 
         #preview:hover {
@@ -466,87 +467,78 @@
             display: none;
         }
 
+        .preview-wrapper {
+            position: relative;
+            display: inline-block;
+            max-width: 400px;
+            width: 100%;
+        }
+
+        .photo-overlay {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            padding: 0.5rem 0.75rem 0.6rem;
+            background: linear-gradient(to top, rgba(0,0,0,0.65), rgba(0,0,0,0.1));
+            color: #fff;
+            font-size: 0.7rem;
+            line-height: 1.1;
+            font-family: 'Inter', sans-serif;
+            letter-spacing: .5px;
+            border-radius: 0 0 12px 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            pointer-events: none;
+        }
+
+        .photo-overlay strong { font-weight: 600; }
+
+        .exif-summary-badge {
+            display: inline-block;
+            background: rgba(255,45,85,0.15);
+            color: var(--primary-red);
+            border: 1px solid rgba(255,45,85,0.4);
+            padding: 0.4rem 0.75rem;
+            border-radius: 40px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-top: 0.5rem;
+            max-width: 100%;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        @media (max-width: 768px) {
+            .exif-summary-badge { font-size: 0.65rem; padding: 0.35rem 0.6rem; }
+            .photo-overlay { font-size: 0.6rem; padding: 0.45rem 0.55rem 0.5rem; }
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
             body { padding: 0.5rem; }
-            
             .container { padding-top: 1rem; }
-            
-            .back-button { 
-                position: static; 
-                margin-bottom: 1rem; 
-                display: inline-flex;
-                align-self: flex-start;
-            }
-            
+            .back-button { position: static; margin-bottom: 1rem; display: inline-flex; align-self: flex-start; }
             .header h1 { font-size: 2rem; }
             .header p { font-size: 1rem; padding: 0 1rem; }
-            
-            .main-card { 
-                padding: 1.5rem; 
-                border-radius: 20px;
-                margin: 1rem 0;
-            }
-            
-            .camera-controls { 
-                flex-direction: column; 
-                align-items: stretch; 
-                gap: 1rem;
-            }
-            
-            .btn { 
-                width: 100%; 
-                max-width: none;
-                padding: 1.2rem 2rem;
-            }
-            
-            .btn-small {
-                padding: 1rem 1.5rem;
-            }
-            
-            .results-section { 
-                grid-template-columns: 1fr; 
-                gap: 1.5rem; 
-            }
-            
-            .result-card {
-                padding: 1.5rem;
-            }
-            
-            .info-item {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 0.5rem;
-            }
-            
-            .info-label {
-                min-width: auto;
-                font-weight: 700;
-            }
-            
-            .map-links {
-                flex-direction: column;
-                gap: 0.8rem;
-            }
-            
-            .map-link {
-                justify-content: center;
-                padding: 1rem;
-            }
-            
-            #video, #canvas {
-                max-width: 100%;
-                border-radius: 15px;
-            }
-            
-            .exif-table {
-                font-size: 0.85rem;
-            }
-            
-            .exif-table th,
-            .exif-table td {
-                padding: 0.6rem 0.4rem;
-            }
+            .main-card { padding: 1.2rem 1rem 1.3rem; border-radius: 20px; margin: 0.8rem 0; }
+            .camera-controls { flex-direction: column; align-items: stretch; gap: 0.75rem; }
+            .btn { width: 100%; max-width: none; padding: 1rem 1.15rem; font-size: 0.95rem; }
+            .btn-small { padding: 0.85rem 1.05rem; font-size: 0.85rem; }
+            .results-section { grid-template-columns: 1fr; gap: 1.2rem; }
+            .result-card { padding: 1.1rem 0.95rem 1.2rem; }
+            .info-item { flex-direction: column; align-items: flex-start; gap: 0.5rem; padding: 0.75rem 0.85rem; }
+            .info-label { min-width: auto; font-weight: 700; }
+            .map-links { flex-direction: column; gap: 0.65rem; }
+            .map-link { justify-content: center; padding: 0.85rem 0.9rem; }
+            #video, #canvas { max-width: 100%; border-radius: 14px; }
+            .exif-table { font-size: 0.78rem; }
+            .exif-table th, .exif-table td { padding: 0.45rem 0.35rem; }
+            .preview-wrapper { max-width: 100%; }
+            #preview { max-width: 100%; }
+            .exif-summary-badge { max-width: 100%; }
         }
 
         @media (max-width: 480px) {
@@ -635,6 +627,10 @@
 
                 <video id="video" autoplay playsinline class="hidden"></video>
                 <canvas id="canvas" class="hidden"></canvas>
+                <div style="margin-top:0.75rem;">
+                    <button id="refresh-geo" class="btn btn-small btn-secondary" style="width:auto;min-width:140px;">🔁 Обновить гео</button>
+                    <small id="geo-accuracy" style="display:block;margin-top:6px;color:var(--text-gray);font-size:0.65rem;letter-spacing:.5px;">Точность: —</small>
+                </div>
             </div>
         </div>
 
@@ -642,7 +638,14 @@
             <div class="results-section">
                 <div class="result-card">
                     <h3>🖼️ Превью фотографии</h3>
-                    <img id="preview" src="" alt="Превью фото">
+                    <div class="preview-wrapper">
+                        <img id="preview" src="" alt="Превью фото">
+                        <div class="photo-overlay hidden" id="photo-overlay">
+                            <span id="overlay-coords">—</span>
+                            <span id="overlay-datetime">—</span>
+                        </div>
+                    </div>
+                    <div id="exif-summary" class="exif-summary-badge hidden" title="Сводка параметров снимка"></div>
                 </div>
 
                 <div class="result-card">
@@ -705,10 +708,18 @@
     const yandexMapsLink = document.getElementById('yandex-maps-link');
     const exifTableBody = document.querySelector('#exif-table tbody');
     const statusElement = document.getElementById('status');
+    const refreshGeoBtn = document.getElementById('refresh-geo');
+    const geoAccuracyEl = document.getElementById('geo-accuracy');
+    const photoOverlay = document.getElementById('photo-overlay');
+    const overlayCoords = document.getElementById('overlay-coords');
+    const overlayDatetime = document.getElementById('overlay-datetime');
+    const exifSummaryEl = document.getElementById('exif-summary');
 
-        let stream;
-        let currentFacingMode = 'user'; // 'user' для фронтальной, 'environment' для задней
-        let userLocation = null;
+    let stream;
+    let currentFacingMode = 'user'; // 'user' для фронтальной, 'environment' для задней
+    let userLocation = null;
+    let bestGeoSample = null; // {lat, lon, accuracy, ts}
+    let geoWatchId = null;
 
         function updateStatus(text, type = 'ready') {
             const icons = {
@@ -825,32 +836,69 @@
             }
         });
 
-        function getGeolocation() {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(position => {
-                    const lat = position.coords.latitude.toFixed(6);
-                    const lon = position.coords.longitude.toFixed(6);
-                    
-                    userLocation = { lat: parseFloat(lat), lon: parseFloat(lon) };
-                    
-                    geolocationSpan.innerHTML = `<strong>${lat}</strong>, <strong>${lon}</strong> <small style="color: var(--success-green);">(браузер)</small>`;
-                    
-                    // Показываем ссылки на карты
-                    updateMapLinks(lat, lon);
-                    mapLinks.classList.remove('hidden');
-                    
-                }, error => {
-                    console.error('Ошибка геолокации:', error);
-                    geolocationSpan.innerHTML = '<span style="color: var(--warning-orange);">Не удалось получить геолокацию из браузера</span>';
-                }, {
-                    enableHighAccuracy: true,
-                    timeout: 10000,
-                    maximumAge: 60000
-                });
-            } else {
-                geolocationSpan.innerHTML = '<span style="color: var(--warning-orange);">Геолокация не поддерживается браузером</span>';
+        function formatAccuracy(acc) {
+            if (acc == null) return '—';
+            if (acc < 25) return acc.toFixed(0) + 'м (отлично)';
+            if (acc < 60) return acc.toFixed(0) + 'м (хорошо)';
+            if (acc < 120) return acc.toFixed(0) + 'м (средне)';
+            return acc.toFixed(0) + 'м (грубо)';
+        }
+
+        function applyBestGeo(sample) {
+            const lat = sample.lat.toFixed(6);
+            const lon = sample.lon.toFixed(6);
+            userLocation = { lat: sample.lat, lon: sample.lon };
+            geolocationSpan.innerHTML = `<strong>${lat}</strong>, <strong>${lon}</strong> <small style="color: var(--success-green);">(браузер)</small>`;
+            updateMapLinks(lat, lon);
+            mapLinks.classList.remove('hidden');
+            geoAccuracyEl.textContent = 'Точность: ' + formatAccuracy(sample.accuracy);
+        }
+
+        function considerGeoSample(position) {
+            const { latitude, longitude, accuracy } = position.coords;
+            const sample = { lat: latitude, lon: longitude, accuracy: accuracy ?? null, ts: Date.now() };
+            // Улучшение если нет лучшего или accuracy меньше, или новая точка свежее >15с и лучше на 20%
+            if (!bestGeoSample || (sample.accuracy && (!bestGeoSample.accuracy || sample.accuracy < bestGeoSample.accuracy - 5)) ||
+                (sample.accuracy && bestGeoSample.accuracy && sample.accuracy < bestGeoSample.accuracy * 0.8)) {
+                bestGeoSample = sample;
+                applyBestGeo(sample);
             }
         }
+
+        function startGeoWatch() {
+            if (!navigator.geolocation) {
+                geolocationSpan.innerHTML = '<span style="color: var(--warning-orange);">Геолокация не поддерживается</span>';
+                return;
+            }
+            if (geoWatchId != null) return; // уже идет
+            geoWatchId = navigator.geolocation.watchPosition(considerGeoSample, err => {
+                console.warn('watchPosition error', err);
+                if (!bestGeoSample) {
+                    geolocationSpan.innerHTML = '<span style="color: var(--warning-orange);">Не удалось получить геолокацию</span>';
+                }
+            }, { enableHighAccuracy: true, maximumAge: 5000, timeout: 15000 });
+        }
+
+        function getGeolocation() {
+            startGeoWatch();
+            // Одно мгновенное получение для старта (если быстрее чем watch)
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(pos => {
+                    if (!bestGeoSample) considerGeoSample(pos);
+                }, () => {}, { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 });
+            }
+        }
+
+        refreshGeoBtn.addEventListener('click', () => {
+            bestGeoSample = null;
+            geoAccuracyEl.textContent = 'Точность: —';
+            geolocationSpan.textContent = 'Обновление...';
+            if (geoWatchId) {
+                navigator.geolocation.clearWatch(geoWatchId);
+                geoWatchId = null;
+            }
+            startGeoWatch();
+        });
 
         function updateMapLinks(lat, lon) {
             googleMapsLink.href = `https://www.google.com/maps?q=${lat},${lon}`;
@@ -898,7 +946,16 @@
             // Очищаем предыдущие EXIF данные
             exifTableBody.innerHTML = '';
 
+            // Отрисовка summary
+            if (data.exif_summary) {
+                exifSummaryEl.textContent = data.exif_summary;
+                exifSummaryEl.classList.remove('hidden');
+            } else {
+                exifSummaryEl.classList.add('hidden');
+            }
+
             // Приоритет: если есть gps_latitude/gps_longitude из EXIF — показываем их
+            let overlayLat = null, overlayLon = null;
             if (data.gps_latitude !== null && data.gps_latitude !== undefined &&
                 data.gps_longitude !== null && data.gps_longitude !== undefined) {
                 const lat = data.gps_latitude.toFixed(6);
@@ -906,12 +963,27 @@
                 geolocationSpan.innerHTML = `<strong>${lat}</strong>, <strong>${lon}</strong> <small style="color: var(--primary-red);">(EXIF)</small>`;
                 updateMapLinks(lat, lon);
                 mapLinks.classList.remove('hidden');
+                overlayLat = lat; overlayLon = lon;
             } else {
                 // Если EXIF GPS нет, сохраняем ранее установленную браузером (не перетираем, если она уже есть)
                 if (!geolocationSpan.textContent || geolocationSpan.textContent.trim() === '-' ) {
                     geolocationSpan.innerHTML = '<span style="color: var(--warning-orange);">GPS координаты в EXIF отсутствуют — ожидаем браузер</span>';
                 }
+                if (userLocation) {
+                    overlayLat = userLocation.lat.toFixed(6);
+                    overlayLon = userLocation.lon.toFixed(6);
+                }
             }
+
+            // Overlay заполнение
+            const dateForOverlay = data.exif_data && data.exif_data['EXIF DateTimeOriginal'] ? data.exif_data['EXIF DateTimeOriginal'] : new Date(data.server_time).toLocaleString('ru-RU');
+            if (overlayLat && overlayLon) {
+                overlayCoords.textContent = `${overlayLat}, ${overlayLon}`;
+            } else {
+                overlayCoords.textContent = '—';
+            }
+            overlayDatetime.textContent = dateForOverlay;
+            photoOverlay.classList.remove('hidden');
 
             // Заполняем таблицу EXIF (отрисовываем первые 300 элементов максимум, чтобы не перегружать)
             if (data.exif_data && Object.keys(data.exif_data).length > 0) {
