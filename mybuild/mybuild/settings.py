@@ -51,6 +51,10 @@ INSTALLED_APPS = [
     "notifications",
     "audit",
 ]
+CSRF_TRUSTED_ORIGINS = [
+    "https://alphabuild.ru",
+    "https://www.alphabuild.ru",
+]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
