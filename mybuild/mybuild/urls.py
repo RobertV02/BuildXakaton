@@ -25,6 +25,7 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('accounts/', include('django.contrib.auth.urls')),
 	path('', include('dashboard.urls')),
     path('playground/', include('playground.urls')),
     path('objects/', include(('objects.urls', 'objects'), namespace='objects')),
