@@ -27,8 +27,16 @@ from django.shortcuts import render
 
 @login_required
 def user_profile(request):
+    # Calculate statistics
+    activated_objects_count = request.user.activated_objects.count()
+    filled_checklists_count = request.user.filled_checklists.count()
+    active_assignments_count = request.user.object_assignments.filter(is_active=True).count()
+    
     return render(request, 'registration/profile.html', {
         'user': request.user,
+        'activated_objects_count': activated_objects_count,
+        'filled_checklists_count': filled_checklists_count,
+        'active_assignments_count': active_assignments_count,
     })
 
 urlpatterns = [

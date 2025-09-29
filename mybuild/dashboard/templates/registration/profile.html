@@ -90,15 +90,15 @@
     <div class="px-6 py-6">
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div class="text-center">
-          <div class="text-2xl font-bold text-primary-600">{{ user.activated_objects.count }}</div>
+          <div class="text-2xl font-bold text-primary-600">{{ activated_objects_count }}</div>
           <div class="text-sm text-gray-600">Активированных объектов</div>
         </div>
         <div class="text-center">
-          <div class="text-2xl font-bold text-success-600">{{ user.filled_checklists.count }}</div>
+          <div class="text-2xl font-bold text-success-600">{{ filled_checklists_count }}</div>
           <div class="text-sm text-gray-600">Заполненных чек-листов</div>
         </div>
         <div class="text-center">
-          <div class="text-2xl font-bold text-warning-600">{{ user.object_assignments.filter(is_active=True).count }}</div>
+          <div class="text-2xl font-bold text-warning-600">{{ active_assignments_count }}</div>
           <div class="text-sm text-gray-600">Активных назначений</div>
         </div>
       </div>
