@@ -101,6 +101,16 @@ class ConstructionObjectViewSet(ScopedQuerySetMixin, viewsets.ModelViewSet):
         obj.activated_at = timezone.now()
         obj.activated_by = request.user
         obj.save(update_fields=['status', 'activated_at', 'activated_by', 'updated_at'])
+
+        # Create opening checklist automatically when object is activated
+        if not hasattr(obj, 'opening_checklist'):
+            from objects.models import OpeningChecklist
+            OpeningChecklist.objects.create(
+                object=obj,
+                data={"fields": []},  # Empty checklist data to be filled later
+                filled_by=None  # Will be set when checklist is filled
+            )
+
         from audit.services import log_action
         from notifications.services import notify, build_basic_payload
         log_action(actor=request.user, action='object_activate', instance=obj)
