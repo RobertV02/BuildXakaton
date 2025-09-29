@@ -31,6 +31,7 @@ urlpatterns = [
     path('objects/', include(('objects.urls', 'objects'), namespace='objects')),
     path('deliveries/', delivery_list, name='deliveries_list'),
     path('remarks/', remarks_list, name='remarks_list'),
+    path('issues/', include(('issues.urls', 'issues'), namespace='issues')),
     path('checklists/', checklists_list, name='checklists_list'),
     path('api/', include(core_api.router.urls)),
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),

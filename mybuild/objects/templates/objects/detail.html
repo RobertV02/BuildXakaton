@@ -329,7 +329,9 @@
               {% for r in remarks %}
                 <tr class="hover:bg-gray-50 transition-colors duration-200">
                   <td class="px-6 py-4">
-                    <div class="text-sm font-medium text-gray-900">{{ r.category.title }}</div>
+                    <div class="text-sm font-medium text-gray-900">
+                      <a href="{% url 'issues:remark_detail' r.id %}" class="text-primary-600 hover:text-primary-800">{{ r.category.title }}</a>
+                    </div>
                     <div class="text-xs text-gray-500">{{ r.description|truncatechars:50 }}</div>
                   </td>
                   <td class="px-6 py-4">
@@ -364,7 +366,7 @@
         <!-- Mobile Cards -->
         <div class="lg:hidden divide-y divide-gray-200">
           {% for r in remarks %}
-            <div class="p-4">
+            <div class="p-4 hover:bg-gray-50 cursor-pointer" onclick="window.location.href='{% url &quot;issues:remark_detail&quot; r.id %}'">
               <div class="flex items-start justify-between">
                 <div class="flex-1">
                   <h4 class="text-sm font-medium text-gray-900">{{ r.category.title }}</h4>

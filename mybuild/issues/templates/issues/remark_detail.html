@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+{% block title %}{{ remark.category.title }} - {{ remark.object.name }}{% endblock %}
+{% block page_heading %}{{ remark.category.title }}{% endblock %}
+{% block page_subtitle %}{{ remark.object.name }}{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto space-y-6">
+  <!-- Remark Header -->
+  <div class="bg-white rounded-xl shadow-md overflow-hidden">
+    <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-4">
+          <div class="flex items-center gap-2">
+            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium {% if remark.status == 'OPEN' %}bg-danger-100 text-danger-800{% elif remark.status == 'IN_PROGRESS' %}bg-warning-100 text-warning-800{% elif remark.status == 'RESOLVED' %}bg-success-100 text-success-800{% elif remark.status == 'ACCEPTED' %}bg-primary-100 text-primary-800{% else %}bg-gray-100 text-gray-800{% endif %}">
+              {{ remark.get_status_display }}
+            </span>
+            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium {% if remark.severity == 'LOW' %}bg-gray-100 text-gray-800{% elif remark.severity == 'MEDIUM' %}bg-warning-100 text-warning-800{% elif remark.severity == 'HIGH' %}bg-danger-100 text-danger-800{% else %}bg-danger-100 text-danger-900{% endif %}">
+              {{ remark.get_severity_display }}
+            </span>
+          </div>
+        </div>
+        <div class="text-right">
+          <p class="text-sm text-gray-500">Создано {{ remark.created_at|date:'d.m.Y H:i' }}</p>
+          {% if remark.created_by %}
+            <p class="text-sm text-gray-600">{{ remark.created_by.get_full_name|default:remark.created_by.username }}</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <div class="px-6 py-6">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Main Content -->
+        <div class="lg:col-span-2 space-y-6">
+          <!-- Description -->
+          <div>
+            <h3 class="text-lg font-semibold text-gray-900 mb-3">Описание замечания</h3>
+            <div class="bg-gray-50 rounded-lg p-4">
+              <p class="text-gray-700 whitespace-pre-wrap">{{ remark.description }}</p>
+            </div>
+          </div>
+
+          <!-- Photos -->
+          {% if remark.photos.all %}
+            <div>
+              <h3 class="text-lg font-semibold text-gray-900 mb-3">Фотографии</h3>
+              <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                {% for photo in remark.photos.all %}
+                  <div class="aspect-square bg-gray-100 rounded-lg overflow-hidden">
+                    <img src="{{ photo.file.url }}" alt="Фото замечания" class="w-full h-full object-cover">
+                  </div>
+                {% endfor %}
+              </div>
+            </div>
+          {% endif %}
+
+          <!-- Location -->
+          {% if remark.latitude and remark.longitude %}
+            <div>
+              <h3 class="text-lg font-semibold text-gray-900 mb-3">Местоположение</h3>
+              <div class="bg-gray-50 rounded-lg p-4">
+                <p class="text-sm text-gray-600">
+                  Координаты: {{ remark.latitude|floatformat:6 }}, {{ remark.longitude|floatformat:6 }}
+                </p>
+              </div>
+            </div>
+          {% endif %}
+        </div>
+
+        <!-- Sidebar -->
+        <div class="space-y-6">
+          <!-- Object Info -->
+          <div class="bg-gray-50 rounded-lg p-4">
+            <h4 class="font-medium text-gray-900 mb-2">Объект</h4>
+            <a href="{% url 'objects:detail' remark.object.id %}" class="text-primary-600 hover:text-primary-800 font-medium">
+              {{ remark.object.name }}
+            </a>
+            <p class="text-sm text-gray-600 mt-1">{{ remark.object.description|truncatechars:100 }}</p>
+          </div>
+
+          <!-- Category Info -->
+          <div class="bg-gray-50 rounded-lg p-4">
+            <h4 class="font-medium text-gray-900 mb-2">Категория</h4>
+            <p class="text-gray-700">{{ remark.category.title }}</p>
+            <p class="text-sm text-gray-600">{{ remark.category.get_issuer_type_display }}</p>
+          </div>
+
+          <!-- SLA Info -->
+          {% if remark.sla_due %}
+            <div class="bg-gray-50 rounded-lg p-4">
+              <h4 class="font-medium text-gray-900 mb-2">SLA</h4>
+              <p class="text-sm text-gray-600">Срок: {{ remark.sla_due|date:'d.m.Y H:i' }}</p>
+              {% if remark.sla_due < remark.created_at %}
+                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-danger-100 text-danger-800 mt-1">
+                  Просрочено
+                </span>
+              {% endif %}
+            </div>
+          {% endif %}
+
+          <!-- Actions -->
+          <div class="bg-white border border-gray-200 rounded-lg p-4">
+            <h4 class="font-medium text-gray-900 mb-3">Действия</h4>
+            <div class="space-y-2">
+              <a href="{% url 'objects:detail' remark.object.id %}?tab=remarks" class="inline-flex items-center gap-2 px-4 py-2 text-sm text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-all duration-200 font-medium w-full justify-center">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                </svg>
+                Вернуться к объекту
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

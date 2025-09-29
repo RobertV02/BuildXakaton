@@ -1,7 +1,13 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from issues.models import Remark
 from objects.models import OpeningChecklist
+
+
+@login_required
+def remark_detail(request, pk):
+    remark = get_object_or_404(Remark.objects.select_related('object', 'category', 'created_by'), pk=pk)
+    return render(request, 'issues/remark_detail.html', {'remark': remark})
 
 
 @login_required
