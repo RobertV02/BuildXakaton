@@ -1,0 +1,244 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru" class="h-full bg-gray-50">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}Alpha Build{% endblock %}</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: { 50: '#fdf2f8', 100: '#fce7f3', 500: '#ec4899', 600: '#db2777', 700: '#be185d' },
+            success: { 50: '#f0fdf4', 500: '#22c55e', 600: '#16a34a' },
+            warning: { 50: '#fffbeb', 500: '#f59e0b', 600: '#d97706' },
+            danger: { 50: '#fef2f2', 500: '#ef4444', 600: '#dc2626' }
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .mobile-menu { transform: translateX(-100%); transition: transform 0.3s ease; }
+    .mobile-menu.open { transform: translateX(0); }
+    .fade-in { animation: fadeIn 0.3s ease-in-out; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .slide-up { animation: slideUp 0.4s ease-out; }
+    @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+  </style>
+  {% block extra_head %}{% endblock %}
+</head>
+<body class="h-full flex bg-gray-50">
+  <!-- Mobile Sidebar Overlay -->
+  <div id="mobile-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden hidden"></div>
+  
+  <!-- Sidebar -->
+  <aside id="sidebar" class="mobile-menu md:translate-x-0 fixed md:relative z-50 md:z-auto w-64 bg-white border-r border-gray-200 min-h-screen md:flex md:flex-col shadow-xl md:shadow-none">
+    <div class="h-16 flex items-center justify-between px-6 border-b border-gray-200 bg-gradient-to-r from-primary-500 to-primary-600">
+      <a href="/" class="text-xl font-bold text-white tracking-tight">Alpha Build</a>
+      <button id="closeSidebar" class="md:hidden text-white hover:text-gray-200 p-1">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+      </button>
+    </div>
+    
+    <nav class="flex-1 overflow-y-auto py-6">
+      {% with p=request.path %}
+      <ul class="space-y-2 px-4">
+        <li>
+          <a href="/" class="group flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 {% if p == '/' %}bg-primary-500 text-white shadow-lg{% else %}text-gray-700 hover:bg-primary-50 hover:text-primary-700{% endif %}">
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path>
+            </svg>
+            <span>Дашборд</span>
+          </a>
+        </li>
+        <li>
+          <a href="/objects/" class="group flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 {% if p|slice:':9' == '/objects/' or p == '/objects/' %}bg-primary-500 text-white shadow-lg{% else %}text-gray-700 hover:bg-primary-50 hover:text-primary-700{% endif %}">
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M4 4a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2H4zm0 2h12v8H4V6z" clip-rule="evenodd"></path>
+            </svg>
+            <span>Объекты</span>
+          </a>
+        </li>
+        <li>
+          <a href="/deliveries/" class="group flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 {% if p|slice:':12' == '/deliveries/' or p == '/deliveries/' %}bg-primary-500 text-white shadow-lg{% else %}text-gray-700 hover:bg-primary-50 hover:text-primary-700{% endif %}">
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M8 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM15 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z"></path>
+              <path d="M3 4a1 1 0 00-1 1v10a1 1 0 001 1h1.05a2.5 2.5 0 014.9 0H10a1 1 0 001-1V5a1 1 0 00-1-1H3zM14 7a1 1 0 00-1 1v6.05A2.5 2.5 0 0115.95 16H17a1 1 0 001-1V8a1 1 0 00-1-1h-3z"></path>
+            </svg>
+            <span>Поставки</span>
+          </a>
+        </li>
+        <li>
+          <a href="/remarks/" class="group flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 {% if p|slice:':9' == '/remarks/' or p == '/remarks/' %}bg-primary-500 text-white shadow-lg{% else %}text-gray-700 hover:bg-primary-50 hover:text-primary-700{% endif %}">
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+            </svg>
+            <span>Замечания</span>
+          </a>
+        </li>
+        <li>
+          <a href="/checklists/" class="group flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 {% if p|slice:':12' == '/checklists/' or p == '/checklists/' %}bg-primary-500 text-white shadow-lg{% else %}text-gray-700 hover:bg-primary-50 hover:text-primary-700{% endif %}">
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zm0 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V8zm0 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1v-2z" clip-rule="evenodd"></path>
+            </svg>
+            <span>Чек-листы</span>
+          </a>
+        </li>
+      </ul>
+      {% endwith %}
+    </nav>
+    
+    <div class="p-4 border-t border-gray-200">
+      <div class="text-center text-xs text-gray-500 font-medium">
+        © 2025 Alpha Build
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main content wrapper -->
+  <div class="flex-1 flex flex-col min-h-screen">
+    <!-- Top bar -->
+    <header class="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-4 lg:px-8 shadow-sm">
+      <div class="flex items-center gap-3">
+        <button id="mobileMenuToggle" class="md:hidden p-2 rounded-lg hover:bg-gray-100 text-gray-600 transition-colors">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+          </svg>
+        </button>
+        <div class="hidden md:block">
+          <h1 class="text-lg font-semibold text-gray-800">{% block page_heading %}{% endblock %}</h1>
+          <p class="text-sm text-gray-500">{% block page_subtitle %}{% endblock %}</p>
+        </div>
+      </div>
+      
+      <div class="flex items-center gap-4">
+        {% if user.is_authenticated %}
+          <div class="hidden sm:flex items-center gap-3 px-3 py-2 bg-gray-50 rounded-lg">
+            <div class="w-8 h-8 bg-primary-500 rounded-full flex items-center justify-center">
+              <span class="text-white text-sm font-semibold">{{ user.username|first|upper }}</span>
+            </div>
+            <span class="text-sm font-medium text-gray-700">{{ user.username }}</span>
+          </div>
+          <form method="post" action="/logout/" class="inline">
+            {% csrf_token %}
+            <button class="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all" type="submit">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+              </svg>
+              <span class="hidden sm:inline">Выйти</span>
+            </button>
+          </form>
+        {% else %}
+          <a href="/login/" class="px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors font-medium">Войти</a>
+        {% endif %}
+      </div>
+    </header>
+
+    <!-- Toast notifications -->
+    <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-3 max-w-sm"></div>
+
+    <!-- Page content -->
+    <main class="flex-1 p-4 lg:p-8 bg-gray-50" id="content">
+      {% if messages %}
+        <div id="django-messages" class="hidden">
+          {% for message in messages %}
+            <div data-tags="{{ message.tags }}" data-text="{{ message|escape }}"></div>
+          {% endfor %}
+        </div>
+      {% endif %}
+      
+      <div class="max-w-7xl mx-auto">
+        {% block content %}{% endblock %}
+      </div>
+    </main>
+  </div>
+
+  {% block extra_scripts %}{% endblock %}
+  <script>
+    // Mobile menu functionality
+    document.addEventListener('DOMContentLoaded', function() {
+      const mobileToggle = document.getElementById('mobileMenuToggle');
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('mobile-overlay');
+      const closeSidebar = document.getElementById('closeSidebar');
+      
+      function openSidebar() {
+        sidebar.classList.add('open');
+        overlay.classList.remove('hidden');
+        document.body.classList.add('overflow-hidden');
+      }
+      
+      function closeSidebarFn() {
+        sidebar.classList.remove('open');
+        overlay.classList.add('hidden');
+        document.body.classList.remove('overflow-hidden');
+      }
+      
+      mobileToggle?.addEventListener('click', openSidebar);
+      closeSidebar?.addEventListener('click', closeSidebarFn);
+      overlay?.addEventListener('click', closeSidebarFn);
+      
+      // Enhanced toast notifications
+      const container = document.getElementById('toast-container');
+      const raw = document.getElementById('django-messages');
+      
+      if(raw) {
+        [...raw.children].forEach((m, idx) => {
+          const text = m.getAttribute('data-text');
+          const tags = m.getAttribute('data-tags') || '';
+          
+          let bgColor, icon;
+          if (tags.includes('error')) {
+            bgColor = 'bg-danger-500';
+            icon = '<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>';
+          } else if (tags.includes('success')) {
+            bgColor = 'bg-success-500';
+            icon = '<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>';
+          } else {
+            bgColor = 'bg-gray-700';
+            icon = '<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a.75.75 0 000 1.5h.253a.25.25 0 01.244.304l-.459 2.066A1.75 1.75 0 0010.747 15H11a.75.75 0 000-1.5h-.253a.25.25 0 01-.244-.304l.459-2.066A1.75 1.75 0 009.253 9H9z" clip-rule="evenodd"></path></svg>';
+          }
+          
+          const el = document.createElement('div');
+          el.className = `${bgColor} text-white shadow-lg rounded-xl px-4 py-3 text-sm flex items-start gap-3 transform transition-all duration-300 slide-up max-w-sm`;
+          el.innerHTML = `
+            <div class="flex-shrink-0 mt-0.5">${icon}</div>
+            <div class="flex-1 font-medium">${text}</div>
+            <button class="flex-shrink-0 text-white/70 hover:text-white transition-colors ml-2">
+              <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+              </svg>
+            </button>
+          `;
+          
+          const closeBtn = el.querySelector('button');
+          closeBtn.addEventListener('click', () => {
+            el.style.transform = 'translateX(100%)';
+            el.style.opacity = '0';
+            setTimeout(() => el.remove(), 300);
+          });
+          
+          setTimeout(() => {
+            if(document.body.contains(el)) {
+              el.style.transform = 'translateX(100%)';
+              el.style.opacity = '0';
+              setTimeout(() => el.remove(), 300);
+            }
+          }, 5000 + idx * 500);
+          
+          setTimeout(() => container.appendChild(el), idx * 100);
+        });
+      }
+    });
+  </script>
+</body>
+</html>

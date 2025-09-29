@@ -1,0 +1,206 @@
+{% extends 'base.html' %}
+{% block title %}Новое замечание - Alpha Build{% endblock %}
+{% block page_heading %}Новое замечание{% endblock %}
+{% block page_subtitle %}Регистрация нарушения или замечания по объекту "{{ object.name }}"{% endblock %}
+
+{% block content %}
+<!-- Breadcrumb -->
+<nav class="flex items-center gap-2 text-sm text-gray-500 mb-6">
+  <a href="/objects/" class="hover:text-primary-600 transition-colors">Объекты</a>
+  <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+    <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 111.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+  </svg>
+  <a href="/objects/{{ object.id }}/" class="hover:text-primary-600 transition-colors">{{ object.name }}</a>
+  <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+    <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 111.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+  </svg>
+  <a href="/objects/{{ object.id }}/?tab=remarks" class="hover:text-primary-600 transition-colors">Замечания</a>
+  <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+    <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 111.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+  </svg>
+  <span class="text-gray-900 font-medium">Новое замечание</span>
+</nav>
+
+<!-- Form Container -->
+<div class="max-w-2xl mx-auto">
+  <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+    <!-- Form Header -->
+    <div class="px-6 py-4 border-b border-gray-100 bg-gradient-to-r from-danger-50 to-warning-50">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 bg-danger-500 rounded-xl flex items-center justify-center">
+          <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+          </svg>
+        </div>
+        <div>
+          <h2 class="text-lg font-semibold text-gray-900">Регистрация замечания</h2>
+          <p class="text-sm text-gray-600">Добавление информации о нарушении или проблеме</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Form Content -->
+    <div class="p-6">
+      <form method="post" class="space-y-6" id="remarkForm">{% csrf_token %}
+        <!-- Category Field -->
+        <div class="space-y-2">
+          <label for="{{ form.category.id_for_label }}" class="block text-sm font-semibold text-gray-700 flex items-center gap-2">
+            <svg class="w-4 h-4 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zm0 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V8zm0 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1v-2z" clip-rule="evenodd"></path>
+            </svg>
+            Категория нарушения
+            <span class="text-danger-500">*</span>
+          </label>
+          <div class="relative">
+            {{ form.category }}
+            {% if form.category.errors %}
+              <div class="absolute inset-y-0 right-0 flex items-center pr-3">
+                <svg class="w-5 h-5 text-danger-500" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                </svg>
+              </div>
+            {% endif %}
+          </div>
+          {% if form.category.errors %}
+            <div class="text-sm text-danger-600 flex items-center gap-1">
+              <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+              </svg>
+              {{ form.category.errors.0 }}
+            </div>
+          {% endif %}
+          <p class="text-xs text-gray-500">Выберите подходящую категорию для классификации замечания</p>
+        </div>
+
+        <!-- Severity Field -->
+        <div class="space-y-2">
+          <label for="{{ form.severity.id_for_label }}" class="block text-sm font-semibold text-gray-700 flex items-center gap-2">
+            <svg class="w-4 h-4 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+            </svg>
+            Уровень серьёзности
+            <span class="text-danger-500">*</span>
+          </label>
+          <div class="relative">
+            {{ form.severity }}
+            {% if form.severity.errors %}
+              <div class="absolute inset-y-0 right-0 flex items-center pr-3">
+                <svg class="w-5 h-5 text-danger-500" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                </svg>
+              </div>
+            {% endif %}
+          </div>
+          {% if form.severity.errors %}
+            <div class="text-sm text-danger-600 flex items-center gap-1">
+              <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+              </svg>
+              {{ form.severity.errors.0 }}
+            </div>
+          {% endif %}
+          <p class="text-xs text-gray-500">Оцените критичность найденного нарушения</p>
+        </div>
+
+        <!-- Description Field -->
+        <div class="space-y-2">
+          <label for="{{ form.description.id_for_label }}" class="block text-sm font-semibold text-gray-700 flex items-center gap-2">
+            <svg class="w-4 h-4 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zm0 4a1 1 0 011-1h12a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1V8z" clip-rule="evenodd"></path>
+            </svg>
+            Подробное описание
+            <span class="text-danger-500">*</span>
+          </label>
+          <div class="relative">
+            {{ form.description }}
+            {% if form.description.errors %}
+              <div class="absolute top-3 right-3">
+                <svg class="w-5 h-5 text-danger-500" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                </svg>
+              </div>
+            {% endif %}
+          </div>
+          {% if form.description.errors %}
+            <div class="text-sm text-danger-600 flex items-center gap-1">
+              <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+              </svg>
+              {{ form.description.errors.0 }}
+            </div>
+          {% endif %}
+          <p class="text-xs text-gray-500">Опишите детально обнаруженное нарушение, укажите местоположение и рекомендации по устранению</p>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="flex items-center justify-between pt-6 border-t border-gray-100">
+          <a href="/objects/{{ object.id }}/?tab=remarks" class="inline-flex items-center gap-2 px-4 py-2 text-gray-700 bg-gray-100 rounded-xl hover:bg-gray-200 transition-all duration-200 font-medium">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd"></path>
+            </svg>
+            Отмена
+          </a>
+          <button type="submit" class="inline-flex items-center gap-2 px-6 py-2 bg-danger-500 text-white rounded-xl hover:bg-danger-600 transition-all duration-200 font-medium group">
+            <svg class="w-4 h-4 group-hover:scale-110 transition-transform" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+            </svg>
+            Сохранить замечание
+          </button>
+        </div>
+      </form>
+
+      <!-- General Form Errors -->
+      {% if form.non_field_errors %}
+        <div class="mt-6 p-4 bg-danger-50 border border-danger-200 rounded-xl">
+          <div class="flex items-start gap-3">
+            <svg class="w-5 h-5 text-danger-500 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+            </svg>
+            <div>
+              <h3 class="text-sm font-medium text-danger-800">Ошибки формы</h3>
+              <ul class="mt-1 text-sm text-danger-700">
+                {% for error in form.non_field_errors %}
+                  <li>{{ error }}</li>
+                {% endfor %}
+              </ul>
+            </div>
+          </div>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<!-- Enhanced Form Styling -->
+<style>
+  /* Custom form field styling */
+  #remarkForm select,
+  #remarkForm textarea {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.75rem;
+    font-size: 0.875rem;
+    transition: all 0.2s ease;
+    background-color: white;
+  }
+  
+  #remarkForm textarea {
+    min-height: 120px;
+    resize: vertical;
+  }
+  
+  #remarkForm select:focus,
+  #remarkForm textarea:focus {
+    outline: none;
+    border-color: rgb(239 68 68);
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+  }
+  
+  #remarkForm select.error,
+  #remarkForm textarea.error {
+    border-color: #ef4444;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+  }
+</style>
+{% endblock %}
