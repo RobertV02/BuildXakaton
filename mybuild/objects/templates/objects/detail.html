@@ -366,7 +366,7 @@
         <!-- Mobile Cards -->
         <div class="lg:hidden divide-y divide-gray-200">
           {% for r in remarks %}
-            {% with remark_url %}{% url 'issues:remark_detail' r.id %}{% endwith %}
+            {% url 'issues:remark_detail' r.id as remark_url %}
             <div class="p-4 hover:bg-gray-50 cursor-pointer" onclick="window.location.href='{{ remark_url }}'">
               <div class="flex items-start justify-between">
                 <div class="flex-1">
