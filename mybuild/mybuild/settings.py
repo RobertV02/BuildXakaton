@@ -52,6 +52,8 @@ INSTALLED_APPS = [
     "audit",
     'playground',
     'rest_framework',
+    'drf_spectacular',
+    'drf_spectacular_sidecar',
 ]
 CSRF_TRUSTED_ORIGINS = [
     "https://alphabuild.ru",
@@ -159,3 +161,18 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# DRF / Spectacular
+REST_FRAMEWORK = {
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+}
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'MyBuild API',
+    'DESCRIPTION': 'API схемы (RBAC, FSM, Offline, Audit, Notifications, Geo Presence).',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+    'COMPONENT_SPLIT_REQUEST': True,
+    'SCHEMA_PATH_PREFIX': r'/api',
+    'CONTACT': {'email': 'support@example.com'},
+}

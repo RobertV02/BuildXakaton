@@ -64,6 +64,11 @@ class WorkItem(BaseModel):
     def __str__(self):
         return self.name
 
+    class Meta:
+        permissions = [
+            ("can_set_actual", "Может устанавливать фактические показатели работы"),
+        ]
+
 
 class ChangeRequest(BaseModel):
     object = models.ForeignKey(

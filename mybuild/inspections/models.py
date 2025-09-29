@@ -2,7 +2,7 @@ import uuid
 from django.contrib.auth.models import User
 from django.db import models
 from django.utils import timezone
-from core.models import BaseModel
+from core.models import BaseModel, OfflineFieldsMixin
 from objects.models import ConstructionObject
 
 class PresenceMethod(models.TextChoices):
@@ -28,7 +28,7 @@ class PresenceToken(BaseModel):
     def __str__(self):
         return f'Токен для {self.object.name} ({self.get_method_display()})'
 
-class InspectionVisit(BaseModel):
+class InspectionVisit(BaseModel, OfflineFieldsMixin):
     object = models.ForeignKey(ConstructionObject, on_delete=models.CASCADE, related_name='inspection_visits', db_index=True)
     inspector = models.ForeignKey(User, on_delete=models.CASCADE, related_name='inspection_visits', db_index=True)
     started_at = models.DateTimeField(auto_now_add=True, db_index=True)
@@ -41,7 +41,7 @@ class InspectionVisit(BaseModel):
     def __str__(self):
         return f'Визит {self.inspector.username} на {self.object.name} в {self.started_at}'
 
-class PresenceConfirmation(BaseModel):
+class PresenceConfirmation(BaseModel, OfflineFieldsMixin):
     visit = models.OneToOneField(InspectionVisit, on_delete=models.CASCADE, related_name='presence_confirmation')
     status = models.CharField(max_length=20, choices=PresenceStatus.choices, default=PresenceStatus.DRAFT, db_index=True)
     method = models.CharField(max_length=10, choices=PresenceMethod.choices)

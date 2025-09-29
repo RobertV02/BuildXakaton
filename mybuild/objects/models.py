@@ -7,9 +7,10 @@ from orgs.models import Organization, RoleType
 
 class ObjectStatus(models.TextChoices):
     DRAFT = 'DRAFT', 'Черновик'
-    PENDING_ACTIVATION = 'PENDING_ACTIVATION', 'Ожидает активации'
+    PLANNED = 'PLANNED', 'Запланирован'
+    ACTIVATION_PENDING = 'ACTIVATION_PENDING', 'Ожидает активации'
     ACTIVE = 'ACTIVE', 'Активен'
-    COMPLETED = 'COMPLETED', 'Завершен'
+    CLOSED = 'CLOSED', 'Закрыт'
 
 
 class OpeningChecklistStatus(models.TextChoices):
@@ -20,13 +21,22 @@ class OpeningChecklistStatus(models.TextChoices):
 
 
 class ConstructionObject(BaseModel):
-    org = models.ForeignKey(Organization, on_delete=models.CASCADE, related_name='objects', db_index=True)
+    # related_name changed from 'objects' to 'construction_objects' to avoid shadowing Organization.objects manager
+    org = models.ForeignKey(Organization, on_delete=models.CASCADE, related_name='construction_objects', db_index=True)
     name = models.CharField(max_length=255, db_index=True)
     description = models.TextField(blank=True, null=True)
     polygon = models.JSONField()
     status = models.CharField(max_length=20, choices=ObjectStatus.choices, default=ObjectStatus.DRAFT, db_index=True)
     plan_start = models.DateField(null=True, blank=True, db_index=True)
     plan_end = models.DateField(null=True, blank=True, db_index=True)
+    activated_at = models.DateTimeField(null=True, blank=True, db_index=True)
+    activated_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='activated_objects')
+
+    class Meta:
+        permissions = [
+            ("can_confirm_geozone", "Может подтверждать геозону объекта"),
+            ("can_view_auditlog", "Может просматривать аудит"),
+        ]
 
     def __str__(self):
         return self.name
@@ -55,6 +65,12 @@ class OpeningChecklist(BaseModel):
     reviewed_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='reviewed_checklists')
     reviewed_at = models.DateTimeField(null=True, blank=True)
     review_comment = models.TextField(blank=True, null=True)
+
+    class Meta:
+        permissions = [
+            ("can_review_checklist", "Может рецензировать чеклист"),
+            ("can_approve_checklist", "Может утверждать чеклист"),
+        ]
 
     def __str__(self):
         return f'Чек-лист для {self.object.name}'

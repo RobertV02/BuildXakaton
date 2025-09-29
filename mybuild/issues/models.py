@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User
 from django.db import models
-from core.models import BaseModel
+from core.models import BaseModel, OfflineFieldsMixin
 from documents.models import Attachment
 from objects.models import ConstructionObject
 
@@ -29,7 +29,7 @@ class IssueCategory(BaseModel):
     def __str__(self):
         return self.title
 
-class IssueBase(BaseModel):
+class IssueBase(BaseModel, OfflineFieldsMixin):
     object = models.ForeignKey(ConstructionObject, on_delete=models.CASCADE, db_index=True)
     category = models.ForeignKey(IssueCategory, on_delete=models.PROTECT)
     description = models.TextField()
@@ -40,7 +40,6 @@ class IssueBase(BaseModel):
     photos = models.ManyToManyField(Attachment, blank=True, related_name='%(class)s_photos')
     latitude = models.FloatField(null=True, blank=True)
     longitude = models.FloatField(null=True, blank=True)
-    created_at_client_time = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         abstract = True
@@ -49,6 +48,11 @@ class Remark(IssueBase):
     class Meta:
         verbose_name = "Замечание заказчика"
         verbose_name_plural = "Замечания заказчика"
+        permissions = [
+            ("can_comment_issue", "Может комментировать замечание/нарушение"),
+            ("can_verify_issue", "Может верифицировать устранение"),
+            ("can_close_issue", "Может закрывать замечание/нарушение"),
+        ]
 
 class Violation(IssueBase):
     normative_link = models.CharField(max_length=512, blank=True, null=True)
@@ -56,6 +60,11 @@ class Violation(IssueBase):
     class Meta:
         verbose_name = "Нарушение инспектора"
         verbose_name_plural = "Нарушения инспектора"
+        permissions = [
+            ("can_comment_issue", "Может комментировать замечание/нарушение"),
+            ("can_verify_issue", "Может верифицировать устранение"),
+            ("can_close_issue", "Может закрывать замечание/нарушение"),
+        ]
 
 class Resolution(BaseModel):
     remark = models.ForeignKey(Remark, on_delete=models.CASCADE, null=True, blank=True, related_name='resolutions', db_index=True)

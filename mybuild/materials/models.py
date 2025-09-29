@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from django.db import models
 
-from core.models import BaseModel
+from core.models import BaseModel, OfflineFieldsMixin
 from documents.models import Attachment
 from objects.models import ConstructionObject
 from schedules.models import WorkItem
@@ -27,6 +27,13 @@ class OCRResult(BaseModel):
     def __str__(self):
         return f"OCR для {self.source_file.name}"
 
+    class Meta:
+        permissions = [
+            ("can_run_ocr", "Может запускать OCR"),
+            ("can_validate_ttn", "Может валидировать ТТН"),
+            ("can_approve_ttn", "Может утверждать ТТН"),
+        ]
+
 
 class TTNDocument(BaseModel):
     attachment = models.ForeignKey(Attachment, on_delete=models.PROTECT)
@@ -49,7 +56,7 @@ class QualityPassport(BaseModel):
         return self.number or str(self.id)
 
 
-class Delivery(BaseModel):
+class Delivery(BaseModel, OfflineFieldsMixin):
     object = models.ForeignKey(
         ConstructionObject,
         on_delete=models.CASCADE,
@@ -85,3 +92,22 @@ class Delivery(BaseModel):
 
     def __str__(self):
         return f"Поставка {self.material.name} на {self.object.name}"
+
+
+class LabSampleStatus(models.TextChoices):
+    REQUESTED = 'REQUESTED', 'Запрошено'
+    IN_PROGRESS = 'IN_PROGRESS', 'В работе'
+    DONE = 'DONE', 'Готово'
+    REJECTED = 'REJECTED', 'Отклонено'
+
+
+class LabSampleRequest(BaseModel):
+    material = models.ForeignKey(MaterialType, on_delete=models.CASCADE, related_name='sample_requests')
+    delivery = models.ForeignKey('Delivery', on_delete=models.CASCADE, null=True, blank=True, related_name='sample_requests')
+    initiator = models.ForeignKey(User, on_delete=models.CASCADE, related_name='initiated_samples')
+    reason = models.TextField()
+    status = models.CharField(max_length=20, choices=LabSampleStatus.choices, default=LabSampleStatus.REQUESTED, db_index=True)
+    due_at = models.DateTimeField(null=True, blank=True)
+
+    def __str__(self):
+        return f'Отбор пробы {self.material.name} ({self.status})'
