@@ -22,10 +22,19 @@ from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView, Sp
 from core import api as core_api
 from django.conf import settings
 from django.conf.urls.static import static
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render
+
+@login_required
+def user_profile(request):
+    return render(request, 'registration/profile.html', {
+        'user': request.user,
+    })
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('django.contrib.auth.urls')),
+    path('accounts/profile/', user_profile, name='profile'),
 	path('', include('dashboard.urls')),
     path('playground/', include('playground.urls')),
     path('objects/', include(('objects.urls', 'objects'), namespace='objects')),
