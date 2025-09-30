@@ -37,6 +37,7 @@ def user_profile(request):
         'activated_objects_count': activated_objects_count,
         'filled_checklists_count': filled_checklists_count,
         'active_assignments_count': active_assignments_count,
+        'memberships': request.user.memberships.select_related('org').all(),
     })
 
 urlpatterns = [
