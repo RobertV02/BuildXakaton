@@ -159,6 +159,10 @@
               <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                 <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zm0 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V8zm0 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1v-2z" clip-rule="evenodd"></path>
               </svg>
+            {% elif tab_id == 'daily_checklists' %}
+              <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"></path>
+              </svg>
             {% endif %}
             {{ tab_name }}
           </div>
@@ -457,6 +461,77 @@
             {% else %}
               <p class="text-sm text-gray-500">Нет прав на создание чек-листа</p>
             {% endif %}
+          </div>
+        {% endif %}
+      </div>
+    {% elif active_tab == 'daily_checklists' %}
+      <div class="space-y-6">
+        <!-- Daily Checklists List -->
+        {% if daily_checklists %}
+          <div class="space-y-4">
+            {% for dc in daily_checklists %}
+              <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+                <div class="flex items-start justify-between mb-4">
+                  <div class="flex-1">
+                    <div class="flex items-center gap-3 mb-2">
+                      <h3 class="text-lg font-semibold text-gray-900">Ежедневный чек-лист от {{ dc.created_at|date:"d.m.Y" }}</h3>
+                      <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium {% if dc.status == 'APPROVED' %}bg-success-100 text-success-800{% elif dc.status == 'PENDING_CONFIRMATION' %}bg-warning-100 text-warning-800{% else %}bg-gray-100 text-gray-800{% endif %}">
+                        {{ dc.get_status_display }}
+                      </span>
+                    </div>
+                    <p class="text-sm text-gray-600">Создан: {{ dc.created_at|date:"d.m.Y H:i" }} пользователем {{ dc.created_by.get_full_name|default:dc.created_by.username }}</p>
+                    {% if dc.confirmed_at %}
+                      <p class="text-sm text-gray-600">Подтвержден: {{ dc.confirmed_at|date:"d.m.Y H:i" }} пользователем {{ dc.confirmed_by.get_full_name|default:dc.confirmed_by.username }}</p>
+                    {% endif %}
+                  </div>
+                  <div class="flex items-center gap-2">
+                    {% if can_confirm_daily_checklist and dc.status == 'PENDING_CONFIRMATION' %}
+                      <form method="post" action="{% url 'objects:daily_checklist_confirm' dc.id %}" class="inline">
+                        {% csrf_token %}
+                        <button type="submit" class="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium">
+                          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                          Подтвердить
+                        </button>
+                      </form>
+                    {% endif %}
+                  </div>
+                </div>
+                <div class="border-t border-gray-100 pt-4">
+                  <pre class="text-xs text-gray-700 whitespace-pre-wrap">{{ dc.data|json_script:"dc_data" }}</pre>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="text-center py-12">
+            <svg class="w-16 h-16 text-gray-300 mx-auto mb-4" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"></path>
+            </svg>
+            <h3 class="text-lg font-medium text-gray-900 mb-2">Ежедневные чек-листы отсутствуют</h3>
+            {% if can_create_daily_checklist %}
+              <form method="post" action="{% url 'objects:daily_checklist_create' object.id %}">
+                {% csrf_token %}
+                <button type="submit" class="inline-flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors text-sm font-medium">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                  Создать ежедневный чек-лист
+                </button>
+              </form>
+            {% else %}
+              <p class="text-sm text-gray-500">Нет прав на создание ежедневного чек-листа</p>
+            {% endif %}
+          </div>
+        {% endif %}
+
+        <!-- Create Button at Bottom if there are checklists -->
+        {% if daily_checklists and can_create_daily_checklist %}
+          <div class="flex justify-center pt-6 border-t border-gray-100">
+            <form method="post" action="{% url 'objects:daily_checklist_create' object.id %}">
+              {% csrf_token %}
+              <button type="submit" class="inline-flex items-center gap-2 px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors text-sm font-medium">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                Создать ежедневный чек-лист
+              </button>
+            </form>
           </div>
         {% endif %}
       </div>

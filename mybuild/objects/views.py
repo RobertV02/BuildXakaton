@@ -5,7 +5,7 @@ from django.views.decorators.http import require_http_methods
 from django.contrib import messages
 from django.http import HttpResponseRedirect
 from django.urls import reverse
-from .models import ConstructionObject, OpeningChecklist
+from .models import ConstructionObject, OpeningChecklist, DailyChecklist
 from core import api as core_api
 from rest_framework.test import APIRequestFactory
 from materials.forms import DeliveryForm
@@ -49,12 +49,16 @@ def object_detail(request, pk):
 		('deliveries', 'Поставки'),
 		('remarks', 'Нарушения'),
 		('checklist', 'Чек-лист'),
+		('daily_checklists', 'Ежедневные чек-листы'),
 	]
 	deliveries = obj.deliveries.select_related('material').order_by('-delivered_at')[:100] if tab == 'deliveries' else []
 	remarks = obj.remark_set.order_by('-created_at')[:100] if tab == 'remarks' else []
 	checklist = getattr(obj, 'opening_checklist', None) if tab == 'checklist' else None
+	daily_checklists = obj.daily_checklists.order_by('-created_at')[:100] if tab == 'daily_checklists' else []
 	def is_client(user):
 		return user.groups.filter(name='CLIENT').exists() or user.is_superuser
+	def is_foreman(user):
+		return user.groups.filter(name='FOREMAN').exists() or user.is_superuser
 
 	return render(request, 'objects/detail.html', {
 		'object': obj,
@@ -63,9 +67,14 @@ def object_detail(request, pk):
 		'deliveries': deliveries,
 		'remarks': remarks,
 		'checklist': checklist,
+		'daily_checklists': daily_checklists,
 		'can_create_checklist': is_client(request.user),
 		'can_change_checklist': is_client(request.user),
 		'can_delete_checklist': is_client(request.user),
+		'can_create_daily_checklist': is_foreman(request.user),
+		'can_change_daily_checklist': is_foreman(request.user),
+		'can_delete_daily_checklist': is_foreman(request.user),
+		'can_confirm_daily_checklist': is_client(request.user),
 	})
 
 
@@ -180,6 +189,42 @@ def checklist_reject(request, pk):
 	else:
 		messages.error(request, f'Ошибка: {response.status_code}')
 	return HttpResponseRedirect(reverse('objects:detail', args=[pk]) + '?tab=checklist')
+
+
+@login_required
+@require_http_methods(["POST"])
+def daily_checklist_create(request, pk):
+	obj = get_object_or_404(ConstructionObject, pk=pk)
+	if not request.user.groups.filter(name='FOREMAN').exists() and not request.user.is_superuser:
+		raise PermissionDenied
+	from objects.models import DailyChecklistStatus
+	daily_checklist = DailyChecklist.objects.create(
+		object=obj,
+		created_by=request.user,
+		data={},
+		status=DailyChecklistStatus.PENDING_CONFIRMATION
+	)
+	messages.success(request, 'Ежедневный чек-лист создан и ожидает подтверждения')
+	return HttpResponseRedirect(reverse('objects:detail', args=[pk]) + '?tab=daily_checklists')
+
+
+@login_required
+@require_http_methods(["POST"])
+def daily_checklist_confirm(request, pk):
+	daily_checklist = get_object_or_404(DailyChecklist, pk=pk)
+	if not request.user.groups.filter(name='CLIENT').exists() and not request.user.is_superuser:
+		raise PermissionDenied
+	from objects.models import DailyChecklistStatus
+	if daily_checklist.status != DailyChecklistStatus.PENDING_CONFIRMATION:
+		messages.error(request, 'Можно подтвердить только чек-лист в статусе ожидания подтверждения')
+		return HttpResponseRedirect(reverse('objects:detail', args=[daily_checklist.object.pk]) + '?tab=daily_checklists')
+	from django.utils import timezone
+	daily_checklist.status = DailyChecklistStatus.APPROVED
+	daily_checklist.confirmed_by = request.user
+	daily_checklist.confirmed_at = timezone.now()
+	daily_checklist.save()
+	messages.success(request, 'Ежедневный чек-лист подтвержден')
+	return HttpResponseRedirect(reverse('objects:detail', args=[daily_checklist.object.pk]) + '?tab=daily_checklists')
 
 
 @login_required

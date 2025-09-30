@@ -25,6 +25,11 @@ MODEL_PERMS_MAP = {
         'FOREMAN': ['view_openingchecklist'],
         'INSPECTOR': ['view_openingchecklist'],
     },
+    'objects.dailychecklist': {
+        'CLIENT': ['view_dailychecklist', 'can_confirm_daily_checklist'],
+        'FOREMAN': ['add_dailychecklist', 'change_dailychecklist', 'delete_dailychecklist', 'view_dailychecklist'],
+        'INSPECTOR': ['view_dailychecklist'],
+    },
     'schedules.workitem': {
         'CLIENT': ['add_workitem', 'change_workitem', 'delete_workitem', 'view_workitem'],
         'FOREMAN': ['view_workitem', 'can_set_actual'],

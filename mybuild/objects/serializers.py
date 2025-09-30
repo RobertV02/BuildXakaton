@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from rest_framework import serializers
-from .models import ConstructionObject, OpeningChecklist
+from .models import ConstructionObject, OpeningChecklist, DailyChecklist
 
 
 class ConstructionObjectListSerializer(serializers.ModelSerializer):
@@ -32,3 +32,10 @@ class OpeningChecklistSerializer(serializers.ModelSerializer):
         model = OpeningChecklist
         fields = '__all__'
         read_only_fields = ['submitted_at', 'reviewed_at', 'reviewed_by']
+
+
+class DailyChecklistSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DailyChecklist
+        fields = '__all__'
+        read_only_fields = ['confirmed_at', 'confirmed_by']

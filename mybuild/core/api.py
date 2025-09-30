@@ -12,7 +12,7 @@ from drf_spectacular.utils import extend_schema, OpenApiResponse
 from core.services.scoping import ScopedQuerySetMixin
 from core.permissions import MatrixPermission
 
-from objects.models import ConstructionObject, OpeningChecklist
+from objects.models import ConstructionObject, OpeningChecklist, DailyChecklist
 from schedules.models import WorkItem
 from materials.models import Delivery, OCRResult, TTNDocument, LabSampleRequest
 from issues.models import Remark, Violation
@@ -361,6 +361,40 @@ class OpeningChecklistViewSet(ScopedQuerySetMixin, viewsets.ModelViewSet):
         return response.Response({'status': checklist.status})
 
 
+class DailyChecklistViewSet(ScopedQuerySetMixin, viewsets.ModelViewSet):
+    queryset = DailyChecklist.objects.select_related('object').all()
+    permission_classes = [IsAuthenticated, MatrixPermission]
+    role_map = {
+        'create': ['FOREMAN', 'ADMIN'],
+        'update': ['FOREMAN', 'ADMIN'],
+        'partial_update': ['FOREMAN', 'ADMIN'],
+        'destroy': ['FOREMAN', 'ADMIN'],
+        'confirm': ['CLIENT', 'ADMIN'],
+    }
+
+    def get_serializer_class(self):
+        from objects.serializers import DailyChecklistSerializer
+        return DailyChecklistSerializer
+
+    @decorators.action(detail=True, methods=['post'])
+    @extend_schema(summary="Подтверждение ежедневного чеклиста", responses={200: OpenApiResponse(description="Подтвержден"), 400: OpenApiResponse(description="Неверный статус")})
+    def confirm(self, request, pk=None):
+        checklist = self.get_object()
+        from objects.models import DailyChecklistStatus
+        if checklist.status != DailyChecklistStatus.PENDING_CONFIRMATION:
+            return response.Response({'detail': 'Можно подтвердить только из PENDING_CONFIRMATION.'}, status=400)
+        from django.utils import timezone
+        checklist.status = DailyChecklistStatus.APPROVED
+        checklist.confirmed_at = timezone.now()
+        checklist.confirmed_by = request.user
+        checklist.save(update_fields=['status', 'confirmed_at', 'confirmed_by', 'updated_at'])
+        from audit.services import log_action
+        from notifications.services import notify, build_basic_payload
+        log_action(actor=request.user, action='daily_checklist_confirm', instance=checklist)
+        notify([request.user], 'daily_checklist.confirmed', build_basic_payload(checklist))
+        return response.Response({'status': checklist.status})
+
+
 router = routers.DefaultRouter()
 router.register('objects', ConstructionObjectViewSet, basename='object')
 router.register('work-items', WorkItemViewSet, basename='workitem')
@@ -371,3 +405,4 @@ router.register('lab-samples', LabSampleRequestViewSet, basename='labsample')
 router.register('remarks', RemarkViewSet, basename='remark')
 router.register('violations', ViolationViewSet, basename='violation')
 router.register('opening-checklists', OpeningChecklistViewSet, basename='openingchecklist')
+router.register('daily-checklists', DailyChecklistViewSet, basename='dailychecklist')

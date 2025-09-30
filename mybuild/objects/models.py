@@ -20,6 +20,12 @@ class OpeningChecklistStatus(models.TextChoices):
     REJECTED = 'REJECTED', 'Отклонено'
 
 
+class DailyChecklistStatus(models.TextChoices):
+    DRAFT = 'DRAFT', 'Черновик'
+    PENDING_CONFIRMATION = 'PENDING_CONFIRMATION', 'Ожидание подтверждения'
+    APPROVED = 'APPROVED', 'Подтвержден'
+
+
 class ConstructionObject(BaseModel):
     # related_name changed from 'objects' to 'construction_objects' to avoid shadowing Organization.objects manager
     org = models.ForeignKey(Organization, on_delete=models.CASCADE, related_name='construction_objects', db_index=True)
@@ -74,6 +80,27 @@ class OpeningChecklist(BaseModel):
 
     def __str__(self):
         return f'Чек-лист для {self.object.name}'
+
+
+class DailyChecklist(BaseModel):
+    object = models.ForeignKey(ConstructionObject, on_delete=models.CASCADE, related_name='daily_checklists')
+    created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='created_daily_checklists', db_index=True)
+    data = models.JSONField()
+    status = models.CharField(max_length=25, choices=DailyChecklistStatus.choices, default=DailyChecklistStatus.DRAFT, db_index=True)
+    confirmed_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='confirmed_daily_checklists')
+    confirmed_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        permissions = [
+            ("can_create_daily_checklist", "Может создавать ежедневные чеклисты"),
+            ("can_view_daily_checklist", "Может просматривать ежедневные чеклисты"),
+            ("can_change_daily_checklist", "Может редактировать ежедневные чеклисты"),
+            ("can_delete_daily_checklist", "Может удалять ежедневные чеклисты"),
+            ("can_confirm_daily_checklist", "Может подтверждать ежедневные чеклисты"),
+        ]
+
+    def __str__(self):
+        return f'Ежедневный чек-лист для {self.object.name} от {self.created_at.date()}'
 
 
 class OpeningAct(BaseModel):
