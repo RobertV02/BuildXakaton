@@ -72,7 +72,95 @@
           <p class="text-xs text-gray-500">Выберите подходящую категорию для классификации нарушения</p>
         </div>
 
-        <!-- Severity Field -->
+        <!-- Name Field -->
+        <div class="space-y-2">
+          <label for="{{ form.name.id_for_label }}" class="block text-sm font-semibold text-gray-700 flex items-center gap-2">
+            <svg class="w-4 h-4 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd"></path>
+            </svg>
+            Наименование
+            <span class="text-danger-500">*</span>
+          </label>
+          <div class="relative">
+            {{ form.name }}
+            {% if form.name.errors %}
+              <div class="absolute inset-y-0 right-0 flex items-center pr-3">
+                <svg class="w-5 h-5 text-danger-500" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                </svg>
+              </div>
+            {% endif %}
+          </div>
+          {% if form.name.errors %}
+            <div class="text-sm text-danger-600 flex items-center gap-1">
+              <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+              </svg>
+              {{ form.name.errors.0 }}
+            </div>
+          {% endif %}
+        </div>
+
+        <!-- Fixability and Issue Type Fields -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Fixability Field -->
+          <div class="space-y-2">
+            <label for="{{ form.fixability.id_for_label }}" class="block text-sm font-semibold text-gray-700 flex items-center gap-2">
+              <svg class="w-4 h-4 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+              </svg>
+              Вид
+              <span class="text-danger-500">*</span>
+            </label>
+            <div class="relative">
+              {{ form.fixability }}
+              {% if form.fixability.errors %}
+                <div class="absolute inset-y-0 right-0 flex items-center pr-3">
+                  <svg class="w-5 h-5 text-danger-500" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                  </svg>
+                </div>
+              {% endif %}
+            </div>
+            {% if form.fixability.errors %}
+              <div class="text-sm text-danger-600 flex items-center gap-1">
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                </svg>
+                {{ form.fixability.errors.0 }}
+              </div>
+            {% endif %}
+          </div>
+
+          <!-- Issue Type Field -->
+          <div class="space-y-2">
+            <label for="{{ form.issue_type.id_for_label }}" class="block text-sm font-semibold text-gray-700 flex items-center gap-2">
+              <svg class="w-4 h-4 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zm0 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V8zm0 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1v-2z" clip-rule="evenodd"></path>
+              </svg>
+              Тип
+              <span class="text-danger-500">*</span>
+            </label>
+            <div class="relative">
+              {{ form.issue_type }}
+              {% if form.issue_type.errors %}
+                <div class="absolute inset-y-0 right-0 flex items-center pr-3">
+                  <svg class="w-5 h-5 text-danger-500" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                  </svg>
+                </div>
+              {% endif %}
+            </div>
+            {% if form.issue_type.errors %}
+              <div class="text-sm text-danger-600 flex items-center gap-1">
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                </svg>
+                {{ form.issue_type.errors.0 }}
+              </div>
+            {% endif %}
+          </div>
+        </div>
         <div class="space-y-2">
           <label for="{{ form.severity.id_for_label }}" class="block text-sm font-semibold text-gray-700 flex items-center gap-2">
             <svg class="w-4 h-4 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
@@ -100,6 +188,35 @@
             </div>
           {% endif %}
           <p class="text-xs text-gray-500">Оцените критичность найденного нарушения</p>
+        </div>
+
+        <!-- Resolution Deadline Days Field -->
+        <div class="space-y-2">
+          <label for="{{ form.resolution_deadline_days.id_for_label }}" class="block text-sm font-semibold text-gray-700 flex items-center gap-2">
+            <svg class="w-4 h-4 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"></path>
+            </svg>
+            Регламентный срок устранения (в днях)
+          </label>
+          <div class="relative">
+            {{ form.resolution_deadline_days }}
+            {% if form.resolution_deadline_days.errors %}
+              <div class="absolute inset-y-0 right-0 flex items-center pr-3">
+                <svg class="w-5 h-5 text-danger-500" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                </svg>
+              </div>
+            {% endif %}
+          </div>
+          {% if form.resolution_deadline_days.errors %}
+            <div class="text-sm text-danger-600 flex items-center gap-1">
+              <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+              </svg>
+              {{ form.resolution_deadline_days.errors.0 }}
+            </div>
+          {% endif %}
+          <p class="text-xs text-gray-500">Укажите срок в днях или "-" если неустранимое</p>
         </div>
 
         <!-- Description Field -->

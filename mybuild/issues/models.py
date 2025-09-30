@@ -21,6 +21,14 @@ class Severity(models.TextChoices):
     HIGH = 'HIGH', 'Высокая'
     CRITICAL = 'CRITICAL', 'Критическая'
 
+class Fixability(models.TextChoices):
+    FIXABLE = 'FIXABLE', 'Устранимое'
+    NON_FIXABLE = 'NON_FIXABLE', 'Неустранимое'
+
+class IssueType(models.TextChoices):
+    GROSS = 'GROSS', 'Грубое'
+    SIMPLE = 'SIMPLE', 'Простое'
+
 class IssueCategory(BaseModel):
     title = models.CharField(max_length=255, db_index=True)
     code = models.CharField(max_length=64, unique=True)
@@ -45,9 +53,14 @@ class IssueBase(BaseModel, OfflineFieldsMixin):
         abstract = True
 
 class Remark(IssueBase):
+    name = models.CharField(max_length=255, blank=True, null=True, verbose_name="Наименование")
+    fixability = models.CharField(max_length=20, choices=Fixability.choices, default=Fixability.FIXABLE, verbose_name="Вид")
+    issue_type = models.CharField(max_length=20, choices=IssueType.choices, default=IssueType.SIMPLE, verbose_name="Тип")
+    resolution_deadline_days = models.CharField(max_length=10, blank=True, null=True, verbose_name="Регламентный срок устранения (в днях)")
+
     class Meta:
-        verbose_name = "Замечание заказчика"
-        verbose_name_plural = "Замечания заказчика"
+        verbose_name = "Нарушение заказчика"
+        verbose_name_plural = "Нарушения заказчика"
         permissions = [
             ("can_comment_issue", "Может комментировать замечание/нарушение"),
             ("can_verify_issue", "Может верифицировать устранение"),
