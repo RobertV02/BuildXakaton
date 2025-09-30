@@ -10,56 +10,7 @@ from __future__ import annotations
 from django.core.management.base import BaseCommand
 from django.contrib.auth.models import Group, Permission
 from django.contrib.contenttypes.models import ContentType
-
-ROLE_GROUPS = {
-    'ORG_ADMIN': 'Администратор организации',
-    'CLIENT': 'Заказчик',
-    'FOREMAN': 'Прораб',
-    'INSPECTOR': 'Инспектор',
-}
-
-
-MODEL_PERMS_MAP = {
-    # model_label: {group: [codename,..]}
-    'objects.constructionobject': {
-        'CLIENT': ['add_constructionobject', 'change_constructionobject', 'delete_constructionobject', 'view_constructionobject', 'can_confirm_geozone'],
-        'FOREMAN': ['view_constructionobject'],
-        'INSPECTOR': ['view_constructionobject', 'can_confirm_geozone'],
-    },
-    # OpeningChecklist permissions:
-    # - CLIENT: full CRUD (add, change, delete, view)
-    # - FOREMAN: view only
-    # - INSPECTOR: view only
-    'objects.openingchecklist': {
-        'CLIENT': ['add_openingchecklist', 'change_openingchecklist', 'delete_openingchecklist', 'view_openingchecklist'],
-        'FOREMAN': ['view_openingchecklist'],
-        'INSPECTOR': ['view_openingchecklist'],
-    },
-    'schedules.workitem': {
-        'CLIENT': ['add_workitem', 'change_workitem', 'delete_workitem', 'view_workitem'],
-        'FOREMAN': ['view_workitem', 'can_set_actual'],
-        'INSPECTOR': ['view_workitem'],
-    },
-    'materials.ocrresult': {
-        'FOREMAN': ['can_run_ocr', 'view_ocrresult'],
-        'INSPECTOR': ['can_validate_ttn', 'view_ocrresult'],
-        'CLIENT': ['can_approve_ttn', 'view_ocrresult'],
-    },
-    'issues.remark': {
-        'CLIENT': ['add_remark', 'change_remark', 'view_remark', 'can_comment_issue', 'can_close_issue'],
-        'INSPECTOR': ['view_remark', 'can_comment_issue', 'can_verify_issue'],
-        'FOREMAN': ['view_remark', 'can_comment_issue'],
-    },
-    'issues.violation': {
-        'INSPECTOR': ['add_violation', 'change_violation', 'view_violation', 'can_comment_issue', 'can_close_issue'],
-        'CLIENT': ['view_violation', 'can_comment_issue', 'can_verify_issue'],
-        'FOREMAN': ['view_violation', 'can_comment_issue'],
-    },
-    'audit.auditlog': {
-        'CLIENT': ['can_view_auditlog', 'view_auditlog'],
-        'INSPECTOR': ['can_view_auditlog', 'view_auditlog'],
-    },
-}
+from core.permissions_config import ROLE_GROUPS, MODEL_PERMS_MAP
 
 
 class Command(BaseCommand):
