@@ -40,7 +40,7 @@ class IssueCategory(BaseModel):
 class IssueBase(BaseModel, OfflineFieldsMixin):
     object = models.ForeignKey(ConstructionObject, on_delete=models.CASCADE, db_index=True)
     category = models.CharField(max_length=255, blank=True, null=True, verbose_name="Категория")
-    description = models.TextField()
+    description = models.TextField(blank=True)
     created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, db_index=True)
     status = models.CharField(max_length=20, choices=IssueStatus.choices, default=IssueStatus.OPEN, db_index=True)
     severity = models.CharField(max_length=20, choices=Severity.choices, default=Severity.MEDIUM, db_index=True)

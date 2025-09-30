@@ -42,7 +42,7 @@ def object_detail(request, pk):
 		('checklist', 'Чек-лист'),
 	]
 	deliveries = obj.deliveries.select_related('material').order_by('-delivered_at')[:100] if tab == 'deliveries' else []
-	remarks = obj.remark_set.select_related('category').order_by('-created_at')[:100] if tab == 'remarks' else []
+	remarks = obj.remark_set.order_by('-created_at')[:100] if tab == 'remarks' else []
 	checklist = getattr(obj, 'opening_checklist', None) if tab == 'checklist' else None
 	def is_client(user):
 		return user.groups.filter(name='CLIENT').exists() or user.is_superuser

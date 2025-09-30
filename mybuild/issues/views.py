@@ -6,13 +6,13 @@ from objects.models import OpeningChecklist
 
 @login_required
 def remark_detail(request, pk):
-    remark = get_object_or_404(Remark.objects.select_related('object', 'category', 'created_by'), pk=pk)
+    remark = get_object_or_404(Remark.objects.select_related('object', 'created_by'), pk=pk)
     return render(request, 'issues/remark_detail.html', {'remark': remark})
 
 
 @login_required
 def remarks_list(request):
-	remarks = Remark.objects.select_related('object', 'category').order_by('-created_at')[:300]
+	remarks = Remark.objects.select_related('object').order_by('-created_at')[:300]
 	return render(request, 'issues/list/remarks.html', {'remarks': remarks})
 
 
