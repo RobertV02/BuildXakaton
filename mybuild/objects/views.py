@@ -38,7 +38,7 @@ def object_detail(request, pk):
 	tabs = [
 		('info', 'Инфо'),
 		('deliveries', 'Поставки'),
-		('remarks', 'Замечания'),
+		('remarks', 'Нарушения'),
 		('checklist', 'Чек-лист'),
 	]
 	deliveries = obj.deliveries.select_related('material').order_by('-delivered_at')[:100] if tab == 'deliveries' else []

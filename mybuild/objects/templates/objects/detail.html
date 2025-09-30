@@ -304,13 +304,13 @@
           <svg class="w-6 h-6 text-gray-600" fill="currentColor" viewBox="0 0 20 20">
             <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
           </svg>
-          Замечания и нарушения
+          Нарушения
         </h2>
         <a href="{% url 'objects:remark_new' object.id %}" class="inline-flex items-center gap-2 px-4 py-2 bg-danger-500 text-white rounded-xl hover:bg-danger-600 transition-all duration-200 font-medium group">
           <svg class="w-4 h-4 group-hover:scale-110 transition-transform" fill="currentColor" viewBox="0 0 20 20">
             <path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd"></path>
           </svg>
-          Добавить замечание
+          Добавить нарушение
         </a>
       </div>
       
@@ -353,7 +353,7 @@
                       <svg class="w-12 h-12 text-gray-300" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
                       </svg>
-                      <p class="text-sm font-medium text-gray-900">Замечаний пока нет</p>
+                      <p class="text-sm font-medium text-gray-900">Нарушений пока нет</p>
                       <p class="text-xs text-gray-500">Это хорошо! Объект соответствует требованиям</p>
                     </div>
                   </td>
@@ -380,7 +380,7 @@
             </div>
           {% empty %}
             <div class="p-8 text-center">
-              <p class="text-sm text-gray-500">Замечаний пока нет</p>
+              <p class="text-sm text-gray-500">Нарушений пока нет</p>
             </div>
           {% endfor %}
         </div>
