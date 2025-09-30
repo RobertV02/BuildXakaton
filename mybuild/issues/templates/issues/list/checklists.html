@@ -99,13 +99,26 @@
 <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
   <!-- Header -->
   <div class="px-6 py-4 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
-    <h2 class="text-lg font-semibold text-gray-900 flex items-center gap-3">
-      <svg class="w-6 h-6 text-gray-600" fill="currentColor" viewBox="0 0 20 20">
-        <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zm0 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V8zm0 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1v-2z" clip-rule="evenodd"></path>
-      </svg>
-      Чек-листы активации
-    </h2>
-    <p class="text-sm text-gray-600 mt-1">Список всех чек-листов для активации объектов</p>
+    <div class="flex items-center justify-between">
+      <div>
+        <h2 class="text-lg font-semibold text-gray-900 flex items-center gap-3">
+          <svg class="w-6 h-6 text-gray-600" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zm0 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V8zm0 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1v-2z" clip-rule="evenodd"></path>
+          </svg>
+          Чек-листы активации
+        </h2>
+        <p class="text-sm text-gray-600 mt-1">Список всех чек-листов для активации объектов</p>
+      </div>
+      
+      {% if is_foreman %}
+      <a href="#" onclick="showCreateChecklistModal()" class="inline-flex items-center gap-2 px-4 py-2 bg-primary-500 text-white rounded-xl hover:bg-primary-600 transition-all duration-200 font-medium">
+        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"></path>
+        </svg>
+        Создать чек-лист
+      </a>
+      {% endif %}
+    </div>
   </div>
 
   <!-- Desktop Table View -->
@@ -256,4 +269,57 @@
     </div>
   </div>
 </div>
+
+<!-- Create Checklist Modal -->
+<div id="createChecklistModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
+  <div class="flex items-center justify-center min-h-screen p-4">
+    <div class="bg-white rounded-2xl shadow-xl max-w-md w-full">
+      <div class="px-6 py-4 border-b border-gray-100">
+        <h3 class="text-lg font-semibold text-gray-900">Создать чек-лист активации</h3>
+        <p class="text-sm text-gray-600 mt-1">Выберите объект для создания чек-листа</p>
+      </div>
+      
+      <form method="post" action="{% url 'issues:create_checklist' %}" class="p-6">
+        {% csrf_token %}
+        <div class="space-y-4">
+          <div>
+            <label for="object_id" class="block text-sm font-medium text-gray-700 mb-2">Объект</label>
+            <select name="object_id" id="object_id" required class="w-full px-3 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200">
+              <option value="">Выберите объект...</option>
+              {% for obj in available_objects %}
+                <option value="{{ obj.id }}">{{ obj.name }} ({{ obj.org.name }})</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+        
+        <div class="flex gap-3 mt-6">
+          <button type="button" onclick="hideCreateChecklistModal()" class="flex-1 px-4 py-2 text-gray-700 bg-gray-100 rounded-xl hover:bg-gray-200 transition-all duration-200 font-medium">
+            Отмена
+          </button>
+          <button type="submit" class="flex-1 px-4 py-2 bg-primary-500 text-white rounded-xl hover:bg-primary-600 transition-all duration-200 font-medium">
+            Создать
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+function showCreateChecklistModal() {
+  document.getElementById('createChecklistModal').classList.remove('hidden');
+}
+
+function hideCreateChecklistModal() {
+  document.getElementById('createChecklistModal').classList.add('hidden');
+}
+
+// Close modal when clicking outside
+document.getElementById('createChecklistModal').addEventListener('click', function(e) {
+  if (e.target === this) {
+    hideCreateChecklistModal();
+  }
+});
+</script>
 {% endblock %}

@@ -5,4 +5,5 @@ app_name = 'issues'
 
 urlpatterns = [
     path('remarks/<uuid:pk>/', views.remark_detail, name='remark_detail'),
+    path('checklists/create/', views.create_checklist, name='create_checklist'),
 ]
