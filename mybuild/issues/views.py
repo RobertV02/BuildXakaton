@@ -48,23 +48,25 @@ def confirm_closure(request, pk):
 
 @login_required
 def remarks_list(request):
-	remarks = Remark.objects.select_related('object').order_by('-created_at')[:300]
+	remarks = Remark.objects.select_related('object').order_by('-created_at')
 	# Filter by user's accessible objects unless superuser
 	if not request.user.is_superuser:
 		user_orgs = request.user.memberships.values_list('org', flat=True).distinct()
 		accessible_objects = ConstructionObject.objects.filter(org__in=user_orgs).values_list('id', flat=True)
 		remarks = remarks.filter(object_id__in=accessible_objects)
+	remarks = remarks[:300]
 	return render(request, 'issues/list/remarks.html', {'remarks': remarks})
 
 
 @login_required
 def checklists_list(request):
-	checklists = OpeningChecklist.objects.select_related('object').order_by('-updated_at')[:300]
+	checklists = OpeningChecklist.objects.select_related('object').order_by('-updated_at')
 	# Filter by user's accessible objects unless superuser
 	if not request.user.is_superuser:
 		user_orgs = request.user.memberships.values_list('org', flat=True).distinct()
 		accessible_objects = ConstructionObject.objects.filter(org__in=user_orgs).values_list('id', flat=True)
 		checklists = checklists.filter(object_id__in=accessible_objects)
+	checklists = checklists[:300]
 	return render(request, 'issues/list/checklists.html', {'checklists': checklists})
 
 # Create your views here.
