@@ -8,7 +8,12 @@ from objects.models import OpeningChecklist
 @login_required
 def remark_detail(request, pk):
     remark = get_object_or_404(Remark.objects.select_related('object', 'created_by'), pk=pk)
-    return render(request, 'issues/remark_detail.html', {'remark': remark})
+    context = {
+        'remark': remark,
+        'is_foreman': request.user.groups.filter(name='FOREMAN').exists(),
+        'is_client': request.user.groups.filter(name='CLIENT').exists(),
+    }
+    return render(request, 'issues/remark_detail.html', context)
 
 
 @login_required

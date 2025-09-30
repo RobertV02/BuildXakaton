@@ -64,7 +64,7 @@
           </div>
 
           <!-- Actions -->
-          {% if user.groups.filter(name='FOREMAN') and (remark.status == 'OPEN' or remark.status == 'IN_PROGRESS') %}
+          {% if is_foreman and (remark.status == 'OPEN' or remark.status == 'IN_PROGRESS') %}
             <div class="bg-blue-50 rounded-lg p-4">
               <h4 class="font-medium text-blue-900 mb-2">Действия прораба</h4>
               <form method="post" action="{% url 'issues:confirm_resolution' remark.pk %}">
@@ -77,7 +77,7 @@
                 </button>
               </form>
             </div>
-          {% elif user.groups.filter(name='CLIENT') and remark.status == 'PENDING_CONFIRMATION' %}
+          {% elif is_client and remark.status == 'PENDING_CONFIRMATION' %}
             <div class="bg-green-50 rounded-lg p-4">
               <h4 class="font-medium text-green-900 mb-2">Действия заказчика</h4>
               <form method="post" action="{% url 'issues:confirm_closure' remark.pk %}">
