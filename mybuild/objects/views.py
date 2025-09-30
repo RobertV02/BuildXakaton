@@ -21,9 +21,10 @@ from django.contrib.auth.models import Group
 @login_required
 def object_list(request):
 	qs = ConstructionObject.objects.select_related('org').all().order_by('-created_at')
-	# Filter by user's organizations
-	user_orgs = request.user.memberships.values_list('org', flat=True).distinct()
-	qs = qs.filter(org__in=user_orgs)
+	# Filter by user's organizations unless superuser
+	if not request.user.is_superuser:
+		user_orgs = request.user.memberships.values_list('org', flat=True).distinct()
+		qs = qs.filter(org__in=user_orgs)
 	status = request.GET.get('status')
 	if status:
 		qs = qs.filter(status=status)
@@ -37,10 +38,11 @@ def object_list(request):
 @login_required
 def object_detail(request, pk):
 	obj = get_object_or_404(ConstructionObject.objects.select_related('org'), pk=pk)
-	# Check if user has access to this object's organization
-	user_orgs = request.user.memberships.values_list('org', flat=True).distinct()
-	if obj.org_id not in user_orgs:
-		raise PermissionDenied("У вас нет доступа к этому объекту.")
+	# Check if user has access to this object's organization unless superuser
+	if not request.user.is_superuser:
+		user_orgs = request.user.memberships.values_list('org', flat=True).distinct()
+		if obj.org_id not in user_orgs:
+			raise PermissionDenied("У вас нет доступа к этому объекту.")
 	tab = request.GET.get('tab', 'info')
 	tabs = [
 		('info', 'Инфо'),
