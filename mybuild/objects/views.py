@@ -15,6 +15,7 @@ from issues.models import Remark
 from objects.models import ObjectStatus
 from .forms import OpeningChecklistForm
 from django.core.exceptions import PermissionDenied
+from django.contrib.auth.models import Group
 
 
 @login_required
@@ -43,6 +44,9 @@ def object_detail(request, pk):
 	deliveries = obj.deliveries.select_related('material').order_by('-delivered_at')[:100] if tab == 'deliveries' else []
 	remarks = obj.remark_set.select_related('category').order_by('-created_at')[:100] if tab == 'remarks' else []
 	checklist = getattr(obj, 'opening_checklist', None) if tab == 'checklist' else None
+	def is_client(user):
+		return user.groups.filter(name='CLIENT').exists() or user.is_superuser
+
 	return render(request, 'objects/detail.html', {
 		'object': obj,
 		'tabs': tabs,
@@ -50,9 +54,9 @@ def object_detail(request, pk):
 		'deliveries': deliveries,
 		'remarks': remarks,
 		'checklist': checklist,
-		'can_create_checklist': request.user.has_perm('objects.add_openingchecklist'),
-		'can_change_checklist': request.user.has_perm('objects.change_openingchecklist'),
-		'can_delete_checklist': request.user.has_perm('objects.delete_openingchecklist'),
+		'can_create_checklist': is_client(request.user),
+		'can_change_checklist': is_client(request.user),
+		'can_delete_checklist': is_client(request.user),
 	})
 
 
@@ -81,7 +85,7 @@ def checklist_create(request, pk):
 	if hasattr(obj, 'opening_checklist'):
 		messages.warning(request, 'Чек-лист уже существует')
 		return HttpResponseRedirect(reverse('objects:detail', args=[pk]) + '?tab=checklist')
-	if not request.user.has_perm('objects.add_openingchecklist'):
+	if not request.user.groups.filter(name='CLIENT').exists() and not request.user.is_superuser:
 		raise PermissionDenied
 	if request.method == 'POST':
 		form = OpeningChecklistForm(request.POST)
@@ -104,7 +108,7 @@ def checklist_edit(request, pk):
 		messages.error(request, 'Чек-лист отсутствует')
 		return HttpResponseRedirect(reverse('objects:detail', args=[pk]) + '?tab=checklist')
 	checklist = obj.opening_checklist
-	if not request.user.has_perm('objects.change_openingchecklist'):
+	if not request.user.groups.filter(name='CLIENT').exists() and not request.user.is_superuser:
 		raise PermissionDenied
 	if request.method == 'POST':
 		form = OpeningChecklistForm(request.POST, instance=checklist)
@@ -124,7 +128,7 @@ def checklist_delete(request, pk):
 	if not hasattr(obj, 'opening_checklist'):
 		messages.error(request, 'Чек-лист отсутствует')
 		return HttpResponseRedirect(reverse('objects:detail', args=[pk]) + '?tab=checklist')
-	if not request.user.has_perm('objects.delete_openingchecklist'):
+	if not request.user.groups.filter(name='CLIENT').exists() and not request.user.is_superuser:
 		raise PermissionDenied
 	obj.opening_checklist.delete()
 	messages.success(request, 'Чек-лист удален')
