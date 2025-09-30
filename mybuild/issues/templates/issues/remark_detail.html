@@ -63,6 +63,35 @@
             </div>
           </div>
 
+          <!-- Actions -->
+          {% if user.groups.filter(name='FOREMAN').exists and (remark.status == 'OPEN' or remark.status == 'IN_PROGRESS') %}
+            <div class="bg-blue-50 rounded-lg p-4">
+              <h4 class="font-medium text-blue-900 mb-2">Действия прораба</h4>
+              <form method="post" action="{% url 'issues:confirm_resolution' remark.pk %}">
+                {% csrf_token %}
+                <button type="submit" class="inline-flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
+                  <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                  </svg>
+                  Подтвердить устранение
+                </button>
+              </form>
+            </div>
+          {% elif user.groups.filter(name='CLIENT').exists and remark.status == 'PENDING_CONFIRMATION' %}
+            <div class="bg-green-50 rounded-lg p-4">
+              <h4 class="font-medium text-green-900 mb-2">Действия заказчика</h4>
+              <form method="post" action="{% url 'issues:confirm_closure' remark.pk %}">
+                {% csrf_token %}
+                <button type="submit" class="inline-flex items-center gap-2 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors">
+                  <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                  </svg>
+                  Подтвердить закрытие
+                </button>
+              </form>
+            </div>
+          {% endif %}
+
           <!-- Photos -->
           {% if remark.photos.all %}
             <div>

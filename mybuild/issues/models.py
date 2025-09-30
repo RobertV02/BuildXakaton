@@ -12,6 +12,7 @@ class IssueStatus(models.TextChoices):
     OPEN = 'OPEN', 'Открыто'
     IN_PROGRESS = 'IN_PROGRESS', 'В работе'
     RESOLVED = 'RESOLVED', 'Решено'
+    PENDING_CONFIRMATION = 'PENDING_CONFIRMATION', 'В ожидании подтверждения'
     ACCEPTED = 'ACCEPTED', 'Принято'
     REJECTED = 'REJECTED', 'Отклонено'
 
