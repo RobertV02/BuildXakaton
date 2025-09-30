@@ -13,6 +13,8 @@ from materials.models import Delivery
 from issues.forms import RemarkForm
 from issues.models import Remark
 from objects.models import ObjectStatus
+from .forms import OpeningChecklistForm
+from django.core.exceptions import PermissionDenied
 
 
 @login_required
@@ -48,6 +50,9 @@ def object_detail(request, pk):
 		'deliveries': deliveries,
 		'remarks': remarks,
 		'checklist': checklist,
+		'can_create_checklist': request.user.has_perm('objects.add_openingchecklist'),
+		'can_change_checklist': request.user.has_perm('objects.change_openingchecklist'),
+		'can_delete_checklist': request.user.has_perm('objects.delete_openingchecklist'),
 	})
 
 
@@ -67,6 +72,62 @@ def checklist_submit(request, pk):
 		messages.success(request, 'Отправлено')
 	else:
 		messages.error(request, f'Ошибка: {response.status_code}')
+	return HttpResponseRedirect(reverse('objects:detail', args=[pk]) + '?tab=checklist')
+
+
+@login_required
+def checklist_create(request, pk):
+	obj = get_object_or_404(ConstructionObject, pk=pk)
+	if hasattr(obj, 'opening_checklist'):
+		messages.warning(request, 'Чек-лист уже существует')
+		return HttpResponseRedirect(reverse('objects:detail', args=[pk]) + '?tab=checklist')
+	if not request.user.has_perm('objects.add_openingchecklist'):
+		raise PermissionDenied
+	if request.method == 'POST':
+		form = OpeningChecklistForm(request.POST)
+		if form.is_valid():
+			checklist = form.save(commit=False)
+			checklist.object = obj
+			checklist.filled_by = request.user
+			checklist.save()
+			messages.success(request, 'Чек-лист создан')
+			return HttpResponseRedirect(reverse('objects:detail', args=[pk]) + '?tab=checklist')
+	else:
+		form = OpeningChecklistForm()
+	return render(request, 'objects/checklist_form.html', {'form': form, 'object': obj, 'mode': 'create'})
+
+
+@login_required
+def checklist_edit(request, pk):
+	obj = get_object_or_404(ConstructionObject, pk=pk)
+	if not hasattr(obj, 'opening_checklist'):
+		messages.error(request, 'Чек-лист отсутствует')
+		return HttpResponseRedirect(reverse('objects:detail', args=[pk]) + '?tab=checklist')
+	checklist = obj.opening_checklist
+	if not request.user.has_perm('objects.change_openingchecklist'):
+		raise PermissionDenied
+	if request.method == 'POST':
+		form = OpeningChecklistForm(request.POST, instance=checklist)
+		if form.is_valid():
+			form.save()
+			messages.success(request, 'Чек-лист обновлен')
+			return HttpResponseRedirect(reverse('objects:detail', args=[pk]) + '?tab=checklist')
+	else:
+		form = OpeningChecklistForm(instance=checklist)
+	return render(request, 'objects/checklist_form.html', {'form': form, 'object': obj, 'mode': 'edit'})
+
+
+@login_required
+@require_http_methods(["POST"])
+def checklist_delete(request, pk):
+	obj = get_object_or_404(ConstructionObject, pk=pk)
+	if not hasattr(obj, 'opening_checklist'):
+		messages.error(request, 'Чек-лист отсутствует')
+		return HttpResponseRedirect(reverse('objects:detail', args=[pk]) + '?tab=checklist')
+	if not request.user.has_perm('objects.delete_openingchecklist'):
+		raise PermissionDenied
+	obj.opening_checklist.delete()
+	messages.success(request, 'Чек-лист удален')
 	return HttpResponseRedirect(reverse('objects:detail', args=[pk]) + '?tab=checklist')
 
 

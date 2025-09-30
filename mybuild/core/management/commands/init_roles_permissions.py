@@ -26,10 +26,13 @@ MODEL_PERMS_MAP = {
         'FOREMAN': ['view_constructionobject'],
         'INSPECTOR': ['view_constructionobject', 'can_confirm_geozone'],
     },
+    # OpeningChecklist permissions:
+    # - FOREMAN: full CRUD (add, change, delete, view)
+    # - CLIENT & INSPECTOR: create, view, update only (no delete)
     'objects.openingchecklist': {
-        'CLIENT': ['add_openingchecklist', 'change_openingchecklist', 'view_openingchecklist', 'can_approve_checklist'],
-        'FOREMAN': ['add_openingchecklist', 'change_openingchecklist', 'view_openingchecklist'],
-        'INSPECTOR': ['view_openingchecklist', 'can_review_checklist'],
+        'CLIENT': ['add_openingchecklist', 'change_openingchecklist', 'view_openingchecklist'],
+        'FOREMAN': ['add_openingchecklist', 'change_openingchecklist', 'delete_openingchecklist', 'view_openingchecklist'],
+        'INSPECTOR': ['add_openingchecklist', 'change_openingchecklist', 'view_openingchecklist'],
     },
     'schedules.workitem': {
         'CLIENT': ['add_workitem', 'change_workitem', 'delete_workitem', 'view_workitem'],
