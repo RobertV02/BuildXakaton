@@ -27,14 +27,16 @@ class RemarkForm(forms.ModelForm):
         if fixability == 'NON_FIXABLE':
             if resolution_deadline_days != '-':
                 cleaned_data['resolution_deadline_days'] = '-'
-        elif fixability == 'FIXABLE' and resolution_deadline_days and resolution_deadline_days != '-':
-            try:
-                days = int(resolution_deadline_days)
-                if days <= 0:
-                    raise forms.ValidationError("Срок должен быть положительным числом.")
-                if days % 2 != 0:
-                    raise forms.ValidationError("Срок должен быть четным числом.")
-            except ValueError:
-                raise forms.ValidationError("Срок должен быть числом или '-'.")
         
         return cleaned_data
+
+    def clean_resolution_deadline_days(self):
+        data = self.cleaned_data['resolution_deadline_days']
+        if data and data != '-':
+            try:
+                num = int(data)
+                if num <= 0:
+                    raise forms.ValidationError("Срок должен быть положительным числом.")
+            except ValueError:
+                raise forms.ValidationError("Срок должен быть числом или '-'.")
+        return data
