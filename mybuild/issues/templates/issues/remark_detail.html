@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
-{% block title %}{{ remark.category.title }} - {{ remark.object.name }}{% endblock %}
-{% block page_heading %}{{ remark.category.title }}{% endblock %}
+{% block title %}{{ remark.category }} - {{ remark.object.name }}{% endblock %}
+{% block page_heading %}{{ remark.category }}{% endblock %}
 {% block page_subtitle %}{{ remark.object.name }}{% endblock %}
 
 {% block content %}
@@ -104,8 +104,7 @@
           <!-- Category Info -->
           <div class="bg-gray-50 rounded-lg p-4">
             <h4 class="font-medium text-gray-900 mb-2">Категория</h4>
-            <p class="text-gray-700">{{ remark.category.title }}</p>
-            <p class="text-sm text-gray-600">{{ remark.category.get_issuer_type_display }}</p>
+            <p class="text-gray-700">{{ remark.category }}</p>
           </div>
 
           <!-- SLA Info -->

@@ -320,4 +320,28 @@
     box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
   }
 </style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const fixabilitySelect = document.getElementById('{{ form.fixability.id_for_label }}');
+    const deadlineInput = document.getElementById('{{ form.resolution_deadline_days.id_for_label }}');
+    
+    function updateDeadlineField() {
+        if (fixabilitySelect.value === 'NON_FIXABLE') {
+            deadlineInput.value = '-';
+            deadlineInput.disabled = true;
+            deadlineInput.style.backgroundColor = '#f9fafb';
+        } else {
+            if (deadlineInput.value === '-') {
+                deadlineInput.value = '';
+            }
+            deadlineInput.disabled = false;
+            deadlineInput.style.backgroundColor = '';
+        }
+    }
+    
+    fixabilitySelect.addEventListener('change', updateDeadlineField);
+    updateDeadlineField(); // Initial check
+});
+</script>
 {% endblock %}

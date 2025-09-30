@@ -6,7 +6,7 @@ class RemarkForm(forms.ModelForm):
         model = Remark
         fields = ['category', 'name', 'fixability', 'issue_type', 'description', 'severity', 'resolution_deadline_days']
         widgets = {
-            'category': forms.Select(attrs={'class': 'mt-1 block w-full rounded-md border-gray-300'}),
+            'category': forms.TextInput(attrs={'class': 'mt-1 block w-full rounded-md border-gray-300'}),
             'name': forms.TextInput(attrs={'class': 'mt-1 block w-full rounded-md border-gray-300'}),
             'fixability': forms.Select(attrs={'class': 'mt-1 block w-full rounded-md border-gray-300'}),
             'issue_type': forms.Select(attrs={'class': 'mt-1 block w-full rounded-md border-gray-300'}),
@@ -17,4 +17,15 @@ class RemarkForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['category'].queryset = IssueCategory.objects.order_by('title')
+        # Remove queryset since category is now CharField
+
+    def clean(self):
+        cleaned_data = super().clean()
+        fixability = cleaned_data.get('fixability')
+        resolution_deadline_days = cleaned_data.get('resolution_deadline_days')
+        
+        if fixability == 'NON_FIXABLE':
+            if resolution_deadline_days != '-':
+                cleaned_data['resolution_deadline_days'] = '-'
+        
+        return cleaned_data

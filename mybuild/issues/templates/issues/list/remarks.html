@@ -17,7 +17,7 @@
     <tbody class="divide-y divide-gray-200 bg-white">
       {% for r in remarks %}
         <tr class="hover:bg-gray-50">
-          <td class="px-4 py-2 text-sm"><a href="{% url 'issues:remark_detail' r.id %}" class="text-primary-600 hover:text-primary-800 font-medium">{{ r.category.title }}</a><br><a href="{% url 'objects:detail' r.object.id %}" class="text-pink-600 hover:underline text-xs">{{ r.object.name }}</a></td>
+          <td class="px-4 py-2 text-sm"><a href="{% url 'issues:remark_detail' r.id %}" class="text-primary-600 hover:text-primary-800 font-medium">{{ r.category }}</a><br><a href="{% url 'objects:detail' r.object.id %}" class="text-pink-600 hover:underline text-xs">{{ r.object.name }}</a></td>
           <td class="px-4 py-2 text-sm">{{ r.get_fixability_display }}</td>
           <td class="px-4 py-2 text-sm">{{ r.get_issue_type_display }}</td>
           <td class="px-4 py-2 text-sm">{{ r.resolution_deadline_days|default:"-" }}</td>
