@@ -293,6 +293,12 @@ class OpeningChecklistViewSet(ScopedQuerySetMixin, viewsets.ModelViewSet):
     queryset = OpeningChecklist.objects.select_related('object').all()
     permission_classes = [IsAuthenticated, MatrixPermission]
     role_map = {
+        'create': ['FOREMAN', 'INSPECTOR', 'CLIENT', 'ADMIN'],
+        'list': ['FOREMAN', 'INSPECTOR', 'CLIENT', 'ADMIN'],
+        'retrieve': ['FOREMAN', 'INSPECTOR', 'CLIENT', 'ADMIN'],
+        'update': ['FOREMAN', 'INSPECTOR', 'CLIENT', 'ADMIN'],
+        'partial_update': ['FOREMAN', 'INSPECTOR', 'CLIENT', 'ADMIN'],
+        'destroy': ['FOREMAN', 'ADMIN'],
         'submit': ['FOREMAN', 'ADMIN'],
         'approve': ['ADMIN', 'CLIENT'],
         'reject': ['ADMIN', 'CLIENT'],
