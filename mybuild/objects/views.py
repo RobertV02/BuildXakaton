@@ -107,6 +107,7 @@ def checklist_submit(request, pk):
 
 @login_required
 def checklist_create(request, pk):
+	from objects.constants import OPENING_CHECKLIST_ITEMS
 	obj = get_object_or_404(ConstructionObject, pk=pk)
 	if hasattr(obj, 'opening_checklist'):
 		messages.warning(request, 'Чек-лист уже существует')
@@ -114,21 +115,37 @@ def checklist_create(request, pk):
 	if not request.user.groups.filter(name='CLIENT').exists() and not request.user.is_superuser:
 		raise PermissionDenied
 	if request.method == 'POST':
-		form = OpeningChecklistForm(request.POST)
-		if form.is_valid():
-			checklist = form.save(commit=False)
-			checklist.object = obj
-			checklist.filled_by = request.user
-			checklist.save()
-			messages.success(request, 'Чек-лист создан')
-			return HttpResponseRedirect(reverse('objects:detail', args=[pk]) + '?tab=checklist')
-	else:
-		form = OpeningChecklistForm()
-	return render(request, 'objects/checklist_form.html', {'form': form, 'object': obj, 'mode': 'create'})
+		from objects.constants import OPENING_CHECKLIST_ITEMS, CHECKLIST_ITEM_STATUSES
+		
+		# Collect data from form
+		checklist_data = {}
+		for item in OPENING_CHECKLIST_ITEMS:
+			item_id = item['id']
+			status = request.POST.get(f'item_{item_id}')
+			if status in [choice[0] for choice in CHECKLIST_ITEM_STATUSES]:
+				checklist_data[item_id] = status
+			else:
+				checklist_data[item_id] = None
+		
+		checklist = OpeningChecklist.objects.create(
+			object=obj,
+			filled_by=request.user,
+			data=checklist_data
+		)
+		messages.success(request, 'Чек-лист создан')
+		return HttpResponseRedirect(reverse('objects:detail', args=[pk]) + '?tab=checklist')
+	
+	return render(request, 'objects/checklist_edit.html', {
+		'checklist': None,
+		'object': obj,
+		'checklist_items': OPENING_CHECKLIST_ITEMS,
+		'mode': 'create'
+	})
 
 
 @login_required
 def checklist_edit(request, pk):
+	from objects.constants import OPENING_CHECKLIST_ITEMS, CHECKLIST_ITEM_STATUSES
 	obj = get_object_or_404(ConstructionObject, pk=pk)
 	if not hasattr(obj, 'opening_checklist'):
 		messages.error(request, 'Чек-лист отсутствует')
@@ -137,14 +154,28 @@ def checklist_edit(request, pk):
 	if not request.user.groups.filter(name='CLIENT').exists() and not request.user.is_superuser:
 		raise PermissionDenied
 	if request.method == 'POST':
-		form = OpeningChecklistForm(request.POST, instance=checklist)
-		if form.is_valid():
-			form.save()
-			messages.success(request, 'Чек-лист обновлен')
-			return HttpResponseRedirect(reverse('objects:detail', args=[pk]) + '?tab=checklist')
-	else:
-		form = OpeningChecklistForm(instance=checklist)
-	return render(request, 'objects/checklist_form.html', {'form': form, 'object': obj, 'mode': 'edit'})
+		from objects.constants import OPENING_CHECKLIST_ITEMS, CHECKLIST_ITEM_STATUSES
+		
+		# Collect data from form
+		checklist_data = {}
+		for item in OPENING_CHECKLIST_ITEMS:
+			item_id = item['id']
+			status = request.POST.get(f'item_{item_id}')
+			if status in [choice[0] for choice in CHECKLIST_ITEM_STATUSES]:
+				checklist_data[item_id] = status
+			else:
+				checklist_data[item_id] = None
+		
+		checklist.data = checklist_data
+		checklist.save()
+		messages.success(request, 'Чек-лист сохранен')
+		return HttpResponseRedirect(reverse('objects:detail', args=[pk]) + '?tab=checklist')
+	
+	return render(request, 'objects/checklist_edit.html', {
+		'checklist': checklist,
+		'object': obj,
+		'checklist_items': OPENING_CHECKLIST_ITEMS,
+	})
 
 
 @login_required
