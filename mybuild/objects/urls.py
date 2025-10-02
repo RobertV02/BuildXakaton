@@ -16,6 +16,7 @@ urlpatterns = [
     path('<uuid:pk>/checklist/reject/', views.checklist_reject, name='checklist_reject'),
     path('<uuid:pk>/daily-checklist/create/', views.daily_checklist_create, name='daily_checklist_create'),
     path('daily-checklist/<uuid:pk>/edit/', views.daily_checklist_edit, name='daily_checklist_edit'),
+    path('daily-checklist/<uuid:pk>/view/', views.daily_checklist_view, name='daily_checklist_view'),
     path('daily-checklist/<uuid:pk>/submit/', views.daily_checklist_submit, name='daily_checklist_submit'),
     path('daily-checklist/<uuid:pk>/confirm/', views.daily_checklist_confirm, name='daily_checklist_confirm'),
     path('<uuid:pk>/plan/', views.object_plan, name='plan'),
