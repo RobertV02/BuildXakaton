@@ -30,9 +30,17 @@ def object_list(request):
 	status = request.GET.get('status')
 	if status:
 		qs = qs.filter(status=status)
+	
+	# Check if user can create objects
+	from orgs.models import Membership
+	user_roles = list(Membership.objects.filter(user=request.user).values_list('role', flat=True))
+	allowed_roles = ['ADMIN', 'FOREMAN', 'CLIENT']
+	can_create = any(role in allowed_roles for role in user_roles) or request.user.is_superuser
+	
 	context = {
 		'objects': qs[:200],  # simple cap
 		'statuses': ConstructionObject._meta.get_field('status').choices,
+		'can_create_objects': can_create,
 	}
 	return render(request, 'objects/list.html', context)
 
@@ -415,8 +423,11 @@ def object_close(request, pk):
 
 @login_required
 def object_create(request):
-    # Check if user has permission to add construction objects
-    if not request.user.has_perm('objects.add_constructionobject'):
+    # Check if user has role to create construction objects
+    from orgs.models import Membership
+    user_roles = list(Membership.objects.filter(user=request.user).values_list('role', flat=True))
+    allowed_roles = ['ADMIN', 'FOREMAN', 'CLIENT']  # Same as API role_map
+    if not any(role in allowed_roles for role in user_roles) and not request.user.is_superuser:
         raise PermissionDenied("У вас нет прав на создание объектов.")
     
     if request.method == 'POST':

@@ -32,7 +32,7 @@
         Применить фильтр
       </button>
       
-      {% if perms.objects.add_constructionobject %}
+      {% if can_create_objects %}
       <a href="{% url 'objects:create' %}" class="inline-flex items-center justify-center gap-2 px-6 py-3 bg-green-500 text-white rounded-xl hover:bg-green-600 transition-all duration-200 font-medium group">
         <svg class="w-4 h-4 group-hover:scale-110 transition-transform" fill="currentColor" viewBox="0 0 20 20">
           <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"></path>
