@@ -9,5 +9,9 @@ class UserProfile(BaseModel):
     position = models.CharField(max_length=128, blank=True, null=True)
     organization = models.ForeignKey(Organization, on_delete=models.SET_NULL, null=True, blank=True, verbose_name='Организация')
 
+    class Meta:
+        verbose_name = 'Профиль пользователя'
+        verbose_name_plural = 'Профили пользователей'
+
     def __str__(self):
         return self.user.username

@@ -9,6 +9,8 @@ class Notification(BaseModel):
     is_read = models.BooleanField(default=False, db_index=True)
 
     class Meta:
+        verbose_name = 'Уведомление'
+        verbose_name_plural = 'Уведомления'
         ordering = ['-created_at']
 
     def __str__(self):

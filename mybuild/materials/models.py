@@ -11,6 +11,10 @@ class MaterialType(BaseModel):
     name = models.CharField(max_length=255, unique=True)
     unit = models.CharField(max_length=32)
 
+    class Meta:
+        verbose_name = 'Тип материала'
+        verbose_name_plural = 'Типы материалов'
+
     def __str__(self):
         return self.name
 
@@ -24,15 +28,12 @@ class OCRResult(BaseModel):
     success = models.BooleanField(default=False, db_index=True)
     error = models.TextField(blank=True, null=True)
 
+    class Meta:
+        verbose_name = 'Результат OCR'
+        verbose_name_plural = 'Результаты OCR'
+
     def __str__(self):
         return f"OCR для {self.source_file.name}"
-
-    class Meta:
-        permissions = [
-            ("can_run_ocr", "Может запускать OCR"),
-            ("can_validate_ttn", "Может валидировать ТТН"),
-            ("can_approve_ttn", "Может утверждать ТТН"),
-        ]
 
 
 class TTNDocument(BaseModel):
@@ -43,6 +44,10 @@ class TTNDocument(BaseModel):
     number = models.CharField(max_length=128, db_index=True, blank=True, null=True)
     date = models.DateField(db_index=True, blank=True, null=True)
 
+    class Meta:
+        verbose_name = 'Товарно-транспортная накладная'
+        verbose_name_plural = 'Товарно-транспортные накладные'
+
     def __str__(self):
         return self.number or str(self.id)
 
@@ -51,6 +56,10 @@ class QualityPassport(BaseModel):
     attachment = models.ForeignKey(Attachment, on_delete=models.PROTECT)
     number = models.CharField(max_length=128, db_index=True, blank=True, null=True)
     date = models.DateField(db_index=True, blank=True, null=True)
+
+    class Meta:
+        verbose_name = 'Паспорт качества'
+        verbose_name_plural = 'Паспорта качества'
 
     def __str__(self):
         return self.number or str(self.id)
@@ -90,6 +99,10 @@ class Delivery(BaseModel, OfflineFieldsMixin):
     )
     photos = models.ManyToManyField(Attachment, blank=True)
 
+    class Meta:
+        verbose_name = 'Поставка материалов'
+        verbose_name_plural = 'Поставки материалов'
+
     def __str__(self):
         return f"Поставка {self.material.name} на {self.object.name}"
 
@@ -108,6 +121,10 @@ class LabSampleRequest(BaseModel):
     reason = models.TextField()
     status = models.CharField(max_length=20, choices=LabSampleStatus.choices, default=LabSampleStatus.REQUESTED, db_index=True)
     due_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        verbose_name = 'Заявка на отбор пробы'
+        verbose_name_plural = 'Заявки на отбор проб'
 
     def __str__(self):
         return f'Отбор пробы {self.material.name} ({self.status})'

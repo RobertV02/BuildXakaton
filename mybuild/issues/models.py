@@ -35,6 +35,10 @@ class IssueCategory(BaseModel):
     code = models.CharField(max_length=64, unique=True)
     issuer_type = models.CharField(max_length=20, choices=IssuerType.choices)
 
+    class Meta:
+        verbose_name = 'Категория замечания'
+        verbose_name_plural = 'Категории замечаний'
+
     def __str__(self):
         return self.title
 
@@ -89,6 +93,10 @@ class Resolution(BaseModel):
     accepted_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='accepted_resolutions')
     accepted_at = models.DateTimeField(null=True, blank=True)
     is_accepted = models.BooleanField(default=False, db_index=True)
+
+    class Meta:
+        verbose_name = 'Резолюция'
+        verbose_name_plural = 'Резолюции'
 
     def __str__(self):
         issue = self.remark or self.violation

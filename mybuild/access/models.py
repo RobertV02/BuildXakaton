@@ -21,6 +21,10 @@ class Invitation(BaseModel):
     expires_at = models.DateTimeField()
     status = models.CharField(max_length=20, choices=InvitationStatus.choices, default=InvitationStatus.PENDING, db_index=True)
 
+    class Meta:
+        verbose_name = 'Приглашение'
+        verbose_name_plural = 'Приглашения'
+
     def is_expired(self):
         return timezone.now() > self.expires_at
 

@@ -10,5 +10,9 @@ class Attachment(BaseModel):
     uploaded_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='uploaded_files')
     meta = models.JSONField(default=dict, blank=True)
 
+    class Meta:
+        verbose_name = 'Вложение'
+        verbose_name_plural = 'Вложения'
+
     def __str__(self):
         return self.name or str(self.id)

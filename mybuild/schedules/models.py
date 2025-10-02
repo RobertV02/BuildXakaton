@@ -30,6 +30,8 @@ class ScheduleRevision(BaseModel):
     is_active = models.BooleanField(default=False, db_index=True)
 
     class Meta:
+        verbose_name = 'Ревизия графика'
+        verbose_name_plural = 'Ревизии графиков'
         unique_together = ('object', 'version')
         ordering = ['-version']
 
@@ -61,13 +63,15 @@ class WorkItem(BaseModel):
     )
     dependencies = models.JSONField(default=list, blank=True)
 
-    def __str__(self):
-        return self.name
-
     class Meta:
+        verbose_name = 'Работа'
+        verbose_name_plural = 'Работы'
         permissions = [
             ("can_set_actual", "Может устанавливать фактические показатели работы"),
         ]
+
+    def __str__(self):
+        return self.name
 
 
 class ChangeRequest(BaseModel):
@@ -99,6 +103,10 @@ class ChangeRequest(BaseModel):
     )
     reviewed_at = models.DateTimeField(null=True, blank=True)
     comment = models.TextField(blank=True, null=True)
+
+    class Meta:
+        verbose_name = 'Запрос на изменение'
+        verbose_name_plural = 'Запросы на изменение'
 
     def __str__(self):
         return f'Запрос на изменение для {self.object.name} от {self.proposed_by.username}'

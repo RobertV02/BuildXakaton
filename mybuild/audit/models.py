@@ -15,6 +15,8 @@ class AuditLog(BaseModel):
     was_offline = models.BooleanField(default=False, db_index=True)
 
     class Meta:
+        verbose_name = 'Запись аудита'
+        verbose_name_plural = 'Записи аудита'
         ordering = ['-created_at']
         permissions = [
             ("can_view_auditlog", "Может просматривать аудит"),

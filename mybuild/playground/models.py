@@ -4,6 +4,10 @@ class PhotoTest(models.Model):
     image = models.ImageField(upload_to='test_photos/')
     created_at = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        verbose_name = 'Тестовое фото'
+        verbose_name_plural = 'Тестовые фото'
+
     def __str__(self):
         return f"Photo taken at {self.created_at}"
 

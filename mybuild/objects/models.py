@@ -39,6 +39,8 @@ class ConstructionObject(BaseModel):
     activated_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='activated_objects')
 
     class Meta:
+        verbose_name = 'Строительный объект'
+        verbose_name_plural = 'Строительные объекты'
         permissions = [
             ("can_confirm_geozone", "Может подтверждать геозону объекта"),
             ("can_view_auditlog", "Может просматривать аудит"),
@@ -56,6 +58,8 @@ class ObjectAssignment(BaseModel):
     is_active = models.BooleanField(default=True, db_index=True)
 
     class Meta:
+        verbose_name = 'Назначение на объект'
+        verbose_name_plural = 'Назначения на объекты'
         unique_together = ('object', 'user', 'role')
 
     def __str__(self):
@@ -73,6 +77,8 @@ class OpeningChecklist(BaseModel):
     review_comment = models.TextField(blank=True, null=True)
 
     class Meta:
+        verbose_name = 'Вводный чек-лист'
+        verbose_name_plural = 'Вводные чек-листы'
         permissions = [
             ("can_review_checklist", "Может рецензировать чеклист"),
             ("can_approve_checklist", "Может утверждать чеклист"),
@@ -91,6 +97,8 @@ class DailyChecklist(BaseModel):
     confirmed_at = models.DateTimeField(null=True, blank=True)
 
     class Meta:
+        verbose_name = 'Ежедневный чек-лист'
+        verbose_name_plural = 'Ежедневные чек-листы'
         permissions = [
             ("can_create_daily_checklist", "Может создавать ежедневные чеклисты"),
             ("can_view_daily_checklist", "Может просматривать ежедневные чеклисты"),
@@ -108,5 +116,9 @@ class OpeningAct(BaseModel):
     file = models.ForeignKey('documents.Attachment', on_delete=models.PROTECT)
     uploaded_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='uploaded_acts')
 
+    class Meta:
+        verbose_name = 'Акт ввода в эксплуатацию'
+        verbose_name_plural = 'Акты ввода в эксплуатацию'
+
     def __str__(self):
-        return f'Акт открытия для {self.object.name}'
+        return f'Акт для {self.object.name}'

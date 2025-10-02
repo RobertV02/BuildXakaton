@@ -22,6 +22,10 @@ class PresenceToken(BaseModel):
     is_revoked = models.BooleanField(default=False, db_index=True)
     created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='created_tokens')
 
+    class Meta:
+        verbose_name = 'Токен присутствия'
+        verbose_name_plural = 'Токены присутствия'
+
     def is_valid(self):
         return not self.is_revoked and timezone.now() <= self.expires_at
 
@@ -38,6 +42,10 @@ class InspectionVisit(BaseModel, OfflineFieldsMixin):
     gps_accuracy_m = models.FloatField(null=True, blank=True)
     note = models.TextField(blank=True, null=True)
 
+    class Meta:
+        verbose_name = 'Инспекционный визит'
+        verbose_name_plural = 'Инспекционные визиты'
+
     def __str__(self):
         return f'Визит {self.inspector.username} на {self.object.name} в {self.started_at}'
 
@@ -48,6 +56,10 @@ class PresenceConfirmation(BaseModel, OfflineFieldsMixin):
     token = models.ForeignKey(PresenceToken, on_delete=models.SET_NULL, null=True, blank=True)
     confirmed_at = models.DateTimeField(null=True, blank=True)
     draft_payload = models.JSONField(default=dict, blank=True)
+
+    class Meta:
+        verbose_name = 'Подтверждение присутствия'
+        verbose_name_plural = 'Подтверждения присутствия'
 
     def __str__(self):
         return f'Подтверждение для визита {self.visit.id}'
