@@ -121,6 +121,18 @@ class MatrixPermission(BasePermission):
             except Exception:
                 model = None
         action = getattr(view, 'action', request.method.lower())
+        role_map = getattr(view, 'role_map', {})
+        # Если есть role_map, используем только role-based проверку, игнорируя Django perms
+        if role_map:
+            required_roles = role_map.get(action)
+            if not required_roles:
+                return True
+            # Нужна хотя бы одна роль на любом доступном объекте
+            # (детальная проверка будет в has_object_permission)
+            from orgs.models import Membership
+            user_roles = list(Membership.objects.filter(user=request.user).values_list('role', flat=True))
+            return bool(set(required_roles) & set(user_roles)) or request.user.is_authenticated
+        # Fallback на стандартные model perms если нет role_map
         if model is not None:
             app_label = model._meta.app_label
             model_name = model._meta.model_name
@@ -138,40 +150,20 @@ class MatrixPermission(BasePermission):
                 needed = None
             if needed and not request.user.has_perm(needed):
                 return False
-        role_map = getattr(view, 'role_map', {})
-        if not role_map:
-            return True
-        required_roles = role_map.get(action)
-        if not required_roles:
-            return True
-        # Нужна хотя бы одна роль на любом доступном объекте
-        # (детальная проверка будет в has_object_permission)
-        from orgs.models import Membership
-        user_roles = list(Membership.objects.filter(user=request.user).values_list('role', flat=True))
-        return bool(set(required_roles) & set(user_roles)) or request.user.is_authenticated
+        return True
 
     def has_object_permission(self, request: Request, view, obj) -> bool:
-        print(f"DEBUG MatrixPermission: has_object_permission called for user={request.user.username}, method={request.method}")
         if request.user.is_superuser:
-            print("DEBUG MatrixPermission: superuser - allowed")
             return True
         if request.method in SAFE_METHODS:
-            print("DEBUG MatrixPermission: safe method - allowed")
             return True
         role_map = getattr(view, 'role_map', {})
         action = getattr(view, 'action', request.method.lower())
-        print(f"DEBUG MatrixPermission: role_map={role_map}, action={action}")
         required_roles = role_map.get(action)
-        print(f"DEBUG MatrixPermission: required_roles={required_roles}")
         if not required_roles:
-            print("DEBUG MatrixPermission: no required roles - allowed")
             return True
-        # Debug logging
-        print(f"DEBUG MatrixPermission: action={action}, required_roles={required_roles}")
         role = _get_role_for_object(request.user, obj)
-        print(f"DEBUG MatrixPermission: _get_role_for_object returned: {role}")
         if role in required_roles:
-            print("DEBUG MatrixPermission: role found in required_roles")
             return True
         # Fallback: берем роли по членству в организации, если нет назначения на объект
         org_id = getattr(obj, 'org_id', None)
@@ -180,24 +172,18 @@ class MatrixPermission(BasePermission):
                 org_id = getattr(getattr(obj, 'object'), 'org_id', None)
             except Exception:
                 org_id = None
-        print(f"DEBUG MatrixPermission: org_id={org_id}")
         if org_id is not None:
             try:
                 from orgs.models import Membership
                 membership_roles = set(Membership.objects.filter(user=request.user, org_id=org_id).values_list('role', flat=True))
-                print(f"DEBUG MatrixPermission: membership_roles={membership_roles}")
                 if membership_roles & set(required_roles):
-                    print("DEBUG MatrixPermission: membership roles match")
                     return True
             except Exception as e:
-                print(f"DEBUG MatrixPermission: membership check error: {e}")
+                pass
         # Additional fallback: check Django groups if no membership found
         user_groups = set(request.user.groups.values_list('name', flat=True))
-        print(f"DEBUG MatrixPermission: user_groups={user_groups}")
         if user_groups & set(required_roles):
-            print("DEBUG MatrixPermission: django groups match")
             return True
-        print("DEBUG MatrixPermission: no permission found")
         return False
 
 
