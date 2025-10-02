@@ -365,6 +365,10 @@
       box-shadow: 0 8px 25px -5px rgba(0, 0, 0, 0.15);
     }
   </style>
+  
+  <!-- MapLibre GL JS CSS -->
+  <link href="https://unpkg.com/maplibre-gl@5.7.3/dist/maplibre-gl.css" rel="stylesheet" />
+  
   {% block extra_head %}{% endblock %}
 </head>
 <body class="h-full flex bg-gray-50">
@@ -691,5 +695,8 @@
       }
     });
   </script>
+  
+  <!-- MapLibre GL JS -->
+  <script src="https://unpkg.com/maplibre-gl@5.7.3/dist/maplibre-gl.js"></script>
 </body>
 </html>

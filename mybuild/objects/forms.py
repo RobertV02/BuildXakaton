@@ -5,16 +5,24 @@ import json
 
 
 class ConstructionObjectForm(forms.ModelForm):
-    # Represent polygon JSON data as textarea for simple manual editing
+    # Address field for geocoding
+    address = forms.CharField(
+        label='Адрес объекта',
+        widget=forms.TextInput(attrs={'class': 'w-full', 'placeholder': 'Введите адрес для поиска на карте'}),
+        help_text='Введите адрес, затем нажмите "Подтвердить адрес" для отображения на карте',
+        required=False
+    )
+    
+    # Hidden field for polygon coordinates
     polygon_raw = forms.CharField(
-        label='Геозона (JSON)',
-        widget=forms.Textarea(attrs={'rows': 8, 'class': 'w-full font-mono text-sm'}),
-        help_text='Введите JSON массив координат полигона. Пример: [[55.7558, 37.6176], [55.7559, 37.6177], ...]'
+        label='Координаты полигона',
+        widget=forms.HiddenInput(),
+        required=False
     )
 
     class Meta:
         model = ConstructionObject
-        fields = ['org', 'name', 'description', 'plan_start', 'plan_end', 'polygon_raw']
+        fields = ['org', 'name', 'description', 'plan_start', 'plan_end', 'address', 'polygon_raw']
         widgets = {
             'description': forms.Textarea(attrs={'rows': 3, 'class': 'w-full'}),
             'plan_start': forms.DateInput(attrs={'type': 'date', 'class': 'w-full'}),
@@ -30,24 +38,30 @@ class ConstructionObjectForm(forms.ModelForm):
             user_orgs = self.user.memberships.values_list('org', flat=True).distinct()
             self.fields['org'].queryset = Organization.objects.filter(id__in=user_orgs)
         
-        # Set initial polygon if editing
-        if self.instance and self.instance.pk and self.instance.polygon:
-            self.fields['polygon_raw'].initial = json.dumps(self.instance.polygon, ensure_ascii=False, indent=2)
+        # Set initial values if editing
+        if self.instance and self.instance.pk:
+            if self.instance.polygon:
+                self.fields['polygon_raw'].initial = json.dumps(self.instance.polygon, ensure_ascii=False, indent=2)
         else:
             self.fields['polygon_raw'].initial = json.dumps([], ensure_ascii=False, indent=2)
 
     def clean_polygon_raw(self):
-        raw = self.cleaned_data['polygon_raw']
+        raw = self.cleaned_data.get('polygon_raw', '[]')
+        if not raw or raw == '[]':
+            raise forms.ValidationError('Необходимо указать границы объекта на карте')
         try:
             parsed = json.loads(raw)
         except json.JSONDecodeError as e:
             raise forms.ValidationError(f'Ошибка JSON: {e}')
         if not isinstance(parsed, list):
             raise forms.ValidationError('Геозона должна быть массивом координат (JSON array)')
+        if len(parsed) < 4:
+            raise forms.ValidationError('Полигон должен содержать минимум 4 точки')
         # Basic validation for coordinate array
         if parsed and not all(isinstance(coord, list) and len(coord) >= 2 for coord in parsed):
             raise forms.ValidationError('Каждая координата должна быть массивом [lat, lng]')
         self.cleaned_data['polygon'] = parsed
+        return raw
         return raw
 
     def save(self, commit=True):
