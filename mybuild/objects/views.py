@@ -16,6 +16,7 @@ from objects.models import ObjectStatus
 from .forms import OpeningChecklistForm, ConstructionObjectForm
 from django.core.exceptions import PermissionDenied
 from django.contrib.auth.models import Group
+from . import constants
 
 
 @login_required
@@ -71,6 +72,7 @@ def object_detail(request, pk):
 		'deliveries': deliveries,
 		'remarks': remarks,
 		'checklist': checklist,
+		'checklist_items': constants.OPENING_CHECKLIST_ITEMS if tab == 'checklist' else [],
 		'daily_checklists': daily_checklists,
 		'can_create_checklist': is_client(request.user),
 		'can_change_checklist': is_client(request.user),
