@@ -328,3 +328,36 @@ def object_create(request):
     return render(request, 'objects/create.html', {
         'form': form,
     })
+
+
+@login_required
+def object_edit(request, pk):
+    obj = get_object_or_404(ConstructionObject, pk=pk)
+    # Check if user has access to this object's organization unless superuser
+    if not request.user.is_superuser:
+        user_orgs = request.user.memberships.values_list('org', flat=True).distinct()
+        if obj.org_id not in user_orgs:
+            raise PermissionDenied("У вас нет доступа к этому объекту.")
+    
+    # Only client can edit before activation
+    if not request.user.groups.filter(name='CLIENT').exists() and not request.user.is_superuser:
+        raise PermissionDenied("Только заказчик может редактировать объект.")
+    
+    # Cannot edit after activation
+    if obj.status == ObjectStatus.ACTIVE:
+        messages.error(request, 'Нельзя редактировать объект после активации.')
+        return HttpResponseRedirect(reverse('objects:detail', args=[pk]))
+    
+    if request.method == 'POST':
+        form = ConstructionObjectForm(request.POST, user=request.user, instance=obj)
+        if form.is_valid():
+            form.save()
+            messages.success(request, f'Объект "{obj.name}" успешно обновлен.')
+            return HttpResponseRedirect(reverse('objects:detail', args=[pk]))
+    else:
+        form = ConstructionObjectForm(user=request.user, instance=obj)
+    
+    return render(request, 'objects/edit.html', {
+        'form': form,
+        'object': obj,
+    })

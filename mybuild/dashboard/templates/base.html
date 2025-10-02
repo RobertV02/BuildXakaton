@@ -109,12 +109,6 @@
             </div>
           </div>
           <div class="space-y-2">
-            <a href="{% url 'profile' %}" class="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-white hover:text-primary-700 rounded-lg transition-colors">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-              </svg>
-              Профиль
-            </a>
             <form method="post" action="{% url 'logout' %}">
               {% csrf_token %}
               <button class="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors w-full text-left" type="submit">
@@ -155,12 +149,12 @@
       
       <div class="flex items-center gap-4">
         {% if user.is_authenticated %}
-          <a href="{% url 'profile' %}" class="hidden sm:flex items-center gap-3 px-3 py-2 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+          <div class="hidden sm:flex items-center gap-3 px-3 py-2 bg-gray-50 rounded-lg">
             <div class="w-8 h-8 bg-primary-500 rounded-full flex items-center justify-center">
               <span class="text-white text-sm font-semibold">{{ user.username|first|upper }}</span>
             </div>
             <span class="text-sm font-medium text-gray-700">{{ user.username }}</span>
-          </a>
+          </div>
           <form method="post" action="{% url 'logout' %}" class="inline">
             {% csrf_token %}
             <button class="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all" type="submit">
