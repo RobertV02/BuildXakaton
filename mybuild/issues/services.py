@@ -36,8 +36,8 @@ class RemarkService:
         return remark
 
     def confirm_closure(self, remark: Remark) -> Remark:
-        # Inspector or Foreman can close from PENDING_CONFIRMATION
-        if not (self._in_group('INSPECTOR') or self._in_group('FOREMAN')):
+        # Inspector or Client can close from PENDING_CONFIRMATION
+        if not (self._in_group('INSPECTOR') or self._in_group('CLIENT')):
             raise PermissionDenied('Нет прав подтверждать закрытие')
         if remark.status != 'PENDING_CONFIRMATION':
             raise ValidationError('Можно подтвердить только ожидающее подтверждение нарушение')
