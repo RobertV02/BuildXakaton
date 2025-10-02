@@ -160,8 +160,12 @@ class MatrixPermission(BasePermission):
         required_roles = role_map.get(action)
         if not required_roles:
             return True
+        # Debug logging
+        print(f"DEBUG MatrixPermission: action={action}, required_roles={required_roles}")
         role = _get_role_for_object(request.user, obj)
+        print(f"DEBUG MatrixPermission: _get_role_for_object returned: {role}")
         if role in required_roles:
+            print("DEBUG MatrixPermission: role found in required_roles")
             return True
         # Fallback: берем роли по членству в организации, если нет назначения на объект
         org_id = getattr(obj, 'org_id', None)
@@ -170,18 +174,24 @@ class MatrixPermission(BasePermission):
                 org_id = getattr(getattr(obj, 'object'), 'org_id', None)
             except Exception:
                 org_id = None
+        print(f"DEBUG MatrixPermission: org_id={org_id}")
         if org_id is not None:
             try:
                 from orgs.models import Membership
                 membership_roles = set(Membership.objects.filter(user=request.user, org_id=org_id).values_list('role', flat=True))
+                print(f"DEBUG MatrixPermission: membership_roles={membership_roles}")
                 if membership_roles & set(required_roles):
+                    print("DEBUG MatrixPermission: membership roles match")
                     return True
-            except Exception:
-                pass
+            except Exception as e:
+                print(f"DEBUG MatrixPermission: membership check error: {e}")
         # Additional fallback: check Django groups if no membership found
         user_groups = set(request.user.groups.values_list('name', flat=True))
+        print(f"DEBUG MatrixPermission: user_groups={user_groups}")
         if user_groups & set(required_roles):
+            print("DEBUG MatrixPermission: django groups match")
             return True
+        print("DEBUG MatrixPermission: no permission found")
         return False
 
 
