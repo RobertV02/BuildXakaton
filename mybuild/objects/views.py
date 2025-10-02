@@ -34,7 +34,7 @@ def object_list(request):
 	# Check if user can create objects
 	from orgs.models import Membership
 	user_roles = list(Membership.objects.filter(user=request.user).values_list('role', flat=True))
-	allowed_roles = ['ADMIN', 'FOREMAN', 'CLIENT']
+	allowed_roles = ['ADMIN', 'CLIENT']
 	can_create = any(role in allowed_roles for role in user_roles) or request.user.is_superuser
 	
 	context = {

@@ -28,7 +28,7 @@ class ConstructionObjectViewSet(ScopedQuerySetMixin, viewsets.ModelViewSet):
     queryset = ConstructionObject.objects.all()
     permission_classes = [IsAuthenticated, MatrixPermission]
     role_map = {
-        'create': ['ORG_ADMIN', 'FOREMAN', 'CLIENT'],
+        'create': ['ORG_ADMIN', 'CLIENT'],
         'plan': ['CLIENT'],
         'request_activation': ['CLIENT'],
         'activate': ['INSPECTOR'],
