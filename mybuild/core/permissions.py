@@ -151,14 +151,20 @@ class MatrixPermission(BasePermission):
         return bool(set(required_roles) & set(user_roles)) or request.user.is_authenticated
 
     def has_object_permission(self, request: Request, view, obj) -> bool:
+        print(f"DEBUG MatrixPermission: has_object_permission called for user={request.user.username}, method={request.method}")
         if request.user.is_superuser:
+            print("DEBUG MatrixPermission: superuser - allowed")
             return True
         if request.method in SAFE_METHODS:
+            print("DEBUG MatrixPermission: safe method - allowed")
             return True
         role_map = getattr(view, 'role_map', {})
         action = getattr(view, 'action', request.method.lower())
+        print(f"DEBUG MatrixPermission: role_map={role_map}, action={action}")
         required_roles = role_map.get(action)
+        print(f"DEBUG MatrixPermission: required_roles={required_roles}")
         if not required_roles:
+            print("DEBUG MatrixPermission: no required roles - allowed")
             return True
         # Debug logging
         print(f"DEBUG MatrixPermission: action={action}, required_roles={required_roles}")
