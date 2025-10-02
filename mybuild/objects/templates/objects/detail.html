@@ -61,7 +61,7 @@
     </div>
     
     <!-- FSM Actions -->
-    {% if perms.objects.change_constructionobject %}
+    {% if is_client or is_inspector or is_admin %}
     <div class="flex flex-col gap-3 lg:min-w-[200px]">
       <h3 class="text-sm font-semibold text-gray-700 flex items-center gap-2">
         <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
@@ -71,6 +71,7 @@
       </h3>
       <div class="space-y-2">
         {% if object.status == 'DRAFT' %}
+          {% if is_client %}
           <form method="post" action="{% url 'objects:plan' object.id %}" class="w-full">
             {% csrf_token %}
             <button type="submit" class="w-full inline-flex items-center justify-center gap-2 px-4 py-3 bg-blue-500 text-white rounded-xl hover:bg-blue-600 transition-all duration-200 font-medium group">
@@ -89,7 +90,9 @@
               Запрос активации
             </button>
           </form>
+          {% endif %}
         {% elif object.status == 'PLANNED' %}
+          {% if is_client %}
           <form method="post" action="{% url 'objects:request_activation' object.id %}" class="w-full">
             {% csrf_token %}
             <button type="submit" class="w-full inline-flex items-center justify-center gap-2 px-4 py-3 bg-warning-500 text-white rounded-xl hover:bg-warning-600 transition-all duration-200 font-medium group">
@@ -99,6 +102,7 @@
               Запрос активации
             </button>
           </form>
+          {% endif %}
           <form method="post" action="{% url 'objects:activate' object.id %}" class="w-full">
             {% csrf_token %}
             <button type="submit" class="w-full inline-flex items-center justify-center gap-2 px-4 py-3 bg-success-500 text-white rounded-xl hover:bg-success-600 transition-all duration-200 font-medium group">
@@ -109,6 +113,7 @@
             </button>
           </form>
         {% elif object.status == 'ACTIVATION_PENDING' %}
+          {% if is_inspector %}
           <form method="post" action="{% url 'objects:activate' object.id %}" class="w-full">
             {% csrf_token %}
             <button type="submit" class="w-full inline-flex items-center justify-center gap-2 px-4 py-3 bg-success-500 text-white rounded-xl hover:bg-success-600 transition-all duration-200 font-medium group">
@@ -118,7 +123,9 @@
               Активировать
             </button>
           </form>
+          {% endif %}
         {% elif object.status == 'ACTIVE' %}
+          {% if is_admin %}
           <form method="post" action="{% url 'objects:close' object.id %}" class="w-full">
             {% csrf_token %}
             <button type="submit" class="w-full inline-flex items-center justify-center gap-2 px-4 py-3 bg-danger-500 text-white rounded-xl hover:bg-danger-600 transition-all duration-200 font-medium group">
@@ -128,6 +135,7 @@
               Закрыть объект
             </button>
           </form>
+          {% endif %}
         {% endif %}
       </div>
     </div>

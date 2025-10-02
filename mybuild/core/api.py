@@ -32,7 +32,7 @@ class ConstructionObjectViewSet(ScopedQuerySetMixin, viewsets.ModelViewSet):
         'plan': ['CLIENT'],
         'request_activation': ['CLIENT'],
         'activate': ['INSPECTOR'],
-        'close': ['ORG_ADMIN'],
+        'close': ['ADMIN'],
     }
 
     def get_serializer_class(self):

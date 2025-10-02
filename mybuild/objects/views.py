@@ -59,6 +59,10 @@ def object_detail(request, pk):
 		return user.groups.filter(name='CLIENT').exists() or user.is_superuser
 	def is_foreman(user):
 		return user.groups.filter(name='FOREMAN').exists() or user.is_superuser
+	def is_inspector(user):
+		return user.groups.filter(name='INSPECTOR').exists() or user.is_superuser
+	def is_admin(user):
+		return user.groups.filter(name='ADMIN').exists() or user.is_superuser
 
 	return render(request, 'objects/detail.html', {
 		'object': obj,
@@ -75,6 +79,10 @@ def object_detail(request, pk):
 		'can_change_daily_checklist': is_foreman(request.user),
 		'can_delete_daily_checklist': is_foreman(request.user),
 		'can_confirm_daily_checklist': is_client(request.user),
+		'is_client': is_client(request.user),
+		'is_foreman': is_foreman(request.user),
+		'is_inspector': is_inspector(request.user),
+		'is_admin': is_admin(request.user),
 	})
 
 
