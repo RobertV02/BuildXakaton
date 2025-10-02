@@ -22,6 +22,7 @@ class OpeningChecklistStatus(models.TextChoices):
 
 class DailyChecklistStatus(models.TextChoices):
     DRAFT = 'DRAFT', 'Черновик'
+    SUBMITTED = 'SUBMITTED', 'Отправлено на подтверждение'
     PENDING_CONFIRMATION = 'PENDING_CONFIRMATION', 'Ожидание подтверждения'
     APPROVED = 'APPROVED', 'Подтвержден'
 
@@ -93,6 +94,7 @@ class DailyChecklist(BaseModel):
     created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='created_daily_checklists', db_index=True)
     data = models.JSONField()
     status = models.CharField(max_length=25, choices=DailyChecklistStatus.choices, default=DailyChecklistStatus.DRAFT, db_index=True)
+    submitted_at = models.DateTimeField(null=True, blank=True)
     confirmed_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='confirmed_daily_checklists')
     confirmed_at = models.DateTimeField(null=True, blank=True)
 

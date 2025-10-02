@@ -210,9 +210,9 @@ def daily_checklist_create(request, pk):
 		object=obj,
 		created_by=request.user,
 		data={},
-		status=DailyChecklistStatus.PENDING_CONFIRMATION
+		status=DailyChecklistStatus.DRAFT
 	)
-	messages.success(request, 'Ежедневный чек-лист создан и ожидает подтверждения')
+	messages.success(request, 'Ежедневный чек-лист создан')
 	return HttpResponseRedirect(reverse('objects:detail', args=[pk]) + '?tab=daily_checklists')
 
 
@@ -236,37 +236,60 @@ def daily_checklist_confirm(request, pk):
 
 
 @login_required
-def delivery_new(request, pk):
-	obj = get_object_or_404(ConstructionObject, pk=pk)
+def daily_checklist_edit(request, pk):
+	daily_checklist = get_object_or_404(DailyChecklist, pk=pk)
+	if not request.user.groups.filter(name='FOREMAN').exists() and not request.user.is_superuser:
+		raise PermissionDenied
+	if daily_checklist.created_by != request.user and not request.user.is_superuser:
+		messages.error(request, 'Вы можете редактировать только свои чек-листы')
+		return HttpResponseRedirect(reverse('objects:detail', args=[daily_checklist.object.pk]) + '?tab=daily_checklists')
+	from objects.models import DailyChecklistStatus
+	if daily_checklist.status != DailyChecklistStatus.DRAFT:
+		messages.error(request, 'Можно редактировать только чек-листы в статусе черновика')
+		return HttpResponseRedirect(reverse('objects:detail', args=[daily_checklist.object.pk]) + '?tab=daily_checklists')
+	
 	if request.method == 'POST':
-		form = DeliveryForm(request.POST)
-		if form.is_valid():
-			delivery: Delivery = form.save(commit=False)
-			delivery.object = obj
-			delivery.created_by = request.user
-			delivery.save()
-			messages.success(request, 'Поставка создана')
-			return HttpResponseRedirect(reverse('objects:detail', args=[pk]) + '?tab=deliveries')
-	else:
-		form = DeliveryForm()
-	return render(request, 'materials/delivery_form.html', {'form': form, 'object': obj})
+		import json
+		data_str = request.POST.get('data', '{}')
+		try:
+			data = json.loads(data_str)
+		except json.JSONDecodeError:
+			messages.error(request, 'Неверный формат JSON')
+			return render(request, 'objects/daily_checklist_edit.html', {
+				'checklist': daily_checklist,
+				'object': daily_checklist.object,
+			})
+		daily_checklist.data = data
+		daily_checklist.save()
+		messages.success(request, 'Ежедневный чек-лист сохранен')
+		return HttpResponseRedirect(reverse('objects:detail', args=[daily_checklist.object.pk]) + '?tab=daily_checklists')
+	
+	return render(request, 'objects/daily_checklist_edit.html', {
+		'checklist': daily_checklist,
+		'object': daily_checklist.object,
+	})
 
 
 @login_required
-def remark_new(request, pk):
-	obj = get_object_or_404(ConstructionObject, pk=pk)
-	if request.method == 'POST':
-		form = RemarkForm(request.POST)
-		if form.is_valid():
-			remark: Remark = form.save(commit=False)
-			remark.object = obj
-			remark.created_by = request.user
-			remark.save()
-			messages.success(request, 'Замечание создано')
-			return HttpResponseRedirect(reverse('objects:detail', args=[pk]) + '?tab=remarks')
-	else:
-		form = RemarkForm()
-	return render(request, 'issues/remark_form.html', {'form': form, 'object': obj})
+@require_http_methods(["POST"])
+def daily_checklist_submit(request, pk):
+	daily_checklist = get_object_or_404(DailyChecklist, pk=pk)
+	if not request.user.groups.filter(name='FOREMAN').exists() and not request.user.is_superuser:
+		raise PermissionDenied
+	if daily_checklist.created_by != request.user and not request.user.is_superuser:
+		messages.error(request, 'Вы можете отправлять только свои чек-листы')
+		return HttpResponseRedirect(reverse('objects:detail', args=[daily_checklist.object.pk]) + '?tab=daily_checklists')
+	from objects.models import DailyChecklistStatus
+	if daily_checklist.status != DailyChecklistStatus.DRAFT:
+		messages.error(request, 'Можно отправить только чек-лист в статусе черновика')
+		return HttpResponseRedirect(reverse('objects:detail', args=[daily_checklist.object.pk]) + '?tab=daily_checklists')
+	
+	from django.utils import timezone
+	daily_checklist.status = DailyChecklistStatus.PENDING_CONFIRMATION
+	daily_checklist.submitted_at = timezone.now()
+	daily_checklist.save()
+	messages.success(request, 'Ежедневный чек-лист отправлен на подтверждение')
+	return HttpResponseRedirect(reverse('objects:detail', args=[daily_checklist.object.pk]) + '?tab=daily_checklists')
 
 
 def _run_object_action(request, pk, action: str, expected_statuses=None):
