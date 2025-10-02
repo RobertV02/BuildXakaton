@@ -52,6 +52,7 @@ def remark_detail(request, pk):
         'remark': remark,
         'is_foreman': request.user.groups.filter(name='FOREMAN').exists(),
         'is_client': request.user.groups.filter(name='CLIENT').exists(),
+        'is_inspector': request.user.groups.filter(name='INSPECTOR').exists(),
     }
     return render(request, 'issues/remark_detail.html', context)
 

@@ -155,7 +155,7 @@
           <div class="bg-white border border-gray-200 rounded-lg p-4">
             <h4 class="font-medium text-gray-900 mb-3">Действия</h4>
             <div class="space-y-2">
-              {% if is_foreman and remark.status in 'OPEN,IN_PROGRESS' %}
+              {% if is_foreman and (remark.status == 'OPEN' or remark.status == 'IN_PROGRESS') %}
                 <form method="post" action="{% url 'issues:confirm_resolution' remark.id %}">
                   {% csrf_token %}
                   <button type="submit" class="inline-flex items-center gap-2 px-4 py-2 text-sm text-white bg-primary-600 rounded-lg hover:bg-primary-700 transition-all duration-200 font-medium w-full justify-center">
