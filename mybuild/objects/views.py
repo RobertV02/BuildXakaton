@@ -335,6 +335,8 @@ def daily_checklist_submit(request, pk):
 	daily_checklist.status = DailyChecklistStatus.PENDING_CONFIRMATION
 	daily_checklist.submitted_at = timezone.now()
 	daily_checklist.save()
+	messages.success(request, 'Ежедневный чек-лист отправлен на подтверждение')
+	return HttpResponseRedirect(reverse('objects:detail', args=[daily_checklist.object.pk]) + '?tab=daily_checklists')
 @login_required
 @require_http_methods(["POST"])
 def daily_checklist_confirm(request, pk):
