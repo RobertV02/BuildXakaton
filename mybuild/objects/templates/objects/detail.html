@@ -125,7 +125,7 @@
           </form>
           {% endif %}
         {% elif object.status == 'ACTIVE' %}
-          {% if is_admin %}
+          {% if is_admin or is_client %}
           <form method="post" action="{% url 'objects:close' object.id %}" class="w-full">
             {% csrf_token %}
             <button type="submit" class="w-full inline-flex items-center justify-center gap-2 px-4 py-3 bg-danger-500 text-white rounded-xl hover:bg-danger-600 transition-all duration-200 font-medium group">
