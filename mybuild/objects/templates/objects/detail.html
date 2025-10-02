@@ -1,70 +1,60 @@
 {% extends 'base.html' %}
 {% load object_extras %}
-{% block title %}{{ object.name }}{% endblock %}
-{% block subtitle %}Управление строительным объектом{% endblock %}
+{% block title %}{{ object.name }} - Alpha Build{% endblock %}
+{% block page_heading %}{{ object.name }}{% endblock %}
+{% block page_subtitle %}Управление строительным объектом{% endblock %}
 
 {% block content %}
 <!-- Breadcrumb -->
-<nav class="flex items-center gap-2 text-sm text-gray-600 mb-8">
-  <a href="/objects/" class="flex items-center gap-1 hover:text-blue-600 transition-colors font-medium">
-    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-      <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path>
-    </svg>
-    Объекты
-  </a>
-  <svg class="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+<nav class="flex items-center gap-2 text-sm text-gray-500 mb-6">
+  <a href="/objects/" class="hover:text-primary-600 transition-colors">Объекты</a>
+  <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
     <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 111.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
   </svg>
-  <span class="text-gray-900 font-semibold">{{ object.name }}</span>
+  <span class="text-gray-900 font-medium">{{ object.name }}</span>
 </nav>
 
 <!-- Header Section -->
-<div class="glass-effect rounded-3xl p-8 mb-8 border border-white/20 backdrop-blur-sm">
-  <div class="flex flex-col xl:flex-row xl:items-start xl:justify-between gap-8">
+<div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-8">
+  <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
     <!-- Object Info -->
     <div class="flex-1">
-      <div class="flex items-start gap-6">
-        <div class="w-20 h-20 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-3xl flex items-center justify-center text-white font-bold text-2xl shadow-lg">
+      <div class="flex items-start gap-4">
+        <div class="w-16 h-16 bg-gradient-to-br from-primary-500 to-primary-600 rounded-2xl flex items-center justify-center text-white font-bold text-xl">
           {{ object.name|first|upper }}
         </div>
         <div class="flex-1">
-          <div class="flex flex-col sm:flex-row sm:items-center gap-4 mb-3">
-            <h1 class="text-3xl font-bold text-gray-900 tracking-tight">{{ object.name }}</h1>
-            <div class="flex items-center gap-3">
-              {% status_badge object.status %}
-              <span class="px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-sm font-medium">ID: {{ object.id }}</span>
-            </div>
+          <div class="flex items-center gap-3 mb-2">
+            <h1 class="text-2xl font-bold text-gray-900">{{ object.name }}</h1>
+            {% status_badge object.status %}
           </div>
-          <p class="text-gray-700 text-lg leading-relaxed max-w-3xl">{{ object.description|default:"Нет описания объекта" }}</p>
+          <p class="text-sm text-gray-500 mb-4">ID: {{ object.id }}</p>
+          <p class="text-gray-600 max-w-2xl">{{ object.description|default:"Нет описания объекта" }}</p>
         </div>
       </div>
       
       <!-- Object Details Grid -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8 pt-8 border-t border-white/30">
-        <div class="space-y-6">
-          <div class="flex items-center gap-4">
-            <div class="w-12 h-12 bg-blue-100 rounded-2xl flex items-center justify-center">
-              <svg class="w-6 h-6 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6 pt-6 border-t border-gray-100">
+        <div class="space-y-4">
+          <div>
+            <dt class="text-sm font-medium text-gray-500 mb-1">Организация</dt>
+            <dd class="text-sm font-semibold text-gray-900 flex items-center gap-2">
+              <svg class="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
                 <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3z"></path>
               </svg>
-            </div>
-            <div>
-              <dt class="text-sm font-medium text-gray-600 mb-1">Организация</dt>
-              <dd class="text-lg font-bold text-gray-900">{{ object.org.name }}</dd>
-            </div>
+              {{ object.org.name }}
+            </dd>
           </div>
         </div>
-        <div class="space-y-6">
-          <div class="flex items-center gap-4">
-            <div class="w-12 h-12 bg-green-100 rounded-2xl flex items-center justify-center">
-              <svg class="w-6 h-6 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+        <div class="space-y-4">
+          <div>
+            <dt class="text-sm font-medium text-gray-500 mb-1">Плановые сроки</dt>
+            <dd class="text-sm text-gray-900 flex items-center gap-2">
+              <svg class="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
                 <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"></path>
               </svg>
-            </div>
-            <div>
-              <dt class="text-sm font-medium text-gray-600 mb-1">Плановые сроки</dt>
-              <dd class="text-lg font-bold text-gray-900">{{ object.plan_start|default:"—" }} до {{ object.plan_end|default:"—" }}</dd>
-            </div>
+              {{ object.plan_start|default:"—" }} до {{ object.plan_end|default:"—" }}
+            </dd>
           </div>
         </div>
       </div>
@@ -72,93 +62,89 @@
     
     <!-- FSM Actions -->
     {% if is_client or is_inspector or is_admin %}
-    <div class="xl:min-w-[280px]">
-      <div class="glass-effect rounded-2xl p-6 border border-white/20 backdrop-blur-sm">
-        <h3 class="text-lg font-bold text-gray-900 flex items-center gap-3 mb-6">
-          <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center">
-            <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
-              <path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd"></path>
-            </svg>
-          </div>
-          Доступные действия
-        </h3>
-        <div class="space-y-4">
-          {% if is_client and object.status != 'ACTIVE' %}
-          <a href="{% url 'objects:edit' object.id %}" class="w-full inline-flex items-center justify-center gap-3 px-6 py-4 bg-gradient-to-r from-gray-500 to-gray-600 text-white rounded-xl hover:from-gray-600 hover:to-gray-700 transition-all duration-300 font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 group">
-            <svg class="w-5 h-5 transition-transform duration-300 group-hover:rotate-12" fill="currentColor" viewBox="0 0 20 20">
-              <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
-            </svg>
-            Редактировать
-          </a>
+    <div class="flex flex-col gap-3 lg:min-w-[200px]">
+      <h3 class="text-sm font-semibold text-gray-700 flex items-center gap-2">
+        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd"></path>
+        </svg>
+        Доступные действия
+      </h3>
+      <div class="space-y-2">
+        {% if is_client and object.status != 'ACTIVE' %}
+        <a href="{% url 'objects:edit' object.id %}" class="w-full inline-flex items-center justify-center gap-2 px-4 py-3 bg-gray-500 text-white rounded-xl hover:bg-gray-600 transition-all duration-200 font-medium group">
+          <svg class="w-4 h-4 group-hover:scale-110 transition-transform" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+          </svg>
+          Редактировать
+        </a>
+        {% endif %}
+        {% if object.status == 'DRAFT' %}
+          {% if is_client %}
+          <form method="post" action="{% url 'objects:plan' object.id %}" class="w-full">
+            {% csrf_token %}
+            <button type="submit" class="w-full inline-flex items-center justify-center gap-2 px-4 py-3 bg-blue-500 text-white rounded-xl hover:bg-blue-600 transition-all duration-200 font-medium group">
+              <svg class="w-4 h-4 group-hover:scale-110 transition-transform" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"></path>
+              </svg>
+              Планировать
+            </button>
+          </form>
+          <form method="post" action="{% url 'objects:request_activation' object.id %}" class="w-full">
+            {% csrf_token %}
+            <button type="submit" class="w-full inline-flex items-center justify-center gap-2 px-4 py-3 bg-warning-500 text-white rounded-xl hover:bg-warning-600 transition-all duration-200 font-medium group">
+              <svg class="w-4 h-4 group-hover:scale-110 transition-transform" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+              </svg>
+              Запрос активации
+            </button>
+          </form>
           {% endif %}
-          {% if object.status == 'DRAFT' %}
-            {% if is_client %}
-            <form method="post" action="{% url 'objects:plan' object.id %}" class="w-full">
-              {% csrf_token %}
-              <button type="submit" class="w-full inline-flex items-center justify-center gap-3 px-6 py-4 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-xl hover:from-blue-600 hover:to-indigo-700 transition-all duration-300 font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 group">
-                <svg class="w-5 h-5 transition-transform duration-300 group-hover:scale-110" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"></path>
-                </svg>
-                Планировать
-              </button>
-            </form>
-            <form method="post" action="{% url 'objects:request_activation' object.id %}" class="w-full">
-              {% csrf_token %}
-              <button type="submit" class="w-full inline-flex items-center justify-center gap-3 px-6 py-4 bg-gradient-to-r from-amber-500 to-orange-600 text-white rounded-xl hover:from-amber-600 hover:to-orange-700 transition-all duration-300 font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 group">
-                <svg class="w-5 h-5 transition-transform duration-300 group-hover:bounce" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
-                </svg>
-                Запрос активации
-              </button>
-            </form>
-            {% endif %}
-          {% elif object.status == 'PLANNED' %}
-            {% if is_client %}
-            <form method="post" action="{% url 'objects:request_activation' object.id %}" class="w-full">
-              {% csrf_token %}
-              <button type="submit" class="w-full inline-flex items-center justify-center gap-3 px-6 py-4 bg-gradient-to-r from-amber-500 to-orange-600 text-white rounded-xl hover:from-amber-600 hover:to-orange-700 transition-all duration-300 font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 group">
-                <svg class="w-5 h-5 transition-transform duration-300 group-hover:bounce" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
-                </svg>
-                Запрос активации
-              </button>
-            </form>
-            {% endif %}
-            <form method="post" action="{% url 'objects:activate' object.id %}" class="w-full">
-              {% csrf_token %}
-              <button type="submit" class="w-full inline-flex items-center justify-center gap-3 px-6 py-4 bg-gradient-to-r from-emerald-500 to-green-600 text-white rounded-xl hover:from-emerald-600 hover:to-green-700 transition-all duration-300 font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 group">
-                <svg class="w-5 h-5 transition-transform duration-300 group-hover:scale-110" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
-                </svg>
-                Активировать
-              </button>
-            </form>
-          {% elif object.status == 'ACTIVATION_PENDING' %}
-            {% if is_inspector %}
-            <form method="post" action="{% url 'objects:activate' object.id %}" class="w-full">
-              {% csrf_token %}
-              <button type="submit" class="w-full inline-flex items-center justify-center gap-3 px-6 py-4 bg-gradient-to-r from-emerald-500 to-green-600 text-white rounded-xl hover:from-emerald-600 hover:to-green-700 transition-all duration-300 font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 group">
-                <svg class="w-5 h-5 transition-transform duration-300 group-hover:scale-110" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
-                </svg>
-                Активировать
-              </button>
-            </form>
-            {% endif %}
-          {% elif object.status == 'ACTIVE' %}
-            {% if is_admin or is_client %}
-            <form method="post" action="{% url 'objects:close' object.id %}" class="w-full">
-              {% csrf_token %}
-              <button type="submit" class="w-full inline-flex items-center justify-center gap-3 px-6 py-4 bg-gradient-to-r from-red-500 to-rose-600 text-white rounded-xl hover:from-red-600 hover:to-rose-700 transition-all duration-300 font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 group">
-                <svg class="w-5 h-5 transition-transform duration-300 group-hover:rotate-90" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
-                </svg>
-                Закрыть объект
-              </button>
-            </form>
-            {% endif %}
+        {% elif object.status == 'PLANNED' %}
+          {% if is_client %}
+          <form method="post" action="{% url 'objects:request_activation' object.id %}" class="w-full">
+            {% csrf_token %}
+            <button type="submit" class="w-full inline-flex items-center justify-center gap-2 px-4 py-3 bg-warning-500 text-white rounded-xl hover:bg-warning-600 transition-all duration-200 font-medium group">
+              <svg class="w-4 h-4 group-hover:scale-110 transition-transform" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+              </svg>
+              Запрос активации
+            </button>
+          </form>
           {% endif %}
-        </div>
+          <form method="post" action="{% url 'objects:activate' object.id %}" class="w-full">
+            {% csrf_token %}
+            <button type="submit" class="w-full inline-flex items-center justify-center gap-2 px-4 py-3 bg-success-500 text-white rounded-xl hover:bg-success-600 transition-all duration-200 font-medium group">
+              <svg class="w-4 h-4 group-hover:scale-110 transition-transform" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+              </svg>
+              Активировать
+            </button>
+          </form>
+        {% elif object.status == 'ACTIVATION_PENDING' %}
+          {% if is_inspector %}
+          <form method="post" action="{% url 'objects:activate' object.id %}" class="w-full">
+            {% csrf_token %}
+            <button type="submit" class="w-full inline-flex items-center justify-center gap-2 px-4 py-3 bg-success-500 text-white rounded-xl hover:bg-success-600 transition-all duration-200 font-medium group">
+              <svg class="w-4 h-4 group-hover:scale-110 transition-transform" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+              </svg>
+              Активировать
+            </button>
+          </form>
+          {% endif %}
+        {% elif object.status == 'ACTIVE' %}
+          {% if is_admin or is_client %}
+          <form method="post" action="{% url 'objects:close' object.id %}" class="w-full">
+            {% csrf_token %}
+            <button type="submit" class="w-full inline-flex items-center justify-center gap-2 px-4 py-3 bg-danger-500 text-white rounded-xl hover:bg-danger-600 transition-all duration-200 font-medium group">
+              <svg class="w-4 h-4 group-hover:scale-110 transition-transform" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+              </svg>
+              Закрыть объект
+            </button>
+          </form>
+          {% endif %}
+        {% endif %}
       </div>
     </div>
     {% endif %}
@@ -166,99 +152,82 @@
 </div>
 
 <!-- Enhanced Tabs -->
-<div class="glass-effect rounded-3xl border border-white/20 backdrop-blur-sm overflow-hidden mb-8">
-  <div class="bg-gradient-to-r from-blue-50/50 to-indigo-50/50 border-b border-white/30">
-    <nav class="flex overflow-x-auto scrollbar-hide" aria-label="Tabs">
+<div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+  <div class="border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
+    <nav class="flex overflow-x-auto" aria-label="Tabs">
       {% for tab_id, tab_name in tabs %}
-        <a href="?tab={{ tab_id }}" class="group relative whitespace-nowrap px-8 py-6 text-sm font-semibold transition-all duration-300 {% if active_tab == tab_id %}text-blue-600{% else %}text-gray-600 hover:text-blue-600{% endif %}">
-          <div class="flex items-center gap-3">
+        <a href="?tab={{ tab_id }}" class="group whitespace-nowrap px-6 py-4 text-sm font-medium transition-all duration-200 border-b-2 {% if active_tab == tab_id %}border-primary-500 text-primary-600 bg-primary-50/50{% else %}border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 hover:bg-gray-50{% endif %}">
+          <div class="flex items-center gap-2">
             {% if tab_id == 'info' %}
-              <div class="w-8 h-8 rounded-xl flex items-center justify-center transition-all duration-300 {% if active_tab == tab_id %}bg-blue-500 text-white{% else %}bg-gray-100 text-gray-600 group-hover:bg-blue-100 group-hover:text-blue-600{% endif %}">
-                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
-                </svg>
-              </div>
+              <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+              </svg>
             {% elif tab_id == 'deliveries' %}
-              <div class="w-8 h-8 rounded-xl flex items-center justify-center transition-all duration-300 {% if active_tab == tab_id %}bg-blue-500 text-white{% else %}bg-gray-100 text-gray-600 group-hover:bg-blue-100 group-hover:text-blue-600{% endif %}">
-                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M8 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM15 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z"></path>
-                  <path d="M3 4a1 1 0 00-1 1v10a1 1 0 001 1h1.05a2.5 2.5 0 014.9 0H10a1 1 0 001-1V5a1 1 0 00-1-1H3zM14 7a1 1 0 00-1 1v6.05A2.5 2.5 0 0115.95 16H17a1 1 0 001-1V8a1 1 0 00-1-1h-3z"></path>
-                </svg>
-              </div>
+              <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M8 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM15 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z"></path>
+                <path d="M3 4a1 1 0 00-1 1v10a1 1 0 001 1h1.05a2.5 2.5 0 014.9 0H10a1 1 0 001-1V5a1 1 0 00-1-1H3zM14 7a1 1 0 00-1 1v6.05A2.5 2.5 0 0115.95 16H17a1 1 0 001-1V8a1 1 0 00-1-1h-3z"></path>
+              </svg>
             {% elif tab_id == 'remarks' %}
-              <div class="w-8 h-8 rounded-xl flex items-center justify-center transition-all duration-300 {% if active_tab == tab_id %}bg-blue-500 text-white{% else %}bg-gray-100 text-gray-600 group-hover:bg-blue-100 group-hover:text-blue-600{% endif %}">
-                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
-                </svg>
-              </div>
+              <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+              </svg>
             {% elif tab_id == 'checklist' %}
-              <div class="w-8 h-8 rounded-xl flex items-center justify-center transition-all duration-300 {% if active_tab == tab_id %}bg-blue-500 text-white{% else %}bg-gray-100 text-gray-600 group-hover:bg-blue-100 group-hover:text-blue-600{% endif %}">
-                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zm0 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V8zm0 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1v-2z" clip-rule="evenodd"></path>
-                </svg>
-              </div>
+              <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zm0 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V8zm0 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1v-2z" clip-rule="evenodd"></path>
+              </svg>
             {% elif tab_id == 'daily_checklists' %}
-              <div class="w-8 h-8 rounded-xl flex items-center justify-center transition-all duration-300 {% if active_tab == tab_id %}bg-blue-500 text-white{% else %}bg-gray-100 text-gray-600 group-hover:bg-blue-100 group-hover:text-blue-600{% endif %}">
-                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"></path>
-                </svg>
-              </div>
+              <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"></path>
+              </svg>
             {% endif %}
-            <span class="font-bold">{{ tab_name }}</span>
+            {{ tab_name }}
           </div>
-          {% if active_tab == tab_id %}
-            <div class="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-t-full"></div>
-          {% endif %}
         </a>
       {% endfor %}
     </nav>
   </div>
 
   <!-- Tab Content -->
-  <div class="p-8">
+  <div class="p-6">
     {% if active_tab == 'info' %}
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <div class="space-y-8">
-          <div class="glass-effect rounded-2xl p-6 border border-white/20 backdrop-blur-sm">
-            <h3 class="text-xl font-bold text-gray-900 mb-6 flex items-center gap-3">
-              <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center">
-                <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
-                </svg>
-              </div>
+        <div class="space-y-6">
+          <div class="bg-gray-50 rounded-xl p-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+              <svg class="w-5 h-5 text-gray-600" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+              </svg>
               Основная информация
             </h3>
-            <dl class="space-y-6">
+            <dl class="space-y-4">
               <div>
-                <dt class="text-sm font-medium text-gray-600 mb-2">Организация</dt>
-                <dd class="text-lg font-bold text-gray-900">{{ object.org.name }}</dd>
+                <dt class="text-sm font-medium text-gray-500">Организация</dt>
+                <dd class="mt-1 text-sm font-semibold text-gray-900">{{ object.org.name }}</dd>
               </div>
               <div>
-                <dt class="text-sm font-medium text-gray-600 mb-2">Статус проекта</dt>
-                <dd>{% status_badge object.status %}</dd>
+                <dt class="text-sm font-medium text-gray-500">Статус проекта</dt>
+                <dd class="mt-1">{% status_badge object.status %}</dd>
               </div>
             </dl>
           </div>
         </div>
         
-        <div class="space-y-8">
-          <div class="glass-effect rounded-2xl p-6 border border-white/20 backdrop-blur-sm">
-            <h3 class="text-xl font-bold text-gray-900 mb-6 flex items-center gap-3">
-              <div class="w-10 h-10 bg-gradient-to-br from-emerald-500 to-green-600 rounded-xl flex items-center justify-center">
-                <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"></path>
-                </svg>
-              </div>
+        <div class="space-y-6">
+          <div class="bg-gray-50 rounded-xl p-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+              <svg class="w-5 h-5 text-gray-600" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"></path>
+              </svg>
               Временные рамки
             </h3>
-            <dl class="space-y-6">
+            <dl class="space-y-4">
               <div>
-                <dt class="text-sm font-medium text-gray-600 mb-2">Плановое начало</dt>
-                <dd class="text-lg font-bold text-gray-900">{{ object.plan_start|default:"Не указано" }}</dd>
+                <dt class="text-sm font-medium text-gray-500">Плановое начало</dt>
+                <dd class="mt-1 text-sm text-gray-900">{{ object.plan_start|default:"Не указано" }}</dd>
               </div>
               <div>
-                <dt class="text-sm font-medium text-gray-600 mb-2">Плановое окончание</dt>
-                <dd class="text-lg font-bold text-gray-900">{{ object.plan_end|default:"Не указано" }}</dd>
+                <dt class="text-sm font-medium text-gray-500">Плановое окончание</dt>
+                <dd class="mt-1 text-sm text-gray-900">{{ object.plan_end|default:"Не указано" }}</dd>
               </div>
             </dl>
           </div>

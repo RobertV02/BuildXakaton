@@ -12,58 +12,46 @@
         extend: {
           colors: {
             primary: { 
-              50: '#eff6ff', 100: '#dbeafe', 200: '#bfdbfe', 300: '#93c5fd', 400: '#60a5fa', 
-              500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8', 800: '#1e40af', 900: '#1e3a8a' 
+              50: '#f0f9ff', 100: '#e0f2fe', 200: '#bae6fd', 300: '#7dd3fc', 
+              400: '#38bdf8', 500: '#0ea5e9', 600: '#0284c7', 700: '#0369a1', 
+              800: '#075985', 900: '#0c4a6e' 
             },
             success: { 
-              50: '#ecfdf5', 100: '#d1fae5', 200: '#a7f3d0', 300: '#6ee7b7', 400: '#34d399',
-              500: '#10b981', 600: '#059669', 700: '#047857', 800: '#065f46', 900: '#064e3b' 
+              50: '#ecfdf5', 100: '#d1fae5', 200: '#a7f3d0', 300: '#6ee7b7',
+              400: '#34d399', 500: '#10b981', 600: '#059669', 700: '#047857',
+              800: '#065f46', 900: '#064e3b'
             },
             warning: { 
-              50: '#fffbeb', 100: '#fef3c7', 200: '#fde68a', 300: '#fcd34d', 400: '#fbbf24',
-              500: '#f59e0b', 600: '#d97706', 700: '#b45309', 800: '#92400e', 900: '#78350f' 
+              50: '#fffbeb', 100: '#fef3c7', 200: '#fde68a', 300: '#fcd34d',
+              400: '#fbbf24', 500: '#f59e0b', 600: '#d97706', 700: '#b45309',
+              800: '#92400e', 900: '#78350f'
             },
             danger: { 
-              50: '#fef2f2', 100: '#fee2e2', 200: '#fecaca', 300: '#fca5a5', 400: '#f87171',
-              500: '#ef4444', 600: '#dc2626', 700: '#b91c1c', 800: '#991b1b', 900: '#7f1d1d' 
+              50: '#fef2f2', 100: '#fee2e2', 200: '#fecaca', 300: '#fca5a5',
+              400: '#f87171', 500: '#ef4444', 600: '#dc2626', 700: '#b91c1c',
+              800: '#991b1b', 900: '#7f1d1d'
             },
             gray: {
-              50: '#f9fafb', 100: '#f3f4f6', 200: '#e5e7eb', 300: '#d1d5db', 400: '#9ca3af',
-              500: '#6b7280', 600: '#4b5563', 700: '#374151', 800: '#1f2937', 900: '#111827'
+              50: '#f8fafc', 100: '#f1f5f9', 200: '#e2e8f0', 300: '#cbd5e1',
+              400: '#94a3b8', 500: '#64748b', 600: '#475569', 700: '#334155',
+              800: '#1e293b', 900: '#0f172a'
             }
           },
           animation: {
-            'fade-in': 'fadeIn 0.5s ease-in-out',
+            'fade-in': 'fadeIn 0.5s ease-out',
             'slide-up': 'slideUp 0.6s ease-out',
-            'slide-down': 'slideDown 0.4s ease-out',
+            'slide-in-right': 'slideInRight 0.4s ease-out',
+            'bounce-subtle': 'bounceSubtle 0.6s ease-out',
             'scale-in': 'scaleIn 0.3s ease-out',
-            'bounce-soft': 'bounceSoft 0.6s ease-out'
-          },
-          keyframes: {
-            fadeIn: {
-              '0%': { opacity: '0', transform: 'translateY(10px)' },
-              '100%': { opacity: '1', transform: 'translateY(0)' }
-            },
-            slideUp: {
-              '0%': { opacity: '0', transform: 'translateY(30px)' },
-              '100%': { opacity: '1', transform: 'translateY(0)' }
-            },
-            slideDown: {
-              '0%': { opacity: '0', transform: 'translateY(-20px)' },
-              '100%': { opacity: '1', transform: 'translateY(0)' }
-            },
-            scaleIn: {
-              '0%': { opacity: '0', transform: 'scale(0.95)' },
-              '100%': { opacity: '1', transform: 'scale(1)' }
-            },
-            bounceSoft: {
-              '0%': { transform: 'scale(0.95)' },
-              '50%': { transform: 'scale(1.02)' },
-              '100%': { transform: 'scale(1)' }
-            }
+            'glow': 'glow 2s ease-in-out infinite alternate'
           },
           backdropBlur: {
             xs: '2px'
+          },
+          boxShadow: {
+            'soft': '0 2px 15px -3px rgba(0, 0, 0, 0.07), 0 10px 20px -2px rgba(0, 0, 0, 0.04)',
+            'medium': '0 4px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 30px -5px rgba(0, 0, 0, 0.04)',
+            'strong': '0 10px 40px -10px rgba(0, 0, 0, 0.15), 0 15px 35px -5px rgba(0, 0, 0, 0.08)'
           }
         }
       }
@@ -75,26 +63,21 @@
   <style>
     body { 
       font-family: 'Inter', sans-serif; 
-      background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+      background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
     }
     .mobile-menu { 
       transform: translateX(-100%); 
-      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
       backdrop-filter: blur(10px);
     }
-    .mobile-menu.open { transform: translateX(0); }
-    
-    .glass-effect {
-      background: rgba(255, 255, 255, 0.9);
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.2);
+    .mobile-menu.open { 
+      transform: translateX(0); 
     }
-    
     .nav-item {
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       position: relative;
       overflow: hidden;
     }
-    
     .nav-item::before {
       content: '';
       position: absolute;
@@ -102,46 +85,284 @@
       left: -100%;
       width: 100%;
       height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.1), transparent);
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
       transition: left 0.5s;
     }
-    
     .nav-item:hover::before {
       left: 100%;
     }
-    
+    .nav-item.active {
+      background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+      box-shadow: 0 8px 25px -8px rgba(14, 165, 233, 0.4);
+    }
+    .sidebar-gradient {
+      background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+      border-right: 1px solid rgba(226, 232, 240, 0.8);
+      backdrop-filter: blur(20px);
+    }
+    .header-glass {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(226, 232, 240, 0.5);
+    }
     .card-hover {
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
-    
     .card-hover:hover {
       transform: translateY(-2px);
-      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.15);
+    }
+    .toast-enter {
+      animation: toastEnter 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+    .button-primary {
+      background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .button-primary::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      transition: width 0.6s, height 0.6s;
+    }
+    .button-primary:hover::before {
+      width: 300px;
+      height: 300px;
     }
     
-    .btn-primary {
-      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-      box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.3);
+    .button-success {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .button-success::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      transition: width 0.6s, height 0.6s;
+    }
+    .button-success:hover::before {
+      width: 300px;
+      height: 300px;
+    }
+    
+    .button-warning {
+      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .button-warning::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      transition: width 0.6s, height 0.6s;
+    }
+    .button-warning:hover::before {
+      width: 300px;
+      height: 300px;
+    }
+    
+    @keyframes fadeIn { 
+      from { opacity: 0; transform: translateY(10px); } 
+      to { opacity: 1; transform: translateY(0); } 
+    }
+    @keyframes slideUp { 
+      from { opacity: 0; transform: translateY(20px); } 
+      to { opacity: 1; transform: translateY(0); } 
+    }
+    @keyframes slideInRight {
+      from { opacity: 0; transform: translateX(20px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes bounceSubtle {
+      0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+      40% { transform: translateY(-4px); }
+      60% { transform: translateY(-2px); }
+    }
+    @keyframes scaleIn {
+      from { opacity: 0; transform: scale(0.9); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    @keyframes glow {
+      from { box-shadow: 0 0 20px rgba(14, 165, 233, 0.3); }
+      to { box-shadow: 0 0 30px rgba(14, 165, 233, 0.6); }
+    }
+    @keyframes toastEnter {
+      from { 
+        opacity: 0; 
+        transform: translateX(100%) scale(0.9); 
+      }
+      to { 
+        opacity: 1; 
+        transform: translateX(0) scale(1); 
+      }
+    }
+    
+    /* Controlled animation classes */
+    .sidebar-animate-item {
+      opacity: 0;
+      transform: translateX(-20px);
+      transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .sidebar-animate-item.animate-in {
+      opacity: 1;
+      transform: translateX(0);
+    }
+    
+    .sidebar-animations-loaded .sidebar-animate-item {
+      /* Prevent re-animation after first load */
       transition: all 0.3s ease;
     }
     
-    .btn-primary:hover {
-      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-      box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.4);
+    .logo-text {
+      background: linear-gradient(135deg, #ffffff 0%, #e2e8f0 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .user-avatar {
+      background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+      box-shadow: 0 4px 15px rgba(14, 165, 233, 0.3);
+    }
+    
+    .status-badge {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    /* Card and layout styles */
+    .card-enhanced {
+      background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+      border: 1px solid rgba(226, 232, 240, 0.8);
+      border-radius: 1rem;
+      box-shadow: 0 4px 15px -3px rgba(0, 0, 0, 0.07), 0 8px 20px -2px rgba(0, 0, 0, 0.04);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .card-enhanced:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px -5px rgba(0, 0, 0, 0.1), 0 12px 30px -5px rgba(0, 0, 0, 0.08);
+    }
+    
+    /* Animation classes */
+    .animate-fade-in-up {
+      animation: fadeInUp 0.6s ease-out;
+    }
+    
+    .animate-fade-in-left {
+      animation: fadeInLeft 0.6s ease-out;
+    }
+    
+    .animate-fade-in-right {
+      animation: fadeInRight 0.6s ease-out;
+    }
+    
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    @keyframes fadeInLeft {
+      from {
+        opacity: 0;
+        transform: translateX(-30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+    
+    @keyframes fadeInRight {
+      from {
+        opacity: 0;
+        transform: translateX(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+    
+    /* Status badge variants */
+    .status-badge-draft {
+      background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+      color: white;
+    }
+    
+    .status-badge-planned {
+      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+      color: white;
+    }
+    
+    .status-badge-activation_pending {
+      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+      color: white;
+    }
+    
+    .status-badge-active {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: white;
+    }
+    
+    .status-badge-closed {
+      background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+      color: white;
+    }
+    
+    /* Button base classes */
+    .button-primary,
+    .button-success,
+    .button-warning {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.75rem 1.5rem;
+      border-radius: 0.75rem;
+      font-weight: 600;
+      text-decoration: none;
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-size: 0.875rem;
+      box-shadow: 0 4px 15px -3px rgba(0, 0, 0, 0.1);
+    }
+    
+    .button-primary:hover,
+    .button-success:hover,
+    .button-warning:hover {
       transform: translateY(-1px);
-    }
-    
-    .sidebar-gradient {
-      background: linear-gradient(180deg, #1e40af 0%, #1d4ed8 50%, #2563eb 100%);
-    }
-    
-    @keyframes pulse-soft {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.8; }
-    }
-    
-    .animate-pulse-soft {
-      animation: pulse-soft 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+      box-shadow: 0 8px 25px -5px rgba(0, 0, 0, 0.15);
     }
   </style>
   {% block extra_head %}{% endblock %}
@@ -151,115 +372,94 @@
   <div id="mobile-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden hidden"></div>
   
   <!-- Sidebar -->
-  <aside id="sidebar" class="mobile-menu md:translate-x-0 fixed md:relative z-50 md:z-auto w-64 sidebar-gradient min-h-screen md:flex md:flex-col shadow-2xl md:shadow-xl">
-    <div class="h-16 flex items-center justify-between px-6 border-b border-blue-600/30 backdrop-blur-sm">
-      <a href="/" class="text-xl font-bold text-white tracking-tight flex items-center gap-2">
-        <div class="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center backdrop-blur-sm">
-          <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
-            <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path>
-          </svg>
-        </div>
-        Alpha Build
-      </a>
-      <button id="closeSidebar" class="md:hidden text-white/80 hover:text-white p-2 rounded-lg hover:bg-white/10 transition-all duration-200">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+  <aside id="sidebar" class="mobile-menu md:translate-x-0 fixed md:relative z-50 md:z-auto w-72 sidebar-gradient min-h-screen md:flex md:flex-col shadow-strong md:shadow-medium">
+    <div class="h-20 flex items-center justify-between px-8 border-b border-gray-200/50 bg-gradient-to-r from-primary-600 to-primary-700 relative overflow-hidden">
+      <div class="absolute inset-0 bg-gradient-to-r from-primary-500/20 to-primary-600/20"></div>
+      <a href="/" class="text-2xl font-bold logo-text tracking-tight relative z-10 sidebar-animate-item" data-delay="0">Alpha Build</a>
+      <button id="closeSidebar" class="md:hidden text-white/90 hover:text-white p-2 rounded-lg hover:bg-white/10 transition-all duration-300 relative z-10">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
         </svg>
       </button>
     </div>
     
-    <nav class="flex-1 overflow-y-auto py-6 px-3">
+    <nav class="flex-1 overflow-y-auto py-8 px-6">
       {% with p=request.path %}
-      <ul class="space-y-2">
-        <li>
-          <a href="/" class="nav-item group flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-300 {% if p == '/' %}bg-white/20 text-white shadow-lg backdrop-blur-sm{% else %}text-white/80 hover:bg-white/10 hover:text-white{% endif %}">
-            <div class="w-5 h-5 flex items-center justify-center">
-              <svg class="w-5 h-5 transition-transform duration-300 group-hover:scale-110" fill="currentColor" viewBox="0 0 20 20">
+      <ul class="space-y-3">
+        <li class="sidebar-animate-item" data-delay="100">
+          <a href="{% url 'dashboard' %}" class="nav-item group flex items-center gap-4 px-6 py-4 rounded-2xl font-semibold transition-all duration-300 {% if p == '/' %}active text-white{% else %}text-gray-700 hover:bg-primary-50 hover:text-primary-700 hover:shadow-soft{% endif %}">
+            <div class="w-6 h-6 flex items-center justify-center">
+              <svg class="w-6 h-6 transition-transform duration-300 group-hover:scale-110" fill="currentColor" viewBox="0 0 20 20">
                 <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path>
               </svg>
             </div>
-            <span class="transition-all duration-300">Дашборд</span>
-            {% if p == '/' %}
-              <div class="ml-auto w-2 h-2 bg-white rounded-full animate-pulse-soft"></div>
-            {% endif %}
+            <span class="text-base">Дашборд</span>
           </a>
         </li>
-        <li>
-          <a href="/objects/" class="nav-item group flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-300 {% if p|slice:':9' == '/objects/' or p == '/objects/' %}bg-white/20 text-white shadow-lg backdrop-blur-sm{% else %}text-white/80 hover:bg-white/10 hover:text-white{% endif %}">
-            <div class="w-5 h-5 flex items-center justify-center">
-              <svg class="w-5 h-5 transition-transform duration-300 group-hover:scale-110" fill="currentColor" viewBox="0 0 20 20">
+        <li class="sidebar-animate-item" data-delay="200">
+          <a href="{% url 'objects:list' %}" class="nav-item group flex items-center gap-4 px-6 py-4 rounded-2xl font-semibold transition-all duration-300 {% if p|slice:':9' == '/objects/' or p == '/objects/' %}active text-white{% else %}text-gray-700 hover:bg-primary-50 hover:text-primary-700 hover:shadow-soft{% endif %}">
+            <div class="w-6 h-6 flex items-center justify-center">
+              <svg class="w-6 h-6 transition-transform duration-300 group-hover:scale-110" fill="currentColor" viewBox="0 0 20 20">
                 <path fill-rule="evenodd" d="M4 4a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2H4zm0 2h12v8H4V6z" clip-rule="evenodd"></path>
               </svg>
             </div>
-            <span class="transition-all duration-300">Объекты</span>
-            {% if p|slice:':9' == '/objects/' or p == '/objects/' %}
-              <div class="ml-auto w-2 h-2 bg-white rounded-full animate-pulse-soft"></div>
-            {% endif %}
+            <span class="text-base">Объекты</span>
           </a>
         </li>
-        <li>
-          <a href="/deliveries/" class="nav-item group flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-300 {% if p|slice:':12' == '/deliveries/' or p == '/deliveries/' %}bg-white/20 text-white shadow-lg backdrop-blur-sm{% else %}text-white/80 hover:bg-white/10 hover:text-white{% endif %}">
-            <div class="w-5 h-5 flex items-center justify-center">
-              <svg class="w-5 h-5 transition-transform duration-300 group-hover:scale-110" fill="currentColor" viewBox="0 0 20 20">
+        <li class="sidebar-animate-item" data-delay="300">
+          <a href="{% url 'deliveries_list' %}" class="nav-item group flex items-center gap-4 px-6 py-4 rounded-2xl font-semibold transition-all duration-300 {% if p|slice:':12' == '/deliveries/' or p == '/deliveries/' %}active text-white{% else %}text-gray-700 hover:bg-primary-50 hover:text-primary-700 hover:shadow-soft{% endif %}">
+            <div class="w-6 h-6 flex items-center justify-center">
+              <svg class="w-6 h-6 transition-transform duration-300 group-hover:scale-110" fill="currentColor" viewBox="0 0 20 20">
                 <path d="M8 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM15 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z"></path>
                 <path d="M3 4a1 1 0 00-1 1v10a1 1 0 001 1h1.05a2.5 2.5 0 014.9 0H10a1 1 0 001-1V5a1 1 0 00-1-1H3zM14 7a1 1 0 00-1 1v6.05A2.5 2.5 0 0115.95 16H17a1 1 0 001-1V8a1 1 0 00-1-1h-3z"></path>
               </svg>
             </div>
-            <span class="transition-all duration-300">Поставки</span>
-            {% if p|slice:':12' == '/deliveries/' or p == '/deliveries/' %}
-              <div class="ml-auto w-2 h-2 bg-white rounded-full animate-pulse-soft"></div>
-            {% endif %}
+            <span class="text-base">Поставки</span>
           </a>
         </li>
-        <li>
-          <a href="/remarks/" class="nav-item group flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-300 {% if p|slice:':9' == '/remarks/' or p == '/remarks/' %}bg-white/20 text-white shadow-lg backdrop-blur-sm{% else %}text-white/80 hover:bg-white/10 hover:text-white{% endif %}">
-            <div class="w-5 h-5 flex items-center justify-center">
-              <svg class="w-5 h-5 transition-transform duration-300 group-hover:scale-110" fill="currentColor" viewBox="0 0 20 20">
+        <li class="sidebar-animate-item" data-delay="400">
+          <a href="{% url 'remarks_list' %}" class="nav-item group flex items-center gap-4 px-6 py-4 rounded-2xl font-semibold transition-all duration-300 {% if p|slice:':9' == '/remarks/' or p == '/remarks/' %}active text-white{% else %}text-gray-700 hover:bg-primary-50 hover:text-primary-700 hover:shadow-soft{% endif %}">
+            <div class="w-6 h-6 flex items-center justify-center">
+              <svg class="w-6 h-6 transition-transform duration-300 group-hover:scale-110" fill="currentColor" viewBox="0 0 20 20">
                 <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
               </svg>
             </div>
-            <span class="transition-all duration-300">Нарушения</span>
-            {% if p|slice:':9' == '/remarks/' or p == '/remarks/' %}
-              <div class="ml-auto w-2 h-2 bg-white rounded-full animate-pulse-soft"></div>
-            {% endif %}
+            <span class="text-base">Нарушения</span>
           </a>
         </li>
-        <li>
-          <a href="/checklists/" class="nav-item group flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-300 {% if p|slice:':12' == '/checklists/' or p == '/checklists/' %}bg-white/20 text-white shadow-lg backdrop-blur-sm{% else %}text-white/80 hover:bg-white/10 hover:text-white{% endif %}">
-            <div class="w-5 h-5 flex items-center justify-center">
-              <svg class="w-5 h-5 transition-transform duration-300 group-hover:scale-110" fill="currentColor" viewBox="0 0 20 20">
+        <li class="sidebar-animate-item" data-delay="500">
+          <a href="{% url 'checklists_list' %}" class="nav-item group flex items-center gap-4 px-6 py-4 rounded-2xl font-semibold transition-all duration-300 {% if p|slice:':12' == '/checklists/' or p == '/checklists/' %}active text-white{% else %}text-gray-700 hover:bg-primary-50 hover:text-primary-700 hover:shadow-soft{% endif %}">
+            <div class="w-6 h-6 flex items-center justify-center">
+              <svg class="w-6 h-6 transition-transform duration-300 group-hover:scale-110" fill="currentColor" viewBox="0 0 20 20">
                 <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zm0 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V8zm0 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1v-2z" clip-rule="evenodd"></path>
               </svg>
             </div>
-            <span class="transition-all duration-300">Чек-листы</span>
-            {% if p|slice:':12' == '/checklists/' or p == '/checklists/' %}
-              <div class="ml-auto w-2 h-2 bg-white rounded-full animate-pulse-soft"></div>
-            {% endif %}
+            <span class="text-base">Чек-листы</span>
           </a>
         </li>
       </ul>
       {% endwith %}
       
       {% if user.is_authenticated %}
-      <div class="px-4 mt-6">
-        <div class="glass-effect rounded-xl p-4 border border-white/20">
-          <div class="flex items-center gap-3 mb-3">
-            <div class="w-10 h-10 bg-gradient-to-br from-white/30 to-white/10 rounded-xl flex items-center justify-center backdrop-blur-sm border border-white/20">
-              <span class="text-white text-sm font-semibold">{{ user.username|first|upper }}</span>
+      <div class="px-6 mt-8 sidebar-animate-item" data-delay="600">
+        <div class="bg-gradient-to-br from-gray-50 to-white rounded-2xl p-6 shadow-soft border border-gray-100">
+          <div class="flex items-center gap-4 mb-4">
+            <div class="w-12 h-12 user-avatar rounded-xl flex items-center justify-center">
+              <span class="text-white text-lg font-bold">{{ user.username|first|upper }}</span>
             </div>
             <div class="flex-1 min-w-0">
-              <p class="text-sm font-medium text-white truncate">{{ user.username }}</p>
-              <p class="text-xs text-white/60">{{ user.email|default:"Нет email" }}</p>
+              <p class="text-base font-semibold text-gray-900 truncate">{{ user.username }}</p>
+              <p class="text-sm text-gray-500 truncate">{{ user.email|default:"Нет email" }}</p>
             </div>
           </div>
-          <div class="space-y-2">
+          <div class="space-y-3">
             <form method="post" action="{% url 'logout' %}">
               {% csrf_token %}
-              <button class="flex items-center gap-2 px-3 py-2 text-sm text-white/80 hover:bg-red-500/20 hover:text-white rounded-lg transition-all duration-300 w-full text-left group" type="submit">
-                <svg class="w-4 h-4 transition-transform duration-300 group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <button class="button-primary flex items-center gap-3 px-4 py-3 text-sm text-white rounded-xl transition-all duration-300 w-full text-left hover:shadow-medium relative overflow-hidden" type="submit">
+                <svg class="w-5 h-5 relative z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
                 </svg>
-                Выйти
+                <span class="relative z-10 font-medium">Выйти</span>
               </button>
             </form>
           </div>
@@ -268,65 +468,51 @@
       {% endif %}
     </nav>
     
-    <div class="p-4 border-t border-white/20">
-      <div class="text-center text-xs text-white/60 font-medium">
+    <div class="p-6 border-t border-gray-200/50">
+      <div class="text-center text-sm text-gray-500 font-medium animate-fade-in">
         © 2025 Alpha Build
       </div>
     </div>
   </aside>
 
-  <!-- Main Content -->
-  <div class="lg:ml-64 min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-    <!-- Header -->
-    <header class="glass-effect border-b border-white/20 lg:border-b-0 lg:border-0">
-      <div class="flex justify-between items-center px-4 py-4 lg:px-8 lg:py-6">
-        <div class="flex items-center gap-4">
-          <button id="mobile-menu-toggle" class="lg:hidden p-2 rounded-lg bg-blue-500 text-white hover:bg-blue-600 transition-colors">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
-            </svg>
-          </button>
-          <div>
-            <h1 class="text-2xl font-bold text-gray-900 tracking-tight">
-              {% block page_title %}{{ view.title|default:"Главная" }}{% endblock %}
-            </h1>
-            <p class="text-sm text-gray-600 mt-1">
-              {% block subtitle %}Система управления строительством{% endblock %}
-            </p>
-          </div>
+  <!-- Main content wrapper -->
+  <div class="flex-1 flex flex-col min-h-screen">
+    <!-- Top bar -->
+    <header class="h-20 header-glass flex items-center justify-between px-6 lg:px-10 shadow-soft sticky top-0 z-40">
+      <div class="flex items-center gap-4">
+        <button id="mobileMenuToggle" class="md:hidden p-3 rounded-xl hover:bg-gray-100 text-gray-600 transition-all duration-300 hover:scale-105">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+          </svg>
+        </button>
+        <div class="hidden md:block animate-slide-in-right">
+          <h1 class="text-2xl font-bold text-gray-800 tracking-tight">{% block page_heading %}{% endblock %}</h1>
+          <p class="text-base text-gray-600 mt-1">{% block page_subtitle %}{% endblock %}</p>
         </div>
-        
-        <div class="flex items-center gap-4">
-          <!-- Search -->
-          <div class="hidden md:block relative">
-            <input type="search" placeholder="Поиск..." 
-                   class="w-64 px-4 py-2 pl-10 bg-white/50 backdrop-blur-sm border border-white/30 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300">
-            <svg class="absolute left-3 top-2.5 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-            </svg>
+      </div>
+      
+      <div class="flex items-center gap-6">
+        {% if user.is_authenticated %}
+          <div class="hidden sm:flex items-center gap-4 px-4 py-3 bg-gradient-to-r from-gray-50 to-white rounded-2xl shadow-soft border border-gray-100 animate-scale-in">
+            <div class="w-10 h-10 user-avatar rounded-xl flex items-center justify-center">
+              <span class="text-white text-sm font-bold">{{ user.username|first|upper }}</span>
+            </div>
+            <span class="text-base font-semibold text-gray-700">{{ user.username }}</span>
           </div>
-          
-          <!-- Notifications -->
-          <button class="relative p-2 bg-white/20 backdrop-blur-sm hover:bg-white/30 rounded-xl transition-all duration-300 group">
-            <svg class="w-6 h-6 text-gray-700 group-hover:text-blue-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-5 5v-5z"></path>
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19H4a2 2 0 01-2-2V7a2 2 0 012-2h16a2 2 0 012 2v10a2 2 0 01-2 2h-5"></path>
-            </svg>
-            <span class="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center animate-pulse">3</span>
-          </button>
-
-          <!-- Profile Dropdown -->
-          <div class="relative group">
-            <button class="flex items-center gap-2 p-2 bg-white/20 backdrop-blur-sm hover:bg-white/30 rounded-xl transition-all duration-300">
-              <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center">
-                <span class="text-white text-sm font-semibold">{{ user.username|first|upper }}</span>
-              </div>
-              <svg class="w-4 h-4 text-gray-600 group-hover:text-blue-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+          <form method="post" action="{% url 'logout' %}" class="inline">
+            {% csrf_token %}
+            <button class="button-primary flex items-center gap-3 px-5 py-3 text-sm text-white rounded-xl transition-all duration-300 hover:shadow-medium relative overflow-hidden" type="submit">
+              <svg class="w-5 h-5 relative z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
               </svg>
+              <span class="hidden sm:inline relative z-10 font-medium">Выйти</span>
             </button>
-          </div>
-        </div>
+          </form>
+        {% else %}
+          <a href="/login/" class="button-primary px-6 py-3 text-white rounded-xl hover:shadow-medium transition-all duration-300 font-semibold relative overflow-hidden">
+            <span class="relative z-10">Войти</span>
+          </a>
+        {% endif %}
       </div>
     </header>
 
@@ -334,7 +520,7 @@
     <div id="toast-container" class="fixed top-4 right-4 z-50 space-y-3 max-w-sm"></div>
 
     <!-- Page content -->
-    <main class="flex-1 p-4 lg:p-8 bg-gray-50" id="content">
+    <main class="flex-1 bg-gradient-to-br from-gray-50 via-white to-gray-100 overflow-auto" id="content">
       {% if messages %}
         <div id="django-messages" class="hidden">
           {% for message in messages %}
@@ -343,15 +529,61 @@
         </div>
       {% endif %}
       
-      <div class="max-w-7xl mx-auto">
-        {% block content %}{% endblock %}
+      <div class="container mx-auto px-6 lg:px-10 py-8">
+        <!-- Success Messages -->
+        {% if messages %}
+          <div class="mb-8 space-y-4 animate-slide-down">
+            {% for message in messages %}
+              <div class="message-{{ message.tags }} px-6 py-4 rounded-2xl shadow-soft border flex items-center gap-4 animate-scale-in">
+                {% if message.tags == 'success' %}
+                  <div class="w-8 h-8 bg-success-100 rounded-xl flex items-center justify-center">
+                    <svg class="w-5 h-5 text-success-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                  </div>
+                {% elif message.tags == 'error' %}
+                  <div class="w-8 h-8 bg-danger-100 rounded-xl flex items-center justify-center">
+                    <svg class="w-5 h-5 text-danger-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                  </div>
+                {% elif message.tags == 'warning' %}
+                  <div class="w-8 h-8 bg-warning-100 rounded-xl flex items-center justify-center">
+                    <svg class="w-5 h-5 text-warning-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.268 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                    </svg>
+                  </div>
+                {% else %}
+                  <div class="w-8 h-8 bg-blue-100 rounded-xl flex items-center justify-center">
+                    <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                  </div>
+                {% endif %}
+                <div class="flex-1">
+                  <p class="text-base font-medium">{{ message }}</p>
+                </div>
+                <button class="text-gray-400 hover:text-gray-600 transition-colors" onclick="this.parentElement.remove()">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                  </svg>
+                </button>
+              </div>
+            {% endfor %}
+          </div>
+        {% endif %}
+
+        <!-- Main Content -->
+        <div class="animate-fade-in-up">
+          {% block content %}{% endblock %}
+        </div>
       </div>
     </main>
   </div>
 
   {% block extra_scripts %}{% endblock %}
   <script>
-    // Mobile menu functionality
+    // Mobile menu functionality and animation control
     document.addEventListener('DOMContentLoaded', function() {
       const mobileToggle = document.getElementById('mobileMenuToggle');
       const sidebar = document.getElementById('sidebar');
@@ -373,6 +605,38 @@
       mobileToggle?.addEventListener('click', openSidebar);
       closeSidebar?.addEventListener('click', closeSidebarFn);
       overlay?.addEventListener('click', closeSidebarFn);
+      
+      // Sidebar animation control - only run once per page load
+      const animationKey = 'sidebar_animated_' + window.location.pathname;
+      const isAlreadyAnimated = sessionStorage.getItem(animationKey);
+      
+      if (!isAlreadyAnimated) {
+        // First time on this page - run animations
+        const animateItems = document.querySelectorAll('.sidebar-animate-item');
+        
+        animateItems.forEach((item, index) => {
+          const delay = item.getAttribute('data-delay') || (index * 100);
+          
+          setTimeout(() => {
+            item.classList.add('animate-in');
+          }, parseInt(delay));
+        });
+        
+        // Mark this page as animated
+        sessionStorage.setItem(animationKey, 'true');
+        
+        // After all animations complete, mark sidebar as loaded
+        setTimeout(() => {
+          sidebar.classList.add('sidebar-animations-loaded');
+        }, 1000);
+      } else {
+        // Already animated - show items immediately
+        const animateItems = document.querySelectorAll('.sidebar-animate-item');
+        animateItems.forEach(item => {
+          item.classList.add('animate-in');
+        });
+        sidebar.classList.add('sidebar-animations-loaded');
+      }
       
       // Enhanced toast notifications
       const container = document.getElementById('toast-container');

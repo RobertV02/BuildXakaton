@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+{% block title %}Создать нарушение - Alpha Build{% endblock %}
+{% block page_heading %}Зафиксировать нарушение{% endblock %}
+{% block page_subtitle %}Создание записи о нарушении качества или безопасности{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto">
+    <div class="card-enhanced p-8">
+        <form method="post" enctype="multipart/form-data" class="space-y-6">
+            {% csrf_token %}
+            
+            <div>
+                <label for="id_construction_object" class="block text-sm font-medium text-gray-700 mb-2">
+                    Объект строительства
+                </label>
+                <select name="construction_object" id="id_construction_object" 
+                        class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    <option value="">Выберите объект</option>
+                    {% for obj in accessible_objects %}
+                        <option value="{{ obj.id }}">{{ obj.name }} - {{ obj.address }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div>
+                <label for="id_title" class="block text-sm font-medium text-gray-700 mb-2">
+                    Название нарушения
+                </label>
+                {{ form.title }}
+            </div>
+            
+            <div>
+                <label for="id_description" class="block text-sm font-medium text-gray-700 mb-2">
+                    Описание нарушения
+                </label>
+                {{ form.description }}
+            </div>
+            
+            <div class="grid grid-cols-2 gap-6">
+                <div>
+                    <label for="id_severity" class="block text-sm font-medium text-gray-700 mb-2">
+                        Степень серьезности
+                    </label>
+                    {{ form.severity }}
+                </div>
+                
+                <div>
+                    <label for="id_category" class="block text-sm font-medium text-gray-700 mb-2">
+                        Категория
+                    </label>
+                    {{ form.category }}
+                </div>
+            </div>
+            
+            <div>
+                <label for="id_photos" class="block text-sm font-medium text-gray-700 mb-2">
+                    Фотографии (опционально)
+                </label>
+                {{ form.photos }}
+            </div>
+            
+            <div class="flex gap-4 pt-6">
+                <button type="submit" class="button-primary">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                    </svg>
+                    Создать нарушение
+                </button>
+                
+                <a href="{% url 'remarks_list' %}" class="px-6 py-3 bg-gray-100 text-gray-700 rounded-xl font-semibold hover:bg-gray-200 transition-colors">
+                    Отмена
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    .card-enhanced input, .card-enhanced select, .card-enhanced textarea {
+        @apply w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors;
+    }
+    
+    .card-enhanced textarea {
+        @apply h-32 resize-vertical;
+    }
+</style>
+{% endblock %}

@@ -95,4 +95,38 @@ def checklists_list(request):
 	checklists = checklists[:300]
 	return render(request, 'issues/list/checklists.html', {'checklists': checklists})
 
-# Create your views here.
+
+@login_required
+def remarks_create(request):
+	"""Создание нового нарушения"""
+	if request.user.is_superuser:
+		accessible_objects = ConstructionObject.objects.all()
+	else:
+		user_orgs = request.user.memberships.values_list('org', flat=True).distinct()
+		accessible_objects = ConstructionObject.objects.filter(org__in=user_orgs)
+	
+	if request.method == 'POST':
+		form = RemarkForm(request.POST, request.FILES)
+		if form.is_valid():
+			try:
+				object_id = request.POST.get('construction_object')
+				obj = get_object_or_404(ConstructionObject, pk=object_id)
+				
+				# Проверка доступа
+				if not request.user.is_superuser:
+					if obj.org_id not in request.user.memberships.values_list('org', flat=True):
+						raise PermissionDenied("У вас нет доступа к этому объекту.")
+				
+				service = RemarkService(user=request.user)
+				remark = service.create(obj, form.cleaned_data)
+				messages.success(request, 'Нарушение создано успешно.')
+				return redirect('remarks_list')
+			except Exception as e:
+				messages.error(request, str(e))
+	else:
+		form = RemarkForm()
+	
+	return render(request, 'issues/create_remark.html', {
+		'form': form,
+		'accessible_objects': accessible_objects
+	})
