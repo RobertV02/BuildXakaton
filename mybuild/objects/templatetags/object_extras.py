@@ -25,3 +25,11 @@ def status_badge(status: str):
 def checklist_status_badge(status: str):
     cls = STATUS_STYLES.get(status, 'bg-gray-100 text-gray-800')
     return mark_safe(f"<span class='inline-flex items-center rounded px-2 py-0.5 text-xs font-medium {cls}'>Checklist: {status}</span>")
+
+
+@register.filter
+def get_item(dictionary, key):
+    """Get item from dictionary by key"""
+    if isinstance(dictionary, dict):
+        return dictionary.get(key)
+    return None

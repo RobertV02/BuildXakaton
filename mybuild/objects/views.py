@@ -206,10 +206,17 @@ def daily_checklist_create(request, pk):
 	if not request.user.groups.filter(name='FOREMAN').exists() and not request.user.is_superuser:
 		raise PermissionDenied
 	from objects.models import DailyChecklistStatus
+	from objects.constants import DAILY_CHECKLIST_ITEMS
+	
+	# Initialize checklist data with all items set to None (not checked)
+	initial_data = {}
+	for item in DAILY_CHECKLIST_ITEMS:
+		initial_data[item['id']] = None
+	
 	daily_checklist = DailyChecklist.objects.create(
 		object=obj,
 		created_by=request.user,
-		data={},
+		data=initial_data,
 		status=DailyChecklistStatus.DRAFT
 	)
 	messages.success(request, 'Ежедневный чек-лист создан')
@@ -222,6 +229,12 @@ def daily_checklist_confirm(request, pk):
 	daily_checklist = get_object_or_404(DailyChecklist, pk=pk)
 	if not request.user.groups.filter(name='CLIENT').exists() and not request.user.is_superuser:
 		raise PermissionDenied
+	# Check if user has access to this object's organization
+	if not request.user.is_superuser:
+		user_orgs = request.user.memberships.values_list('org', flat=True).distinct()
+		if daily_checklist.object.org_id not in user_orgs:
+			messages.error(request, 'У вас нет доступа к этому чек-листу')
+			return HttpResponseRedirect(reverse('objects:detail', args=[daily_checklist.object.pk]) + '?tab=daily_checklists')
 	from objects.models import DailyChecklistStatus
 	if daily_checklist.status != DailyChecklistStatus.PENDING_CONFIRMATION:
 		messages.error(request, 'Можно подтвердить только чек-лист в статусе ожидания подтверждения')
@@ -237,6 +250,7 @@ def daily_checklist_confirm(request, pk):
 
 @login_required
 def daily_checklist_edit(request, pk):
+	from objects.constants import DAILY_CHECKLIST_ITEMS
 	daily_checklist = get_object_or_404(DailyChecklist, pk=pk)
 	if not request.user.groups.filter(name='FOREMAN').exists() and not request.user.is_superuser:
 		raise PermissionDenied
@@ -249,17 +263,19 @@ def daily_checklist_edit(request, pk):
 		return HttpResponseRedirect(reverse('objects:detail', args=[daily_checklist.object.pk]) + '?tab=daily_checklists')
 	
 	if request.method == 'POST':
-		import json
-		data_str = request.POST.get('data', '{}')
-		try:
-			data = json.loads(data_str)
-		except json.JSONDecodeError:
-			messages.error(request, 'Неверный формат JSON')
-			return render(request, 'objects/daily_checklist_edit.html', {
-				'checklist': daily_checklist,
-				'object': daily_checklist.object,
-			})
-		daily_checklist.data = data
+		from objects.constants import DAILY_CHECKLIST_ITEMS, CHECKLIST_ITEM_STATUSES
+		
+		# Collect data from form
+		checklist_data = {}
+		for item in DAILY_CHECKLIST_ITEMS:
+			item_id = item['id']
+			status = request.POST.get(f'item_{item_id}')
+			if status in [choice[0] for choice in CHECKLIST_ITEM_STATUSES]:
+				checklist_data[item_id] = status
+			else:
+				checklist_data[item_id] = None
+		
+		daily_checklist.data = checklist_data
 		daily_checklist.save()
 		messages.success(request, 'Ежедневный чек-лист сохранен')
 		return HttpResponseRedirect(reverse('objects:detail', args=[daily_checklist.object.pk]) + '?tab=daily_checklists')
@@ -267,6 +283,7 @@ def daily_checklist_edit(request, pk):
 	return render(request, 'objects/daily_checklist_edit.html', {
 		'checklist': daily_checklist,
 		'object': daily_checklist.object,
+		'checklist_items': DAILY_CHECKLIST_ITEMS,
 	})
 
 
