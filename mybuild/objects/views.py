@@ -44,6 +44,16 @@ def object_detail(request, pk):
 		user_orgs = request.user.memberships.values_list('org', flat=True).distinct()
 		if obj.org_id not in user_orgs:
 			raise PermissionDenied("У вас нет доступа к этому объекту.")
+	
+	def is_client(user):
+		return user.groups.filter(name='CLIENT').exists() or user.is_superuser
+	def is_foreman(user):
+		return user.groups.filter(name='FOREMAN').exists() or user.is_superuser
+	def is_inspector(user):
+		return user.groups.filter(name='INSPECTOR').exists() or user.is_superuser
+	def is_admin(user):
+		return user.groups.filter(name='ADMIN').exists() or user.is_superuser
+	
 	tab = request.GET.get('tab', 'info')
 	tabs = [
 		('info', 'Инфо'),
@@ -71,14 +81,6 @@ def object_detail(request, pk):
 				checklist = opening_checklist
 	
 	daily_checklists = obj.daily_checklists.order_by('-created_at')[:100] if tab == 'daily_checklists' else []
-	def is_client(user):
-		return user.groups.filter(name='CLIENT').exists() or user.is_superuser
-	def is_foreman(user):
-		return user.groups.filter(name='FOREMAN').exists() or user.is_superuser
-	def is_inspector(user):
-		return user.groups.filter(name='INSPECTOR').exists() or user.is_superuser
-	def is_admin(user):
-		return user.groups.filter(name='ADMIN').exists() or user.is_superuser
 
 	return render(request, 'objects/detail.html', {
 		'object': obj,
