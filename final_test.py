@@ -22,6 +22,12 @@ print(f"User: {user.username}")
 print(f"Object: {obj.name} (ID: {obj.pk})")
 print(f"Object status: {obj.status}")
 
+# Set object to ACTIVATION_PENDING status for testing
+if obj.status != 'ACTIVATION_PENDING':
+    obj.status = 'ACTIVATION_PENDING'
+    obj.save()
+    print(f"Set object status to: {obj.status}")
+
 # Test the API call
 client = APIClient()
 client.force_authenticate(user=user)
