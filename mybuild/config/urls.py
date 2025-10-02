@@ -6,7 +6,9 @@ from core import api as core_api
 
 urlpatterns = [
 	path('admin/', admin.site.urls),
+	path('accounts/', include('django.contrib.auth.urls')),
 	path('', include('dashboard.urls')),
+	path('objects/', include('objects.urls')),
 	path('playground/', include('playground.urls')),
 	path('api/', include(core_api.router.urls)),
 ]

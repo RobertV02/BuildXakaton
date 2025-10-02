@@ -4,6 +4,7 @@ from . import views
 app_name = 'objects'
 
 urlpatterns = [
+    path('create/', views.object_create, name='create'),
     path('', views.object_list, name='list'),
     path('<uuid:pk>/', views.object_detail, name='detail'),
     path('<uuid:pk>/checklist/submit/', views.checklist_submit, name='checklist_submit'),

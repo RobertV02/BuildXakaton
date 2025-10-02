@@ -13,7 +13,7 @@ from materials.models import Delivery
 from issues.forms import RemarkForm
 from issues.models import Remark
 from objects.models import ObjectStatus
-from .forms import OpeningChecklistForm
+from .forms import OpeningChecklistForm, ConstructionObjectForm
 from django.core.exceptions import PermissionDenied
 from django.contrib.auth.models import Group
 
@@ -301,4 +301,22 @@ def object_activate(request, pk):
 def object_close(request, pk):
 	return _run_object_action(request, pk, 'close', expected_statuses=[ObjectStatus.ACTIVE])
 
-# Create your views here.
+
+@login_required
+def object_create(request):
+    # Check if user has permission to add construction objects
+    if not request.user.has_perm('objects.add_constructionobject'):
+        raise PermissionDenied("У вас нет прав на создание объектов.")
+    
+    if request.method == 'POST':
+        form = ConstructionObjectForm(request.POST, user=request.user)
+        if form.is_valid():
+            obj = form.save()
+            messages.success(request, f'Объект "{obj.name}" успешно создан.')
+            return HttpResponseRedirect(reverse('objects:list'))
+    else:
+        form = ConstructionObjectForm(user=request.user)
+    
+    return render(request, 'objects/create.html', {
+        'form': form,
+    })
