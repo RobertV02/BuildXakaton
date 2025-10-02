@@ -92,9 +92,9 @@ def object_detail(request, pk):
 		'checklist_items': constants.OPENING_CHECKLIST_ITEMS if tab == 'checklist' else [],
 		'daily_checklists': daily_checklists,
 		'can_create_checklist': is_client(request.user),
-		'can_change_checklist': is_client(request.user) and (not checklist or checklist.status == 'DRAFT'),
+		'can_change_checklist': is_client(request.user) and (not checklist or checklist.status in ['DRAFT', 'REJECTED']),
 		'can_delete_checklist': is_client(request.user) and (not checklist or checklist.status == 'DRAFT'),
-		'can_submit_checklist': is_client(request.user) and checklist and checklist.status == 'DRAFT',
+		'can_submit_checklist': is_client(request.user) and checklist and checklist.status in ['DRAFT', 'REJECTED'],
 		'can_approve_checklist': is_inspector(request.user) and checklist and checklist.status == 'SUBMITTED',
 		'can_reject_checklist': is_inspector(request.user) and checklist and checklist.status == 'SUBMITTED',
 		'can_create_daily_checklist': is_foreman(request.user),
@@ -121,17 +121,25 @@ def checklist_submit(request, pk):
 		messages.error(request, 'Только заказчики могут отправлять чек-листы на проверку')
 		return HttpResponseRedirect(reverse('objects:detail', args=[pk]) + '?tab=checklist')
 	
-	if checklist.status != 'DRAFT':
-		messages.error(request, 'Можно отправить на проверку только чек-лист в статусе черновика')
+	if checklist.status not in ['DRAFT', 'REJECTED']:
+		messages.error(request, 'Можно отправить на проверку только чек-лист в статусе черновика или отклоненный')
 		return HttpResponseRedirect(reverse('objects:detail', args=[pk]) + '?tab=checklist')
 	
 	# Change status to SUBMITTED for inspector review
 	from django.utils import timezone
+	was_rejected = checklist.status == 'REJECTED'
 	checklist.status = 'SUBMITTED'
 	checklist.submitted_at = timezone.now()
+	# Clear previous review data when resubmitting
+	checklist.reviewed_by = None
+	checklist.reviewed_at = None
+	checklist.review_comment = ''
 	checklist.save()
 	
-	messages.success(request, 'Чек-лист отправлен на проверку инспектору')
+	if was_rejected:
+		messages.success(request, 'Чек-лист повторно отправлен на проверку инспектору')
+	else:
+		messages.success(request, 'Чек-лист отправлен на проверку инспектору')
 	return HttpResponseRedirect(reverse('objects:detail', args=[pk]) + '?tab=checklist')
 
 
