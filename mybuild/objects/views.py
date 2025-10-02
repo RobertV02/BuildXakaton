@@ -16,6 +16,7 @@ from objects.models import ObjectStatus
 from .forms import OpeningChecklistForm, ConstructionObjectForm
 from django.core.exceptions import PermissionDenied
 from django.contrib.auth.models import Group
+from objects.permissions import roles as role_checks  # предполагаемый модуль с функциями is_client/is_foreman/... если отсутствует – создать отдельно
 from . import constants
 
 
@@ -36,77 +37,109 @@ def object_list(request):
 	return render(request, 'objects/list.html', context)
 
 
+class ObjectDetailContextAssembler:
+	"""Encapsulates building of context & permission flags for object_detail view."""
+	def __init__(self, user, obj, tab: str):
+		self.user = user
+		self.obj = obj
+		self.tab = tab
+
+	# Role checks delegate to central role helpers
+	@property
+	def is_client(self):
+		return role_checks.is_client(self.user)
+
+	@property
+	def is_foreman(self):
+		return role_checks.is_foreman(self.user)
+
+	@property
+	def is_inspector(self):
+		return role_checks.is_inspector(self.user)
+
+	@property
+	def is_admin(self):
+		return role_checks.is_admin(self.user)
+
+	def base_tabs(self):
+		return [
+			('info', 'Инфо'),
+			('deliveries', 'Поставки'),
+			('remarks', 'Нарушения'),
+			('checklist', 'Чек-лист'),
+			('daily_checklists', 'Ежедневные чек-листы'),
+		]
+
+	def get_deliveries(self):
+		if self.tab == 'deliveries':
+			return self.obj.deliveries.select_related('material').order_by('-delivered_at')[:100]
+		return []
+
+	def get_remarks(self):
+		if self.tab == 'remarks':
+			return self.obj.remark_set.order_by('-created_at')[:100]
+		return []
+
+	def get_opening_checklist(self):
+		if self.tab != 'checklist':
+			return None
+		opening_checklist = getattr(self.obj, 'opening_checklist', None)
+		if not opening_checklist:
+			return None
+		if self.is_admin or self.is_client:
+			return opening_checklist
+		if self.is_inspector and opening_checklist.status in ['SUBMITTED','APPROVED','REJECTED']:
+			return opening_checklist
+		return None
+
+	def get_daily_checklists(self):
+		if self.tab == 'daily_checklists':
+			return self.obj.daily_checklists.order_by('-created_at')[:100]
+		return []
+
+	def build(self):
+		checklist = self.get_opening_checklist()
+		ctx = {
+			'object': self.obj,
+			'tabs': self.base_tabs(),
+			'active_tab': self.tab,
+			'deliveries': self.get_deliveries(),
+			'remarks': self.get_remarks(),
+			'checklist': checklist,
+			'checklist_items': constants.OPENING_CHECKLIST_ITEMS if self.tab == 'checklist' else [],
+			'daily_checklists': self.get_daily_checklists(),
+			# Permissions (derived)
+			'can_create_checklist': self.is_client,
+			'can_change_checklist': self.is_client and (not checklist or checklist.status in ['DRAFT','REJECTED']),
+			'can_delete_checklist': self.is_client and (not checklist or checklist.status == 'DRAFT'),
+			'can_submit_checklist': self.is_client and checklist and checklist.status in ['DRAFT','REJECTED'],
+			'can_approve_checklist': self.is_inspector and checklist and checklist.status == 'SUBMITTED',
+			'can_reject_checklist': self.is_inspector and checklist and checklist.status == 'SUBMITTED',
+			'can_create_daily_checklist': self.is_foreman,
+			'can_change_daily_checklist': self.is_foreman,
+			'can_delete_daily_checklist': self.is_foreman,
+			'can_confirm_daily_checklist': self.is_client,
+			'can_create_remark': (self.is_client or self.is_inspector),
+			# Direct role flags
+			'is_client': self.is_client,
+			'is_foreman': self.is_foreman,
+			'is_inspector': self.is_inspector,
+			'is_admin': self.is_admin,
+		}
+		return ctx
+
+
 @login_required
 def object_detail(request, pk):
 	obj = get_object_or_404(ConstructionObject.objects.select_related('org'), pk=pk)
-	# Check if user has access to this object's organization unless superuser
 	if not request.user.is_superuser:
 		user_orgs = request.user.memberships.values_list('org', flat=True).distinct()
 		if obj.org_id not in user_orgs:
 			raise PermissionDenied("У вас нет доступа к этому объекту.")
-	
-	def is_client(user):
-		return user.groups.filter(name='CLIENT').exists() or user.is_superuser
-	def is_foreman(user):
-		return user.groups.filter(name='FOREMAN').exists() or user.is_superuser
-	def is_inspector(user):
-		return user.groups.filter(name='INSPECTOR').exists() or user.is_superuser
-	def is_admin(user):
-		return user.groups.filter(name='ADMIN').exists() or user.is_superuser
-	
 	tab = request.GET.get('tab', 'info')
-	tabs = [
-		('info', 'Инфо'),
-		('deliveries', 'Поставки'),
-		('remarks', 'Нарушения'),
-		('checklist', 'Чек-лист'),
-		('daily_checklists', 'Ежедневные чек-листы'),
-	]
-	deliveries = obj.deliveries.select_related('material').order_by('-delivered_at')[:100] if tab == 'deliveries' else []
-	remarks = obj.remark_set.order_by('-created_at')[:100] if tab == 'remarks' else []
-	
-	# Checklist visibility logic
-	checklist = None
-	if tab == 'checklist':
-		opening_checklist = getattr(obj, 'opening_checklist', None)
-		if opening_checklist:
-			# Clients can see their checklists always
-			if is_client(request.user):
-				checklist = opening_checklist
-			# Inspectors can see only submitted checklists
-			elif is_inspector(request.user) and opening_checklist.status in ['SUBMITTED', 'APPROVED', 'REJECTED']:
-				checklist = opening_checklist
-			# Admins can see everything
-			elif is_admin(request.user):
-				checklist = opening_checklist
-	
-	daily_checklists = obj.daily_checklists.order_by('-created_at')[:100] if tab == 'daily_checklists' else []
-
-	return render(request, 'objects/detail.html', {
-		'object': obj,
-		'tabs': tabs,
-		'active_tab': tab,
-		'deliveries': deliveries,
-		'remarks': remarks,
-		'checklist': checklist,
-		'checklist_items': constants.OPENING_CHECKLIST_ITEMS if tab == 'checklist' else [],
-		'daily_checklists': daily_checklists,
-		'can_create_checklist': is_client(request.user),
-		'can_change_checklist': is_client(request.user) and (not checklist or checklist.status in ['DRAFT', 'REJECTED']),
-		'can_delete_checklist': is_client(request.user) and (not checklist or checklist.status == 'DRAFT'),
-		'can_submit_checklist': is_client(request.user) and checklist and checklist.status in ['DRAFT', 'REJECTED'],
-		'can_approve_checklist': is_inspector(request.user) and checklist and checklist.status == 'SUBMITTED',
-		'can_reject_checklist': is_inspector(request.user) and checklist and checklist.status == 'SUBMITTED',
-		'can_create_daily_checklist': is_foreman(request.user),
-		'can_change_daily_checklist': is_foreman(request.user),
-		'can_delete_daily_checklist': is_foreman(request.user),
-		'can_confirm_daily_checklist': is_client(request.user),
-		'can_create_remark': (is_client(request.user) or is_inspector(request.user)) if request.user.is_superuser else (is_client(request.user) or is_inspector(request.user)),
-		'is_client': is_client(request.user),
-		'is_foreman': is_foreman(request.user),
-		'is_inspector': is_inspector(request.user),
-		'is_admin': is_admin(request.user),
-	})
+	assembler = ObjectDetailContextAssembler(request.user, obj, tab)
+	context = assembler.build()
+	return render(request, 'objects/detail.html', context)
 
 
 @login_required
@@ -116,31 +149,15 @@ def checklist_submit(request, pk):
 	if not hasattr(obj, 'opening_checklist'):
 		messages.error(request, 'Чек-лист отсутствует')
 		return HttpResponseRedirect(reverse('objects:detail', args=[pk]) + '?tab=checklist')
-	
+	from objects.services.checklists import OpeningChecklistService
+	service = OpeningChecklistService(user=request.user, obj=obj)
 	checklist = obj.opening_checklist
-	if not request.user.groups.filter(name='CLIENT').exists() and not request.user.is_superuser:
-		messages.error(request, 'Только заказчики могут отправлять чек-листы на проверку')
-		return HttpResponseRedirect(reverse('objects:detail', args=[pk]) + '?tab=checklist')
-	
-	if checklist.status not in ['DRAFT', 'REJECTED']:
-		messages.error(request, 'Можно отправить на проверку только чек-лист в статусе черновика или отклоненный')
-		return HttpResponseRedirect(reverse('objects:detail', args=[pk]) + '?tab=checklist')
-	
-	# Change status to SUBMITTED for inspector review
-	from django.utils import timezone
-	was_rejected = checklist.status == 'REJECTED'
-	checklist.status = 'SUBMITTED'
-	checklist.submitted_at = timezone.now()
-	# Clear previous review data when resubmitting
-	checklist.reviewed_by = None
-	checklist.reviewed_at = None
-	checklist.review_comment = ''
-	checklist.save()
-	
-	if was_rejected:
-		messages.success(request, 'Чек-лист повторно отправлен на проверку инспектору')
-	else:
-		messages.success(request, 'Чек-лист отправлен на проверку инспектору')
+	try:
+		was_rejected = (checklist.status == 'REJECTED')
+		service.submit(checklist)
+		messages.success(request, 'Чек-лист повторно отправлен на проверку инспектору' if was_rejected else 'Чек-лист отправлен на проверку инспектору')
+	except Exception as e:  # PermissionDenied / ValidationError
+		messages.error(request, str(e))
 	return HttpResponseRedirect(reverse('objects:detail', args=[pk]) + '?tab=checklist')
 
 
@@ -148,15 +165,10 @@ def checklist_submit(request, pk):
 def checklist_create(request, pk):
 	from objects.constants import OPENING_CHECKLIST_ITEMS
 	obj = get_object_or_404(ConstructionObject, pk=pk)
-	if hasattr(obj, 'opening_checklist'):
-		messages.warning(request, 'Чек-лист уже существует')
-		return HttpResponseRedirect(reverse('objects:detail', args=[pk]) + '?tab=checklist')
-	if not request.user.groups.filter(name='CLIENT').exists() and not request.user.is_superuser:
-		raise PermissionDenied
+	from objects.services.checklists import OpeningChecklistService
+	from objects.constants import CHECKLIST_ITEM_STATUSES
+	service = OpeningChecklistService(user=request.user, obj=obj)
 	if request.method == 'POST':
-		from objects.constants import OPENING_CHECKLIST_ITEMS, CHECKLIST_ITEM_STATUSES
-		
-		# Collect data from form
 		checklist_data = {}
 		for item in OPENING_CHECKLIST_ITEMS:
 			item_id = item['id']
@@ -165,14 +177,12 @@ def checklist_create(request, pk):
 				checklist_data[item_id] = status
 			else:
 				checklist_data[item_id] = None
-		
-		checklist = OpeningChecklist.objects.create(
-			object=obj,
-			filled_by=request.user,
-			data=checklist_data
-		)
-		messages.success(request, 'Чек-лист создан')
-		return HttpResponseRedirect(reverse('objects:detail', args=[pk]) + '?tab=checklist')
+		try:
+			service.create(checklist_data)
+			messages.success(request, 'Чек-лист создан')
+			return HttpResponseRedirect(reverse('objects:detail', args=[pk]) + '?tab=checklist')
+		except Exception as e:
+			messages.error(request, str(e))
 	
 	return render(request, 'objects/checklist_edit.html', {
 		'checklist': None,
@@ -190,12 +200,9 @@ def checklist_edit(request, pk):
 		messages.error(request, 'Чек-лист отсутствует')
 		return HttpResponseRedirect(reverse('objects:detail', args=[pk]) + '?tab=checklist')
 	checklist = obj.opening_checklist
-	if not request.user.groups.filter(name='CLIENT').exists() and not request.user.is_superuser:
-		raise PermissionDenied
+	from objects.services.checklists import OpeningChecklistService
+	service = OpeningChecklistService(user=request.user, obj=obj)
 	if request.method == 'POST':
-		from objects.constants import OPENING_CHECKLIST_ITEMS, CHECKLIST_ITEM_STATUSES
-		
-		# Collect data from form
 		checklist_data = {}
 		for item in OPENING_CHECKLIST_ITEMS:
 			item_id = item['id']
@@ -204,11 +211,12 @@ def checklist_edit(request, pk):
 				checklist_data[item_id] = status
 			else:
 				checklist_data[item_id] = None
-		
-		checklist.data = checklist_data
-		checklist.save()
-		messages.success(request, 'Чек-лист сохранен')
-		return HttpResponseRedirect(reverse('objects:detail', args=[pk]) + '?tab=checklist')
+		try:
+			service.update(checklist, checklist_data)
+			messages.success(request, 'Чек-лист сохранен')
+			return HttpResponseRedirect(reverse('objects:detail', args=[pk]) + '?tab=checklist')
+		except Exception as e:
+			messages.error(request, str(e))
 	
 	return render(request, 'objects/checklist_edit.html', {
 		'checklist': checklist,
@@ -238,24 +246,13 @@ def checklist_approve(request, pk):
 	if not hasattr(obj, 'opening_checklist'):
 		messages.error(request, 'Чек-лист отсутствует')
 		return HttpResponseRedirect(reverse('objects:detail', args=[pk]) + '?tab=checklist')
-	
-	checklist = obj.opening_checklist
-	if not request.user.groups.filter(name='INSPECTOR').exists() and not request.user.is_superuser:
-		messages.error(request, 'Только инспекторы могут одобрять чек-листы')
-		return HttpResponseRedirect(reverse('objects:detail', args=[pk]) + '?tab=checklist')
-	
-	if checklist.status != 'SUBMITTED':
-		messages.error(request, 'Можно одобрить только чек-лист в статусе "Отправлено"')
-		return HttpResponseRedirect(reverse('objects:detail', args=[pk]) + '?tab=checklist')
-	
-	# Approve the checklist
-	from django.utils import timezone
-	checklist.status = 'APPROVED'
-	checklist.reviewed_by = request.user
-	checklist.reviewed_at = timezone.now()
-	checklist.save()
-	
-	messages.success(request, 'Чек-лист одобрен')
+	from objects.services.checklists import OpeningChecklistService
+	service = OpeningChecklistService(user=request.user, obj=obj)
+	try:
+		service.approve(obj.opening_checklist)
+		messages.success(request, 'Чек-лист одобрен')
+	except Exception as e:
+		messages.error(request, str(e))
 	return HttpResponseRedirect(reverse('objects:detail', args=[pk]) + '?tab=checklist')
 
 
@@ -266,25 +263,14 @@ def checklist_reject(request, pk):
 	if not hasattr(obj, 'opening_checklist'):
 		messages.error(request, 'Чек-лист отсутствует')
 		return HttpResponseRedirect(reverse('objects:detail', args=[pk]) + '?tab=checklist')
-	
-	checklist = obj.opening_checklist
-	if not request.user.groups.filter(name='INSPECTOR').exists() and not request.user.is_superuser:
-		messages.error(request, 'Только инспекторы могут отклонять чек-листы')
-		return HttpResponseRedirect(reverse('objects:detail', args=[pk]) + '?tab=checklist')
-	
-	if checklist.status != 'SUBMITTED':
-		messages.error(request, 'Можно отклонить только чек-лист в статусе "Отправлено"')
-		return HttpResponseRedirect(reverse('objects:detail', args=[pk]) + '?tab=checklist')
-	
-	# Reject the checklist
-	from django.utils import timezone
-	checklist.status = 'REJECTED'
-	checklist.reviewed_by = request.user
-	checklist.reviewed_at = timezone.now()
-	checklist.review_comment = request.POST.get('review_comment', '').strip()
-	checklist.save()
-	
-	messages.success(request, 'Чек-лист отклонен')
+	from objects.services.checklists import OpeningChecklistService
+	service = OpeningChecklistService(user=request.user, obj=obj)
+	comment = request.POST.get('review_comment', '').strip()
+	try:
+		service.reject(obj.opening_checklist, comment)
+		messages.success(request, 'Чек-лист отклонен')
+	except Exception as e:
+		messages.error(request, str(e))
 	return HttpResponseRedirect(reverse('objects:detail', args=[pk]) + '?tab=checklist')
 
 
@@ -292,23 +278,15 @@ def checklist_reject(request, pk):
 @require_http_methods(["POST"])
 def daily_checklist_create(request, pk):
 	obj = get_object_or_404(ConstructionObject, pk=pk)
-	if not request.user.groups.filter(name='FOREMAN').exists() and not request.user.is_superuser:
-		raise PermissionDenied
-	from objects.models import DailyChecklistStatus
+	from objects.services.checklists import DailyChecklistService
 	from objects.constants import DAILY_CHECKLIST_ITEMS
-	
-	# Initialize checklist data with all items set to None (not checked)
-	initial_data = {}
-	for item in DAILY_CHECKLIST_ITEMS:
-		initial_data[item['id']] = None
-	
-	daily_checklist = DailyChecklist.objects.create(
-		object=obj,
-		created_by=request.user,
-		data=initial_data,
-		status=DailyChecklistStatus.DRAFT
-	)
-	messages.success(request, 'Ежедневный чек-лист создан')
+	service = DailyChecklistService(user=request.user, obj=obj)
+	initial_data = {item['id']: None for item in DAILY_CHECKLIST_ITEMS}
+	try:
+		service.create(initial_data)
+		messages.success(request, 'Ежедневный чек-лист создан')
+	except Exception as e:
+		messages.error(request, str(e))
 	return HttpResponseRedirect(reverse('objects:detail', args=[pk]) + '?tab=daily_checklists')
 
 
@@ -316,25 +294,13 @@ def daily_checklist_create(request, pk):
 @require_http_methods(["POST"])
 def daily_checklist_confirm(request, pk):
 	daily_checklist = get_object_or_404(DailyChecklist, pk=pk)
-	if not request.user.groups.filter(name='CLIENT').exists() and not request.user.is_superuser:
-		raise PermissionDenied
-	# Check if user has access to this object's organization
-	# Temporarily disabled for testing
-	# if not request.user.is_superuser:
-	# 	user_orgs = request.user.memberships.values_list('org', flat=True).distinct()
-	# 	if daily_checklist.object.org_id not in user_orgs:
-	# 		messages.error(request, 'У вас нет доступа к этому чек-листу')
-	# 		return HttpResponseRedirect(reverse('objects:detail', args=[daily_checklist.object.pk]) + '?tab=daily_checklists'])
-	from objects.models import DailyChecklistStatus
-	if daily_checklist.status != DailyChecklistStatus.PENDING_CONFIRMATION:
-		messages.error(request, 'Можно подтвердить только чек-лист в статусе ожидания подтверждения')
-		return HttpResponseRedirect(reverse('objects:detail', args=[daily_checklist.object.pk]) + '?tab=daily_checklists')
-	from django.utils import timezone
-	daily_checklist.status = DailyChecklistStatus.APPROVED
-	daily_checklist.confirmed_by = request.user
-	daily_checklist.confirmed_at = timezone.now()
-	daily_checklist.save()
-	messages.success(request, 'Ежедневный чек-лист подтвержден')
+	from objects.services.checklists import DailyChecklistService
+	service = DailyChecklistService(user=request.user, obj=daily_checklist.object)
+	try:
+		service.approve(daily_checklist)
+		messages.success(request, 'Ежедневный чек-лист подтвержден')
+	except Exception as e:
+		messages.error(request, str(e))
 	return HttpResponseRedirect(reverse('objects:detail', args=[daily_checklist.object.pk]) + '?tab=daily_checklists')
 
 
@@ -369,22 +335,11 @@ def daily_checklist_view(request, pk):
 
 @login_required
 def daily_checklist_edit(request, pk):
-	from objects.constants import DAILY_CHECKLIST_ITEMS
+	from objects.constants import DAILY_CHECKLIST_ITEMS, CHECKLIST_ITEM_STATUSES
 	daily_checklist = get_object_or_404(DailyChecklist, pk=pk)
-	if not request.user.groups.filter(name='FOREMAN').exists() and not request.user.is_superuser:
-		raise PermissionDenied
-	if daily_checklist.created_by != request.user and not request.user.is_superuser:
-		messages.error(request, 'Вы можете редактировать только свои чек-листы')
-		return HttpResponseRedirect(reverse('objects:detail', args=[daily_checklist.object.pk]) + '?tab=daily_checklists')
-	from objects.models import DailyChecklistStatus
-	if daily_checklist.status != DailyChecklistStatus.DRAFT:
-		messages.error(request, 'Можно редактировать только чек-листы в статусе черновика')
-		return HttpResponseRedirect(reverse('objects:detail', args=[daily_checklist.object.pk]) + '?tab=daily_checklists')
-	
+	from objects.services.checklists import DailyChecklistService
+	service = DailyChecklistService(user=request.user, obj=daily_checklist.object)
 	if request.method == 'POST':
-		from objects.constants import DAILY_CHECKLIST_ITEMS, CHECKLIST_ITEM_STATUSES
-		
-		# Collect data from form
 		checklist_data = {}
 		for item in DAILY_CHECKLIST_ITEMS:
 			item_id = item['id']
@@ -393,69 +348,26 @@ def daily_checklist_edit(request, pk):
 				checklist_data[item_id] = status
 			else:
 				checklist_data[item_id] = None
-		
-		daily_checklist.data = checklist_data
-		daily_checklist.save()
-		messages.success(request, 'Ежедневный чек-лист сохранен')
-		return HttpResponseRedirect(reverse('objects:detail', args=[daily_checklist.object.pk]) + '?tab=daily_checklists')
-	
-	return render(request, 'objects/daily_checklist_edit.html', {
-		'checklist': daily_checklist,
-		'object': daily_checklist.object,
-		'checklist_items': DAILY_CHECKLIST_ITEMS,
-	})
+		try:
+			service.update(daily_checklist, checklist_data)
+			messages.success(request, 'Ежедневный чек-лист сохранен')
+			return HttpResponseRedirect(reverse('objects:detail', args=[daily_checklist.object.pk]) + '?tab=daily_checklists')
+		except Exception as e:
+			messages.error(request, str(e))
+	return render(request, 'objects/daily_checklist_edit.html', {'checklist': daily_checklist,'object': daily_checklist.object,'checklist_items': DAILY_CHECKLIST_ITEMS})
 
 
 @login_required
 @require_http_methods(["POST"])
 def daily_checklist_submit(request, pk):
 	daily_checklist = get_object_or_404(DailyChecklist, pk=pk)
-	if not request.user.groups.filter(name='FOREMAN').exists() and not request.user.is_superuser:
-		raise PermissionDenied
-	if daily_checklist.created_by != request.user and not request.user.is_superuser:
-		messages.error(request, 'Вы можете отправлять только свои чек-листы')
-		return HttpResponseRedirect(reverse('objects:detail', args=[daily_checklist.object.pk]) + '?tab=daily_checklists')
-	from objects.models import DailyChecklistStatus
-	if daily_checklist.status != DailyChecklistStatus.DRAFT:
-		messages.error(request, 'Можно отправить только чек-лист в статусе черновика')
-		return HttpResponseRedirect(reverse('objects:detail', args=[daily_checklist.object.pk]) + '?tab=daily_checklists')
-	
-	from django.utils import timezone
-	daily_checklist.status = DailyChecklistStatus.PENDING_CONFIRMATION
-	daily_checklist.submitted_at = timezone.now()
-	daily_checklist.save()
-	messages.success(request, 'Ежедневный чек-лист отправлен на подтверждение')
-	return HttpResponseRedirect(reverse('objects:detail', args=[daily_checklist.object.pk]) + '?tab=daily_checklists')
-@login_required
-@require_http_methods(["POST"])
-def daily_checklist_confirm(request, pk):
-	daily_checklist = get_object_or_404(DailyChecklist, pk=pk)
-	
-	# Check permissions - only clients can confirm checklists
-	if not request.user.is_superuser and not request.user.groups.filter(name='CLIENT').exists():
-		messages.error(request, 'Только заказчики могут подтверждать чек-листы')
-		return HttpResponseRedirect(reverse('objects:detail', args=[daily_checklist.object.pk]) + '?tab=daily_checklists')
-	
-	# Check if user has access to this object's organization
-	if not request.user.is_superuser:
-		user_orgs = request.user.memberships.values_list('org', flat=True).distinct()
-		if daily_checklist.object.org_id not in user_orgs:
-			messages.error(request, 'У вас нет доступа к этому чек-листу')
-			return HttpResponseRedirect(reverse('objects:detail', args=[daily_checklist.object.pk]) + '?tab=daily_checklists')
-	
-	from objects.models import DailyChecklistStatus
-	if daily_checklist.status != DailyChecklistStatus.PENDING_CONFIRMATION:
-		messages.error(request, 'Можно подтверждать только чек-листы в статусе ожидания подтверждения')
-		return HttpResponseRedirect(reverse('objects:detail', args=[daily_checklist.object.pk]) + '?tab=daily_checklists')
-	
-	# Confirm the checklist
-	from django.utils import timezone
-	daily_checklist.status = DailyChecklistStatus.APPROVED
-	daily_checklist.confirmed_at = timezone.now()
-	daily_checklist.confirmed_by = request.user
-	daily_checklist.save()
-	
-	messages.success(request, 'Ежедневный чек-лист подтвержден')
+	from objects.services.checklists import DailyChecklistService
+	service = DailyChecklistService(user=request.user, obj=daily_checklist.object)
+	try:
+		service.submit(daily_checklist)
+		messages.success(request, 'Ежедневный чек-лист отправлен на подтверждение')
+	except Exception as e:
+		messages.error(request, str(e))
 	return HttpResponseRedirect(reverse('objects:detail', args=[daily_checklist.object.pk]) + '?tab=daily_checklists')
 
 

@@ -5,39 +5,30 @@ from django.core.exceptions import PermissionDenied
 from issues.models import Remark
 from objects.models import OpeningChecklist, ConstructionObject
 from issues.forms import RemarkForm
+from issues.services import RemarkService
 
 
 @login_required
 def remark_new(request, pk):
     obj = get_object_or_404(ConstructionObject, pk=pk)
-    
-    # Check if user can create remarks
+    # Access check to organization
     if not request.user.is_superuser:
         user_orgs = request.user.memberships.values_list('org', flat=True).distinct()
         if obj.org_id not in user_orgs:
             raise PermissionDenied("У вас нет доступа к этому объекту.")
-        
-        # Only CLIENT and INSPECTOR can create remarks
-        user_groups = request.user.groups.values_list('name', flat=True)
-        if not ('CLIENT' in user_groups or 'INSPECTOR' in user_groups):
-            raise PermissionDenied("Только заказчики и инспекторы могут создавать нарушения.")
-    
+    service = RemarkService(user=request.user)
     if request.method == 'POST':
         form = RemarkForm(request.POST, request.FILES)
         if form.is_valid():
-            remark = form.save(commit=False)
-            remark.object = obj
-            remark.created_by = request.user
-            remark.save()
-            messages.success(request, 'Нарушение создано успешно.')
-            return redirect('objects:detail', pk=pk)
+            try:
+                remark = service.create(obj, form.cleaned_data)
+                messages.success(request, 'Нарушение создано успешно.')
+                return redirect('objects:detail', pk=pk)
+            except Exception as e:
+                messages.error(request, str(e))
     else:
         form = RemarkForm()
-    
-    return render(request, 'issues/remark_form.html', {
-        'form': form,
-        'object': obj,
-    })
+    return render(request, 'issues/remark_form.html', {'form': form,'object': obj})
 
 
 @login_required
@@ -60,27 +51,24 @@ def remark_detail(request, pk):
 @login_required
 def confirm_resolution(request, pk):
     remark = get_object_or_404(Remark, pk=pk)
-    if request.user.groups.filter(name='FOREMAN').exists() and remark.status in ['OPEN', 'IN_PROGRESS']:
-        remark.status = 'PENDING_CONFIRMATION'
-        remark.save()
-        messages.success(request, 'Устранение подтверждено, ожидается подтверждение от заказчика.')
-    else:
-        messages.error(request, 'У вас нет прав для этого действия.')
+    service = RemarkService(user=request.user)
+    try:
+        service.submit_resolution(remark)
+        messages.success(request, 'Устранение подтверждено, ожидается подтверждение.')
+    except Exception as e:
+        messages.error(request, str(e))
     return redirect('issues:remark_detail', pk=pk)
 
 
 @login_required
 def confirm_closure(request, pk):
     remark = get_object_or_404(Remark, pk=pk)
-    user_groups = request.user.groups.values_list('name', flat=True)
-    
-    # INSPECTOR or FOREMAN can confirm closure
-    if ('INSPECTOR' in user_groups or 'FOREMAN' in user_groups or request.user.is_superuser) and remark.status == 'PENDING_CONFIRMATION':
-        remark.status = 'ACCEPTED'
-        remark.save()
+    service = RemarkService(user=request.user)
+    try:
+        service.confirm_closure(remark)
         messages.success(request, 'Устранение нарушения подтверждено.')
-    else:
-        messages.error(request, 'У вас нет прав для этого действия.')
+    except Exception as e:
+        messages.error(request, str(e))
     return redirect('issues:remark_detail', pk=pk)
 
 
