@@ -426,7 +426,7 @@ def object_create(request):
     # Check if user has role to create construction objects
     from orgs.models import Membership
     user_roles = list(Membership.objects.filter(user=request.user).values_list('role', flat=True))
-    allowed_roles = ['ADMIN', 'FOREMAN', 'CLIENT']  # Same as API role_map
+    allowed_roles = ['ADMIN', 'CLIENT']  # Same as API role_map
     if not any(role in allowed_roles for role in user_roles) and not request.user.is_superuser:
         raise PermissionDenied("У вас нет прав на создание объектов.")
     
