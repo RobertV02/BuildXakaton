@@ -4,6 +4,40 @@ from django.contrib import messages
 from django.core.exceptions import PermissionDenied
 from issues.models import Remark
 from objects.models import OpeningChecklist, ConstructionObject
+from issues.forms import RemarkForm
+
+
+@login_required
+def remark_new(request, pk):
+    obj = get_object_or_404(ConstructionObject, pk=pk)
+    
+    # Check if user can create remarks
+    if not request.user.is_superuser:
+        user_orgs = request.user.memberships.values_list('org', flat=True).distinct()
+        if obj.org_id not in user_orgs:
+            raise PermissionDenied("У вас нет доступа к этому объекту.")
+        
+        # Only CLIENT and INSPECTOR can create remarks
+        user_groups = request.user.groups.values_list('name', flat=True)
+        if not ('CLIENT' in user_groups or 'INSPECTOR' in user_groups):
+            raise PermissionDenied("Только заказчики и инспекторы могут создавать нарушения.")
+    
+    if request.method == 'POST':
+        form = RemarkForm(request.POST, request.FILES)
+        if form.is_valid():
+            remark = form.save(commit=False)
+            remark.object = obj
+            remark.created_by = request.user
+            remark.save()
+            messages.success(request, 'Нарушение создано успешно.')
+            return redirect('objects:detail', pk=pk)
+    else:
+        form = RemarkForm()
+    
+    return render(request, 'issues/remark_form.html', {
+        'form': form,
+        'object': obj,
+    })
 
 
 @login_required
@@ -37,10 +71,13 @@ def confirm_resolution(request, pk):
 @login_required
 def confirm_closure(request, pk):
     remark = get_object_or_404(Remark, pk=pk)
-    if request.user.groups.filter(name='CLIENT').exists() and remark.status == 'PENDING_CONFIRMATION':
+    user_groups = request.user.groups.values_list('name', flat=True)
+    
+    # INSPECTOR or FOREMAN can confirm closure
+    if ('INSPECTOR' in user_groups or 'FOREMAN' in user_groups or request.user.is_superuser) and remark.status == 'PENDING_CONFIRMATION':
         remark.status = 'ACCEPTED'
         remark.save()
-        messages.success(request, 'Нарушение закрыто.')
+        messages.success(request, 'Устранение нарушения подтверждено.')
     else:
         messages.error(request, 'У вас нет прав для этого действия.')
     return redirect('issues:remark_detail', pk=pk)
