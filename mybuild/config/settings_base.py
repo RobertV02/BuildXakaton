@@ -6,7 +6,7 @@ import os
 BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = config("SECRET_KEY", default="unsafe-secret-key")
 DEBUG = config("DEBUG", cast=bool, default=False)
-ALLOWED_HOSTS = ['45.90.216.199', "alphabuild.ru", "www.alphabuild.ru", "localhost", "127.0.0.1"]
+ALLOWED_HOSTS = ['45.90.216.199', "alphabuild.ru", "www.alphabuild.ru", "localhost", "127.0.0.1", "testserver"]
 
 INSTALLED_APPS = [
     'django.contrib.admin',

@@ -1,4 +1,10 @@
-"""Регистрация DRF router и базовые ViewSet скелеты.
+"""Регистрация DRF rout    role_map = {
+        'create': ['ADMIN', 'FOREMAN'],
+        'plan': ['CLIENT'],
+        'request_activation': ['CLIENT'],
+        'activate': ['INSPECTOR'],
+        'close': ['ADMIN'],
+    }зовые ViewSet скелеты.
 
 Пока минимально: только модели без бизнес-логики (CRUD / read-only) —
 логика и кастом-экшены будут добавляться постепенно.
@@ -22,11 +28,11 @@ class ConstructionObjectViewSet(ScopedQuerySetMixin, viewsets.ModelViewSet):
     queryset = ConstructionObject.objects.all()
     permission_classes = [IsAuthenticated, MatrixPermission]
     role_map = {
-        'create': ['ADMIN', 'FOREMAN'],
-        'plan': ['ADMIN', 'FOREMAN'],
-        'request_activation': ['ADMIN', 'FOREMAN'],
-        'activate': ['ADMIN'],
-        'close': ['ADMIN'],
+        'create': ['ORG_ADMIN', 'FOREMAN'],
+        'plan': ['CLIENT'],
+        'request_activation': ['CLIENT'],
+        'activate': ['INSPECTOR'],
+        'close': ['ORG_ADMIN'],
     }
 
     def get_serializer_class(self):

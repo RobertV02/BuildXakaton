@@ -146,7 +146,8 @@ class MatrixPermission(BasePermission):
             return True
         # Нужна хотя бы одна роль на любом доступном объекте
         # (детальная проверка будет в has_object_permission)
-        user_roles = []  # TODO: собрать роли пользователя глобально при необходимости
+        from orgs.models import Membership
+        user_roles = list(Membership.objects.filter(user=request.user).values_list('role', flat=True))
         return bool(set(required_roles) & set(user_roles)) or request.user.is_authenticated
 
     def has_object_permission(self, request: Request, view, obj) -> bool:

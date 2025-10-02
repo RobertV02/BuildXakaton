@@ -6,7 +6,7 @@ Changes to this file will be applied via migrations when deploying to server.
 """
 
 ROLE_GROUPS = {
-    'ORG_ADMIN': 'Администратор организации',
+    'ADMIN': 'Администратор организации',
     'CLIENT': 'Заказчик',
     'FOREMAN': 'Прораб',
     'INSPECTOR': 'Инспектор',
@@ -19,6 +19,7 @@ MODEL_PERMS_MAP = {
         'CLIENT': ['add_constructionobject', 'change_constructionobject', 'delete_constructionobject', 'view_constructionobject', 'can_confirm_geozone'],
         'FOREMAN': ['view_constructionobject'],
         'INSPECTOR': ['view_constructionobject', 'can_confirm_geozone'],
+        'ORG_ADMIN': ['add_constructionobject', 'change_constructionobject', 'delete_constructionobject', 'view_constructionobject'],
     },
     'objects.openingchecklist': {
         'CLIENT': ['add_openingchecklist', 'change_openingchecklist', 'delete_openingchecklist', 'view_openingchecklist'],
