@@ -47,6 +47,11 @@ def scope_qs_to_user(qs: QuerySet, user: User) -> QuerySet:
     """
     if user.is_superuser:
         return qs
+    # Allow access to all objects for users with system-wide roles
+    system_roles = ['ADMIN', 'INSPECTOR']
+    user_groups = set(user.groups.values_list('name', flat=True))
+    if user_groups & set(system_roles):
+        return qs
     model = qs.model
     org_field = None
     object_field = None

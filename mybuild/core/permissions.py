@@ -178,6 +178,10 @@ class MatrixPermission(BasePermission):
                     return True
             except Exception:
                 pass
+        # Additional fallback: check Django groups if no membership found
+        user_groups = set(request.user.groups.values_list('name', flat=True))
+        if user_groups & set(required_roles):
+            return True
         return False
 
 
