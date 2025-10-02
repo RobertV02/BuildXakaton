@@ -12,7 +12,7 @@
   <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
     <h1 class="text-2xl font-bold text-gray-900 mb-6">Создание нового объекта</h1>
     
-    <form method="post" class="space-y-6">
+    <form method="post" class="space-y-6" onsubmit="preparePolygonForSubmit()">
       {% csrf_token %}
       
       {% if form.non_field_errors %}
@@ -527,6 +527,16 @@ document.addEventListener('DOMContentLoaded', function() {
         initMap(lat, lng);
         alert(`Карта инициализирована с координатами: ${lat}, ${lng}`);
     });
+
+    // Prepare polygon data before form submission
+    function preparePolygonForSubmit() {
+        if (polygonPoints.length >= 4 && !document.getElementById('id_polygon_raw').value) {
+            // Auto-complete the polygon if not already done
+            const closedPoints = polygonPoints.concat([polygonPoints[0]]);
+            const latLngPoints = closedPoints.map(point => [point[1], point[0]]); // [lat, lng]
+            document.getElementById('id_polygon_raw').value = JSON.stringify(latLngPoints);
+        }
+    }
 });
 </script>
 {% endblock %}

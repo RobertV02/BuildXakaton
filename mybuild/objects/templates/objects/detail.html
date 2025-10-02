@@ -14,6 +14,9 @@
   <span class="text-gray-900 font-medium">{{ object.name }}</span>
 </nav>
 
+
+</nav>
+
 <!-- Header Section -->
 <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-8">
   <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
@@ -167,11 +170,11 @@
                 <path d="M8 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM15 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z"></path>
                 <path d="M3 4a1 1 0 00-1 1v10a1 1 0 001 1h1.05a2.5 2.5 0 014.9 0H10a1 1 0 001-1V5a1 1 0 00-1-1H3zM14 7a1 1 0 00-1 1v6.05A2.5 2.5 0 0115.95 16H17a1 1 0 001-1V8a1 1 0 00-1-1h-3z"></path>
               </svg>
-            {% elif tab_id == 'remarks' %}
+            {% elif tab_id == 'map' %}
               <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                <path fill-rule="evenodd" d="M12 7a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0V8.414l-4.293 4.293a1 1 0 01-1.414 0L8 10.414l-4.293 4.293a1 1 0 01-1.414-1.414l5-5a1 1 0 011.414 0L11 10.586 14.586 7H12z" clip-rule="evenodd"></path>
               </svg>
-            {% elif tab_id == 'checklist' %}
+            {% elif tab_id == 'deliveries' %}
               <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                 <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zm0 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V8zm0 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1v-2z" clip-rule="evenodd"></path>
               </svg>
@@ -232,6 +235,43 @@
             </dl>
           </div>
         </div>
+      </div>
+      
+    {% elif active_tab == 'map' %}
+      <div class="space-y-6">
+        <h2 class="text-xl font-semibold text-gray-900 flex items-center gap-3">
+          <svg class="w-6 h-6 text-gray-600" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M12 7a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0V8.414l-4.293 4.293a1 1 0 01-1.414 0L8 10.414l-4.293 4.293a1 1 0 01-1.414-1.414l5-5a1 1 0 011.414 0L11 10.586 14.586 7H12z" clip-rule="evenodd"></path>
+          </svg>
+          Карта объекта
+        </h2>
+        
+        <div class="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm">
+          <div id="object-map" class="w-full h-[600px]"></div>
+        </div>
+        
+        {% if object.polygon %}
+          <div class="bg-blue-50 rounded-xl p-4 border border-blue-200">
+            <div class="flex items-center gap-2 text-blue-800">
+              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+              </svg>
+              <span class="font-medium">Геозона объекта определена</span>
+            </div>
+            <p class="text-sm text-blue-700 mt-1">На карте выделена территория строительного объекта.</p>
+            <p class="text-xs text-blue-600 mt-2">Отладка: {{ object.polygon|length }} точек</p>
+          </div>
+        {% else %}
+          <div class="bg-yellow-50 rounded-xl p-4 border border-yellow-200">
+            <div class="flex items-center gap-2 text-yellow-800">
+              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+              </svg>
+              <span class="font-medium">Геозона не определена</span>
+            </div>
+            <p class="text-sm text-yellow-700 mt-1">Границы объекта не указаны. <a href="{% url 'objects:edit' object.id %}" class="underline hover:no-underline">Добавить геозону</a></p>
+          </div>
+        {% endif %}
       </div>
       
     {% elif active_tab == 'deliveries' %}
@@ -688,3 +728,136 @@
 </div>
 
 {% endblock %}
+
+{% if active_tab == 'map' %}
+<link href="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.css" rel="stylesheet" />
+<script>const polygonData = {{ object.polygon|default:"[]"|safe }};</script>
+<script src="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.js"></script>
+
+<script>
+console.log('Map tab active, initializing map...');
+initMap();
+
+function initMap() {
+    console.log('Initializing map...');
+    console.log('MapLibre available:', typeof maplibregl);
+    console.log('Map container exists:', document.getElementById('object-map'));
+    
+    // MapLibre style with OSM tiles
+    const mapStyle = {
+        "version": 8,
+        "sources": {
+            "osm": {
+                "type": "raster",
+                "tiles": ["https://tile.openstreetmap.org/{z}/{x}/{y}.png"],
+                "tileSize": 256,
+                "attribution": "© OpenStreetMap contributors"
+            }
+        },
+        "layers": [
+            { "id": "background", "type": "background", "paint": { "background-color": "#ffffff" } },
+            { "id": "osm", "type": "raster", "source": "osm" }
+        ]
+    };
+
+    // polygonData is already defined from the script tag
+    console.log('Polygon data:', polygonData);
+    
+    // Calculate center and zoom
+    let center = [37.6176, 55.7558]; // Default: Moscow
+    let zoom = 10;
+    
+    if (polygonData && polygonData.length > 0) {
+        // Calculate center from polygon
+        let totalLat = 0, totalLng = 0;
+        polygonData.forEach(coord => {
+            totalLat += coord[0];
+            totalLng += coord[1];
+        });
+        center = [totalLng / polygonData.length, totalLat / polygonData.length];
+        zoom = 16;
+        console.log('Calculated center:', center, 'zoom:', zoom);
+    }
+
+    // Initialize map
+    const map = new maplibregl.Map({
+        container: 'object-map',
+        style: mapStyle,
+        center: center,
+        zoom: zoom
+    });
+
+    console.log('Map initialized with center:', center, 'zoom:', zoom);
+
+    // Add navigation controls
+    map.addControl(new maplibregl.NavigationControl(), 'top-right');
+    map.addControl(new maplibregl.AttributionControl({ compact: false }), 'bottom-right');
+
+    // Add polygon if exists
+    map.on('load', () => {
+        console.log('Map loaded');
+        if (polygonData && polygonData.length > 0) {
+            console.log('Adding polygon with', polygonData.length, 'points');
+            // Convert [lat, lng] to [lng, lat] for GeoJSON
+            const lngLatCoords = polygonData.map(coord => [coord[1], coord[0]]);
+            console.log('Converted coords:', lngLatCoords);
+            
+            const polygonGeoJSON = {
+                "type": "FeatureCollection",
+                "features": [{
+                    "type": "Feature",
+                    "properties": { 
+                        "name": "Зона объекта {{ object.name }}",
+                        "object_id": "{{ object.id }}"
+                    },
+                    "geometry": {
+                        "type": "Polygon",
+                        "coordinates": [lngLatCoords]
+                    }
+                }]
+            };
+
+            console.log('GeoJSON:', polygonGeoJSON);
+
+            // Add source
+            map.addSource('object-polygon', {
+                type: 'geojson',
+                data: polygonGeoJSON
+            });
+
+            // Add fill layer
+            map.addLayer({
+                id: 'object-polygon-fill',
+                type: 'fill',
+                source: 'object-polygon',
+                paint: {
+                    'fill-color': '#3B82F6',
+                    'fill-opacity': 0.3
+                }
+            });
+
+            // Add outline layer
+            map.addLayer({
+                id: 'object-polygon-outline',
+                type: 'line',
+                source: 'object-polygon',
+                paint: {
+                    'line-color': '#1D4ED8',
+                    'line-width': 3
+                }
+            });
+
+            // Fit map to polygon bounds
+            const bounds = new maplibregl.LngLatBounds();
+            lngLatCoords.forEach(coord => bounds.extend(coord));
+            map.fitBounds(bounds, { padding: 50, maxZoom: 18 });
+            console.log('Fitted bounds');
+        } else {
+            console.log('No polygon data to display');
+        }
+    });
+}
+</script>
+{% endif %}
+
+

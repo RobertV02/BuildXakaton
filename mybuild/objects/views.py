@@ -64,6 +64,7 @@ class ObjectDetailContextAssembler:
 	def base_tabs(self):
 		return [
 			('info', 'Инфо'),
+			('map', 'Карта'),
 			('deliveries', 'Поставки'),
 			('remarks', 'Нарушения'),
 			('checklist', 'Чек-лист'),

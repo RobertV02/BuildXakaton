@@ -48,7 +48,7 @@ class ConstructionObjectForm(forms.ModelForm):
     def clean_polygon_raw(self):
         raw = self.cleaned_data.get('polygon_raw', '[]')
         if not raw or raw == '[]':
-            raise forms.ValidationError('Необходимо указать границы объекта на карте')
+            return raw  # Allow empty polygon
         try:
             parsed = json.loads(raw)
         except json.JSONDecodeError as e:
@@ -61,7 +61,6 @@ class ConstructionObjectForm(forms.ModelForm):
         if parsed and not all(isinstance(coord, list) and len(coord) >= 2 for coord in parsed):
             raise forms.ValidationError('Каждая координата должна быть массивом [lat, lng]')
         self.cleaned_data['polygon'] = parsed
-        return raw
         return raw
 
     def save(self, commit=True):
