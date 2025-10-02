@@ -54,7 +54,22 @@ def object_detail(request, pk):
 	]
 	deliveries = obj.deliveries.select_related('material').order_by('-delivered_at')[:100] if tab == 'deliveries' else []
 	remarks = obj.remark_set.order_by('-created_at')[:100] if tab == 'remarks' else []
-	checklist = getattr(obj, 'opening_checklist', None) if tab == 'checklist' else None
+	
+	# Checklist visibility logic
+	checklist = None
+	if tab == 'checklist':
+		opening_checklist = getattr(obj, 'opening_checklist', None)
+		if opening_checklist:
+			# Clients can see their checklists always
+			if is_client(request.user):
+				checklist = opening_checklist
+			# Inspectors can see only submitted checklists
+			elif is_inspector(request.user) and opening_checklist.status in ['SUBMITTED', 'APPROVED', 'REJECTED']:
+				checklist = opening_checklist
+			# Admins can see everything
+			elif is_admin(request.user):
+				checklist = opening_checklist
+	
 	daily_checklists = obj.daily_checklists.order_by('-created_at')[:100] if tab == 'daily_checklists' else []
 	def is_client(user):
 		return user.groups.filter(name='CLIENT').exists() or user.is_superuser
@@ -75,8 +90,11 @@ def object_detail(request, pk):
 		'checklist_items': constants.OPENING_CHECKLIST_ITEMS if tab == 'checklist' else [],
 		'daily_checklists': daily_checklists,
 		'can_create_checklist': is_client(request.user),
-		'can_change_checklist': is_client(request.user),
-		'can_delete_checklist': is_client(request.user),
+		'can_change_checklist': is_client(request.user) and (not checklist or checklist.status == 'DRAFT'),
+		'can_delete_checklist': is_client(request.user) and (not checklist or checklist.status == 'DRAFT'),
+		'can_submit_checklist': is_client(request.user) and checklist and checklist.status == 'DRAFT',
+		'can_approve_checklist': is_inspector(request.user) and checklist and checklist.status == 'SUBMITTED',
+		'can_reject_checklist': is_inspector(request.user) and checklist and checklist.status == 'SUBMITTED',
 		'can_create_daily_checklist': is_foreman(request.user),
 		'can_change_daily_checklist': is_foreman(request.user),
 		'can_delete_daily_checklist': is_foreman(request.user),
@@ -95,15 +113,23 @@ def checklist_submit(request, pk):
 	if not hasattr(obj, 'opening_checklist'):
 		messages.error(request, 'Чек-лист отсутствует')
 		return HttpResponseRedirect(reverse('objects:detail', args=[pk]) + '?tab=checklist')
-	factory = APIRequestFactory()
-	drf_request = factory.post('/')
-	drf_request.user = request.user
-	view = core_api.OpeningChecklistViewSet.as_view({'post': 'submit'})
-	response = view(drf_request, pk=obj.opening_checklist.pk)
-	if response.status_code < 300:
-		messages.success(request, 'Отправлено')
-	else:
-		messages.error(request, f'Ошибка: {response.status_code}')
+	
+	checklist = obj.opening_checklist
+	if not request.user.groups.filter(name='CLIENT').exists() and not request.user.is_superuser:
+		messages.error(request, 'Только заказчики могут отправлять чек-листы на проверку')
+		return HttpResponseRedirect(reverse('objects:detail', args=[pk]) + '?tab=checklist')
+	
+	if checklist.status != 'DRAFT':
+		messages.error(request, 'Можно отправить на проверку только чек-лист в статусе черновика')
+		return HttpResponseRedirect(reverse('objects:detail', args=[pk]) + '?tab=checklist')
+	
+	# Change status to SUBMITTED for inspector review
+	from django.utils import timezone
+	checklist.status = 'SUBMITTED'
+	checklist.submitted_at = timezone.now()
+	checklist.save()
+	
+	messages.success(request, 'Чек-лист отправлен на проверку инспектору')
 	return HttpResponseRedirect(reverse('objects:detail', args=[pk]) + '?tab=checklist')
 
 
@@ -201,15 +227,24 @@ def checklist_approve(request, pk):
 	if not hasattr(obj, 'opening_checklist'):
 		messages.error(request, 'Чек-лист отсутствует')
 		return HttpResponseRedirect(reverse('objects:detail', args=[pk]) + '?tab=checklist')
-	factory = APIRequestFactory()
-	drf_request = factory.post('/')
-	drf_request.user = request.user
-	view = core_api.OpeningChecklistViewSet.as_view({'post': 'approve'})
-	response = view(drf_request, pk=obj.opening_checklist.pk)
-	if response.status_code < 300:
-		messages.success(request, 'Одобрено')
-	else:
-		messages.error(request, f'Ошибка: {response.status_code}')
+	
+	checklist = obj.opening_checklist
+	if not request.user.groups.filter(name='INSPECTOR').exists() and not request.user.is_superuser:
+		messages.error(request, 'Только инспекторы могут одобрять чек-листы')
+		return HttpResponseRedirect(reverse('objects:detail', args=[pk]) + '?tab=checklist')
+	
+	if checklist.status != 'SUBMITTED':
+		messages.error(request, 'Можно одобрить только чек-лист в статусе "Отправлено"')
+		return HttpResponseRedirect(reverse('objects:detail', args=[pk]) + '?tab=checklist')
+	
+	# Approve the checklist
+	from django.utils import timezone
+	checklist.status = 'APPROVED'
+	checklist.reviewed_by = request.user
+	checklist.reviewed_at = timezone.now()
+	checklist.save()
+	
+	messages.success(request, 'Чек-лист одобрен')
 	return HttpResponseRedirect(reverse('objects:detail', args=[pk]) + '?tab=checklist')
 
 
@@ -220,15 +255,25 @@ def checklist_reject(request, pk):
 	if not hasattr(obj, 'opening_checklist'):
 		messages.error(request, 'Чек-лист отсутствует')
 		return HttpResponseRedirect(reverse('objects:detail', args=[pk]) + '?tab=checklist')
-	factory = APIRequestFactory()
-	drf_request = factory.post('/')
-	drf_request.user = request.user
-	view = core_api.OpeningChecklistViewSet.as_view({'post': 'reject'})
-	response = view(drf_request, pk=obj.opening_checklist.pk)
-	if response.status_code < 300:
-		messages.success(request, 'Отклонено')
-	else:
-		messages.error(request, f'Ошибка: {response.status_code}')
+	
+	checklist = obj.opening_checklist
+	if not request.user.groups.filter(name='INSPECTOR').exists() and not request.user.is_superuser:
+		messages.error(request, 'Только инспекторы могут отклонять чек-листы')
+		return HttpResponseRedirect(reverse('objects:detail', args=[pk]) + '?tab=checklist')
+	
+	if checklist.status != 'SUBMITTED':
+		messages.error(request, 'Можно отклонить только чек-лист в статусе "Отправлено"')
+		return HttpResponseRedirect(reverse('objects:detail', args=[pk]) + '?tab=checklist')
+	
+	# Reject the checklist
+	from django.utils import timezone
+	checklist.status = 'REJECTED'
+	checklist.reviewed_by = request.user
+	checklist.reviewed_at = timezone.now()
+	checklist.review_comment = request.POST.get('review_comment', '').strip()
+	checklist.save()
+	
+	messages.success(request, 'Чек-лист отклонен')
 	return HttpResponseRedirect(reverse('objects:detail', args=[pk]) + '?tab=checklist')
 
 

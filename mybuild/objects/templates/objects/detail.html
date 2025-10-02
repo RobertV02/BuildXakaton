@@ -437,6 +437,15 @@
                     Редактировать
                   </a>
                 {% endif %}
+                {% if can_submit_checklist %}
+                  <form method="post" action="{% url 'objects:checklist_submit' object.id %}">
+                    {% csrf_token %}
+                    <button type="submit" class="inline-flex items-center gap-2 px-4 py-2 bg-warning-500 text-white rounded-lg hover:bg-warning-600 transition-all duration-200 text-sm font-medium">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
+                      Отправить на проверку
+                    </button>
+                  </form>
+                {% endif %}
                 {% if can_delete_checklist %}
                   <form method="post" action="{% url 'objects:checklist_delete' object.id %}" onsubmit="return confirm('Удалить чек-лист?')" class="inline">
                     {% csrf_token %}
@@ -518,6 +527,27 @@
                 </div>
               </div>
             </div>
+            
+            <!-- Inspector Actions -->
+            {% if can_approve_checklist or can_reject_checklist %}
+              <div class="mt-6 flex flex-wrap gap-3">
+                {% if can_approve_checklist %}
+                  <form method="post" action="{% url 'objects:checklist_approve' object.id %}">
+                    {% csrf_token %}
+                    <button type="submit" class="inline-flex items-center gap-2 px-4 py-2 bg-success-500 text-white rounded-lg hover:bg-success-600 transition-all duration-200 text-sm font-medium">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                      Одобрить чек-лист
+                    </button>
+                  </form>
+                {% endif %}
+                {% if can_reject_checklist %}
+                  <button type="button" onclick="document.getElementById('reject-modal').classList.remove('hidden')" class="inline-flex items-center gap-2 px-4 py-2 bg-danger-500 text-white rounded-lg hover:bg-danger-600 transition-all duration-200 text-sm font-medium">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    Отклонить чек-лист
+                  </button>
+                {% endif %}
+              </div>
+            {% endif %}
           </div>
         {% else %}
           <div class="text-center py-12">
@@ -627,4 +657,38 @@
     {% endif %}
   </div>
 </div>
+
+<!-- Reject Modal -->
+<div id="reject-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+  <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+    <div class="mt-3">
+      <h3 class="text-lg font-medium text-gray-900 mb-4">Отклонить чек-лист</h3>
+      <form method="post" action="{% url 'objects:checklist_reject' object.id %}">
+        {% csrf_token %}
+        <div class="mb-4">
+          <label for="review_comment" class="block text-sm font-medium text-gray-700 mb-2">
+            Комментарий к отклонению <span class="text-red-500">*</span>
+          </label>
+          <textarea 
+            id="review_comment" 
+            name="review_comment" 
+            rows="4" 
+            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500" 
+            placeholder="Укажите причину отклонения..."
+            required
+          ></textarea>
+        </div>
+        <div class="flex justify-end gap-3">
+          <button type="button" onclick="document.getElementById('reject-modal').classList.add('hidden')" class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition-colors">
+            Отмена
+          </button>
+          <button type="submit" class="px-4 py-2 bg-danger-500 text-white rounded-md hover:bg-danger-600 transition-colors">
+            Отклонить
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
 {% endblock %}
